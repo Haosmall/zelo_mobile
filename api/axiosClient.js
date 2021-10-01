@@ -1,6 +1,7 @@
 import axios from 'axios';
 import queryString from 'query-string';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// import {AsyncStorage} from 'react-native';
 // import config from "../config";
 import {REACT_APP_NODEJS_API_URL} from '../constants';
 

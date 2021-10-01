@@ -1,4 +1,4 @@
-export const REACT_APP_NODEJS_API_URL = 'http://192.168.1.8:3001';
+export const REACT_APP_NODEJS_API_URL = 'http://192.168.1.9:3001';
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_PAGE_SIZE = 20;
 export const REACTIONS = ['♥️', '👍', '😄', '😲', '😭', '😡'];
@@ -22,4 +22,9 @@ export const DEFAULT_REACTION_MODAL_VISIBLE = {
   isVisible: false,
   messageId: '',
   reacts: [],
+};
+export const DEFAULT_RENAME_CONVERSATION_MODAL = {
+  isVisible: false,
+  conversationName: '',
+  type: false,
 };

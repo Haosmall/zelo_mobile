@@ -10,6 +10,7 @@ import {
 import {Avatar} from 'react-native-elements';
 import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
+import MessageNotifyDivider from './MessageNotifyDivider';
 
 const SenderMessage = props => {
   const {
@@ -28,7 +29,9 @@ const SenderMessage = props => {
     ? styles.messageRecall
     : message.messageContent;
 
-  return (
+  return type === messageType.NOTIFY ? (
+    <MessageNotifyDivider message={message} isReceiverMessage={false} />
+  ) : (
     <TouchableWithoutFeedback
       onLongPress={handleOpenOptionModal}
       delayLongPress={500}>
@@ -95,10 +98,10 @@ const styles = StyleSheet.create({
 
     backgroundColor: 'transparent',
     alignSelf: 'flex-start',
-    borderRadius: 10,
     position: 'relative',
-    borderWidth: 1,
-    borderColor: '#E5E6E7',
+    // borderRadius: 10,
+    // borderWidth: 1,
+    // borderColor: 'transparent',
     maxWidth: '73%',
     minWidth: MIN_WIDTH_MESSAGE,
   },

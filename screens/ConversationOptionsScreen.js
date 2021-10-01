@@ -1,20 +1,27 @@
 import React, {useEffect, useState} from 'react';
 import {
+  BackHandler,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  BackHandler,
-  PermissionsAndroid,
-  Platform,
-  FlatList,
-  Image,
-  Button,
   View,
 } from 'react-native';
-// import * as Contacts from 'expo-contacts';
-// import * as ImagePicker from 'expo-image-picker';
+import {Avatar} from 'react-native-elements';
+import {useSelector} from 'react-redux';
+import ConversationOptionsBar from '../components/ConversationOptionsBar';
+import RenameConversationModal from '../components/RenameConversationModal';
+import {DEFAULT_RENAME_CONVERSATION_MODAL} from '../constants';
 
 export default function ConversationOptionsScreen({navigation, route}) {
+  const {conversationId} = route.params;
+
+  const {currentConversation} = useSelector(state => state.message);
+  const {totalMembers, name, type, avatar} = currentConversation;
+
+  const [modalVisible, setModalVisible] = useState(
+    DEFAULT_RENAME_CONVERSATION_MODAL,
+  );
   const handleGoBack = () => {
     navigation.goBack();
     return true;
@@ -26,103 +33,67 @@ export default function ConversationOptionsScreen({navigation, route}) {
       BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
     };
   }, []);
-
-  let [contacts, setContacts] = useState([]);
-
-  useEffect(() => {
-    // (async () => {
-    //   const {status} = await Contacts.requestPermissionsAsync();
-    //   console.log({status});
-    //   if (status === 'granted') {
-    //     const {data} = await Contacts.getContactsAsync();
-    //     if (data.length > 0) {
-    //       data.map(c => console.log(c));
-    //       setContacts(data);
-    //     }
-    //   }
-    // })();
-  }, []);
-
-  // The path of the picked image
-  const [pickedImagePath, setPickedImagePath] = useState('');
-  const [fileType, setfileType] = useState('');
-
-  // This function is triggered when the "Select an image" button pressed
-  const showImagePicker = async (isVideo = false) => {
-    // Ask the user for the permission to access the media library
-    // const permissionResult =
-    //   await ImagePicker.requestMediaLibraryPermissionsAsync();
-    // if (permissionResult.granted === false) {
-    //   alert("You've refused to allow this appp to access your photos!");
-    //   return;
-    // }
-    // const mediaTypes = isVideo
-    //   ? ImagePicker.MediaTypeOptions.Videos
-    //   : ImagePicker.MediaTypeOptions.Images;
-    // const result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes,
-    // });
-    // // Explore the result
-    // console.log(result);
-    // if (!result.cancelled) {
-    //   setPickedImagePath(result.uri);
-    //   setfileType(result.type);
-    //   console.log(result.uri);
-    //   console.log(result.type);
-    // }
-  };
-
-  // This function is triggered when the "Open camera" button pressed
-  const openCamera = async () => {
-    // Ask the user for the permission to access the camera
-    // const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    // if (permissionResult.granted === false) {
-    //   alert("You've refused to allow this appp to access your camera!");
-    //   return;
-    // }
-    // const result = await ImagePicker.launchCameraAsync();
-    // // Explore the result
-    // console.log(result);
-    // if (!result.cancelled) {
-    //   setPickedImagePath(result.uri);
-    //   console.log(result.uri);
-    // }
-  };
-
+  const AVATAR =
+    'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
+  const avatarSource =
+    typeof avatar === 'string'
+      ? {
+          uri: avatar,
+        }
+      : null;
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-      <Text>Options</Text>
-      {/* <FlatList
-				data={contacts}
-				keyExtractor={(item) => item.id}
-				renderItem={({ item, index }) => (
-					<Text style={{ marginBottom: 5 }} key={item.id}>
-						{item.name}: {item.phoneNumbers[0].number}
-					</Text>
-				)}
-			/> */}
-      <View style={styles.screen}>
-        <View style={styles.buttonContainer}>
-          <Button
-            onPress={() => showImagePicker(false)}
-            title="Select an image"
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <View style={styles.subContainer}>
+          <Avatar
+            rounded
+            size="large"
+            source={avatarSource}
+            overlayContainerStyle={styles.overlay}
+            icon={{
+              name: 'groups',
+              type: 'material',
+              size: 55,
+              color: '#f1f2f7',
+            }}>
+            {type && (
+              <Avatar.Accessory
+                size={15}
+                type="feather"
+                name="camera"
+                color="transparent"
+                iconStyle={{color: 'black'}}
+                containerStyle={styles.avatarAccessory}
+              />
+            )}
+          </Avatar>
+
+          <Text style={{fontWeight: '600', fontSize: 16, marginVertical: 8}}>
+            {name}
+          </Text>
+          <ConversationOptionsBar
+            name={name}
+            type={type}
+            setModalVisible={setModalVisible}
           />
-          <Button onPress={openCamera} title="Open camera" />
         </View>
-
-        <View style={styles.imageContainer}>
-          {pickedImagePath !== '' && fileType === 'image' && (
-            <Image source={{uri: pickedImagePath}} style={styles.image} />
-          )}
-        </View>
-
-        <Text>{pickedImagePath}</Text>
-      </View>
+        <Text>{conversationId}</Text>
+        <Text>{totalMembers}</Text>
+        <Text>{name}</Text>
+        <Text>{type.toString()}</Text>
+      </ScrollView>
+      <RenameConversationModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {flex: 1, backgroundColor: '#E2E9F1'},
+  subContainer: {backgroundColor: '#FFF', alignItems: 'center', padding: 12},
+
   screen: {
     flex: 1,
     justifyContent: 'center',
@@ -133,45 +104,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  imageContainer: {
-    padding: 30,
+  overlay: {
+    backgroundColor: '#d9dfeb',
   },
-  image: {
-    width: 400,
-    height: 300,
-    resizeMode: 'cover',
-  },
-  container: {flex: 1, backgroundColor: '#E2E9F1'},
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    width: '100%',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: '#D0D2D3',
-    backgroundColor: '#FFF',
-  },
-  textInput: {
-    bottom: 0,
-    maxHeight: 110,
-    flex: 1,
-    marginRight: 15,
-    borderColor: 'transparent',
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    padding: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-  },
-  headerSubTitle: {
-    color: '#fff',
-    fontSize: 12,
+  avatarAccessory: {
+    justifyContent: 'center',
+    backgroundColor: '#f3f4f8',
+    width: 25,
+    height: 25,
+    borderRadius: 50,
   },
 });

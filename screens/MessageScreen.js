@@ -32,20 +32,27 @@ import {
   DEFAULT_REACTION_MODAL_VISIBLE,
 } from '../constants';
 import {setLoading} from '../redux/globalSlice';
-import {clearMessagePages, fetchMessages} from '../redux/messageSlice';
+import {
+  clearMessagePages,
+  fetchMessages,
+  updateCurrentConversation,
+} from '../redux/messageSlice';
 import LinearGradient from 'react-native-linear-gradient';
 
 const page = DEFAULT_PAGE;
 const size = DEFAULT_PAGE_SIZE;
 
 export default function MessageScreen({navigation, route}) {
-  const {conversationId, totalMembers, name, type} = route.params;
+  const {conversationId} = route.params;
   const dispatch = useDispatch();
-  const {messages, messagePages} = useSelector(state => state.message);
+  const {messages, messagePages, currentConversation} = useSelector(
+    state => state.message,
+  );
   const {currentUserId, isLoading, keyboardHeight} = useSelector(
     state => state.global,
   );
   const {totalPages} = messagePages;
+  const {totalMembers, name, type, avatar} = currentConversation;
 
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_MESSAGE_MODAL_VISIBLE,
@@ -64,7 +71,9 @@ export default function MessageScreen({navigation, route}) {
     return true;
   };
   const handleGoToOptionScreen = () => {
-    navigation.navigate('Tùy chọn');
+    navigation.navigate('Tùy chọn', {
+      conversationId,
+    });
   };
 
   useEffect(() => {
@@ -120,16 +129,17 @@ export default function MessageScreen({navigation, route}) {
       nextMessageTime;
 
     return (
-      <>
-        <ChatMessage
-          message={currentMessage}
-          isMyMessage={isMyMessage}
-          setModalVisible={setModalVisible}
-          showReactDetails={setReactProps}
-        />
-        {isSeparate && <MessageDivider dateString={messageTime} />}
-        {/* <Text>{index}</Text> */}
-      </>
+      <TouchableWithoutFeedback>
+        <View>
+          {isSeparate && <MessageDivider dateString={messageTime} />}
+          <ChatMessage
+            message={currentMessage}
+            isMyMessage={isMyMessage}
+            setModalVisible={setModalVisible}
+            showReactDetails={setReactProps}
+          />
+        </View>
+      </TouchableWithoutFeedback>
     );
   };
 

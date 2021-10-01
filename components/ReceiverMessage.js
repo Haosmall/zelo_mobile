@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import {messageType} from '../constants';
+import MessageNotifyDivider from './MessageNotifyDivider';
 
 const ReceiverMessage = props => {
   const {
@@ -26,7 +27,9 @@ const ReceiverMessage = props => {
     ? styles.messageRecall
     : message.messageContent;
 
-  return (
+  return type === messageType.NOTIFY ? (
+    <MessageNotifyDivider message={message} />
+  ) : (
     <TouchableWithoutFeedback
       onLongPress={handleOpenOptionModal}
       delayLongPress={500}>
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
   },
   receiverContainer: {
     paddingBottom: 15,
-    // backgroundColor: "red",
+    // backgroundColor: 'red',
     backgroundColor: 'transparent',
     alignSelf: 'flex-end',
     position: 'relative',

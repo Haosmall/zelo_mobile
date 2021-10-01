@@ -36,7 +36,7 @@ const Conversation = props => {
         // topDivider={false}
         // bottomDivider={false}
         onPress={() =>
-          handleEnterChat(conversationId, name, totalMembers, type)
+          handleEnterChat(conversationId, name, totalMembers, type, avatars)
         }>
         <CustomAvatar name={name} avatars={avatars} />
         <ListItem.Content>

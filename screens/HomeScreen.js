@@ -14,6 +14,8 @@ import {
   addReaction,
   deleteMessage,
   fetchConversations,
+  renameConversation,
+  updateCurrentConversation,
 } from '../redux/messageSlice';
 
 const generateArray = length =>
@@ -63,16 +65,29 @@ export default function HomeScreen({navigation}) {
       console.log('Add reaction');
       dispatch(addReaction({conversationId, messageId, user, type}));
     });
+    socket.on(
+      'rename-conversation',
+      (conversationId, conversationName, message) => {
+        console.log('Rename conversation');
+        dispatch(
+          renameConversation({conversationId, conversationName, message}),
+        );
+      },
+    );
   }, []);
 
-  const handleEnterChat = (conversationId, name, totalMembers, type) => {
+  const handleEnterChat = (
+    conversationId,
+    name,
+    totalMembers,
+    type,
+    avatar,
+  ) => {
     // dispatch(clearMessagePages());
+    dispatch(updateCurrentConversation({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
-      totalMembers,
-      name,
-      type,
     });
   };
   return (

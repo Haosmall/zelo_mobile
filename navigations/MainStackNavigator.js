@@ -35,7 +35,8 @@ const MainStackNavigator = () => {
     <>
       <LinearGradient
         // Background Linear Gradient
-        colors={['#257afe', '#00bafa']}
+        // colors={['#257afe', '#00bafa']}
+        colors={['#1e63cb', '#0195c7']}
         style={{height: Platform.OS === 'ios' ? 20 : StatusBar.currentHeight}}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 0}}>

@@ -26,18 +26,20 @@ const messageApi = {
   },
   sendFileMessage: (file, params) => {
     const {type, conversationId} = params;
+    console.log('file type: ', typeof file);
 
     const config = {
       params: {
         type,
         conversationId,
       },
-      onUploadProgress: progressEvent => {
-        let percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total,
-        );
-        console.log(percentCompleted);
-      },
+
+      // onUploadProgress: progressEvent => {
+      //   let percentCompleted = Math.round(
+      //     (progressEvent.loaded * 100) / progressEvent.total,
+      //   );
+      //   console.log(percentCompleted);
+      // },
     };
 
     return axiosClient.post(`${BASE_URL}/files`, file, config);

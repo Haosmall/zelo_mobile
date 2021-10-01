@@ -28,7 +28,8 @@ const messageSlice = createSlice({
     conversations: [],
     messagePages: {},
     messages: [],
-    currentConversation: '',
+    currentConversationId: '',
+    currentConversation: {},
   },
 
   reducers: {
@@ -40,7 +41,15 @@ const messageSlice = createSlice({
     clearMessagePages: (state, action) => {
       state.messagePages = {};
       state.messages = [];
-      state.currentConversation = '';
+      state.currentConversationId = '';
+      state.currentConversation = {};
+    },
+    updateCurrentConversation: (state, action) => {
+      const {conversationId} = action.payload;
+      const index = state.conversations.findIndex(
+        conversationEle => conversationEle._id === conversationId,
+      );
+      state.currentConversation = state.conversations[index];
     },
 
     addMessage: (state, action) => {
@@ -61,7 +70,7 @@ const messageSlice = createSlice({
         conversationEle => conversationEle._id !== conversationId,
       );
 
-      if (conversationId === state.currentConversation) {
+      if (conversationId === state.currentConversationId) {
         const length = state.messages.length;
 
         if (length) {
@@ -100,7 +109,7 @@ const messageSlice = createSlice({
           state.conversations = newConversations;
         }
       }
-      if (conversationId === state.currentConversation) {
+      if (conversationId === state.currentConversationId) {
         // tìm messages
         const index = messages.findIndex(messageEle => messageEle._id === id);
         if (index > -1) {
@@ -126,7 +135,7 @@ const messageSlice = createSlice({
     addReaction: (state, action) => {
       const {conversationId, messageId, user, type} = action.payload;
 
-      if (conversationId === state.currentConversation) {
+      if (conversationId === state.currentConversationId) {
         const messages = state.messages.reverse();
         // tìm messages
         const index = messages.findIndex(
@@ -154,6 +163,47 @@ const messageSlice = createSlice({
         }
       }
     },
+
+    renameConversation: (state, action) => {
+      const {conversationId, conversationName, message} = action.payload;
+      // tìm conversation
+      const index = state.conversations.findIndex(
+        conversationEle => conversationEle._id === conversationId,
+      );
+      const seachConversation = state.conversations[index];
+
+      console.log({conversationId, conversationName, message});
+
+      seachConversation.numberUnread = seachConversation.numberUnread + 1;
+      seachConversation.lastMessage = {
+        ...message,
+        createdAt: dateUtils.toTime(message.createdAt),
+      };
+      seachConversation.name = conversationName;
+      // xóa conversation đó ra
+      const conversationTempt = state.conversations.filter(
+        conversationEle => conversationEle._id !== conversationId,
+      );
+
+      if (conversationId === state.currentConversationId) {
+        const length = state.messages.length;
+
+        if (length) {
+          const messagesReverse = state.messages.reverse();
+          const lastMessage = messagesReverse[length - 1];
+          if (lastMessage._id !== message._id) {
+            messagesReverse.push(message);
+            state.messages = messagesReverse.reverse();
+          }
+        } else {
+          state.messages.push(message);
+        }
+        seachConversation.numberUnread = 0;
+      }
+
+      state.currentConversation = seachConversation;
+      state.conversations = [seachConversation, ...conversationTempt];
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {
@@ -180,7 +230,7 @@ const messageSlice = createSlice({
       state.isLoading = false;
       const {messages, conversationId, isSendMessage} = action.payload;
 
-      // xét currentConversation
+      // xét currentConversationId
       const conversationIndex = state.conversations.findIndex(
         conversationEle => conversationEle._id === conversationId,
       );
@@ -190,7 +240,7 @@ const messageSlice = createSlice({
         numberUnread: 0,
       };
 
-      state.currentConversation = conversationId;
+      state.currentConversationId = conversationId;
       state.messagePages = messages;
       if (isSendMessage) {
         console.log('fext mess send');
@@ -211,10 +261,12 @@ const messageSlice = createSlice({
 const {reducer, actions} = messageSlice;
 export const {
   setLoading,
+  updateCurrentConversation,
   clearMessagePages,
   addMessage,
   deleteMessageOnlyMe,
   deleteMessage,
   addReaction,
+  renameConversation,
 } = actions;
 export default reducer;
