@@ -1,5 +1,4 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {Button} from 'react-native-elements';
 import {
   BackHandler,
   FlatList,
@@ -8,9 +7,7 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -23,26 +20,26 @@ import MessageBottomBar from '../components/MessageBottomBar';
 import MessageDivider from '../components/MessageDivider';
 import MessageHeaderLeft from '../components/MessageHeaderLeft';
 import MessageModal from '../components/MessageModal';
+import PinMessageModal from '../components/PinMessageModal';
+import PinnedMessage from '../components/PinnedMessage';
 import ReactionModal from '../components/ReactionModal';
 import StickyBoard from '../components/StickyBoard';
 import {
   DEFAULT_MESSAGE_MODAL_VISIBLE,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
+  DEFAULT_PIN_MESSAGE_MODAL,
   DEFAULT_REACTION_MODAL_VISIBLE,
 } from '../constants';
 import {setLoading} from '../redux/globalSlice';
-import {
-  clearMessagePages,
-  fetchMessages,
-  updateCurrentConversation,
-} from '../redux/messageSlice';
-import LinearGradient from 'react-native-linear-gradient';
+import {clearMessagePages, fetchMessages} from '../redux/messageSlice';
+import {fetchPinMessages} from '../redux/pinSlice';
 
 const page = DEFAULT_PAGE;
 const size = DEFAULT_PAGE_SIZE;
 
 export default function MessageScreen({navigation, route}) {
+  // Props
   const {conversationId} = route.params;
   const dispatch = useDispatch();
   const {messages, messagePages, currentConversation} = useSelector(
@@ -54,14 +51,19 @@ export default function MessageScreen({navigation, route}) {
   const {totalPages} = messagePages;
   const {totalMembers, name, type, avatar} = currentConversation;
 
+  // State
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_MESSAGE_MODAL_VISIBLE,
   );
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [reactProps, setReactProps] = useState(DEFAULT_REACTION_MODAL_VISIBLE);
-
+  const [pinMessageVisible, setPinMessageVisible] = useState(
+    DEFAULT_PIN_MESSAGE_MODAL,
+  );
   const [stickyBoardVisible, setStickyBoardVisible] = useState(false);
   const [apiParams, setApiParams] = useState({page, size});
+
+  // Ref
   const scrollViewRef = useRef(null);
   const positionRef = useRef(0);
 
@@ -108,6 +110,7 @@ export default function MessageScreen({navigation, route}) {
   useLayoutEffect(() => {
     console.log('Message: ', currentUserId);
     dispatch(fetchMessages({conversationId, apiParams}));
+    dispatch(fetchPinMessages({conversationId}));
 
     navigation.setOptions({
       title: '',
@@ -158,20 +161,15 @@ export default function MessageScreen({navigation, route}) {
       console.log({currentPage, totalPages});
     }
   };
-  // const onContentOffsetChanged = (distanceFromTop) => {
-  // 	distanceFromTop === 0 && goToNextPage();
-  // };
 
   const onContentOffsetChanged = distanceFromTop => {
     positionRef.current = distanceFromTop;
-    // console.log({ distanceFromTop });
   };
 
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss;
-        console.log('asda');
         setStickyBoardVisible(false);
       }}>
       <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
@@ -181,28 +179,26 @@ export default function MessageScreen({navigation, route}) {
           keyboardVerticalOffset={90}>
           <>
             {messages.length > 0 ? (
-              <FlatList
-                onScroll={event =>
-                  onContentOffsetChanged(event.nativeEvent.contentOffset.y)
-                }
-                // ref={scrollViewRef}
-                // onLayout={() =>
-                // 	scrollViewRef.current.scrollToEnd({ animated: true })
-                // }
-                onEndReached={() => {
-                  goToNextPage();
-                }}
-                data={messages}
-                keyExtractor={item => item._id}
-                renderItem={({item, index}) => renderMessage(item, index)}
-                initialNumToRender={20}
-                ListFooterComponent={() =>
-                  isLoading ? <MessageDivider isLoading={true} /> : null
-                }
-                // stickyHeaderIndices={[0]}
-                inverted
-                contentContainerStyle={{paddingBottom: 15}}
-              />
+              <>
+                <PinnedMessage openPinMessage={setPinMessageVisible} />
+                <FlatList
+                  onScroll={event =>
+                    onContentOffsetChanged(event.nativeEvent.contentOffset.y)
+                  }
+                  onEndReached={() => {
+                    goToNextPage();
+                  }}
+                  data={messages}
+                  keyExtractor={item => item._id}
+                  renderItem={({item, index}) => renderMessage(item, index)}
+                  initialNumToRender={20}
+                  ListFooterComponent={() =>
+                    isLoading ? <MessageDivider isLoading={true} /> : null
+                  }
+                  inverted
+                  contentContainerStyle={{paddingBottom: 15}}
+                />
+              </>
             ) : (
               <ScrollView></ScrollView>
             )}
@@ -229,6 +225,11 @@ export default function MessageScreen({navigation, route}) {
           <MessageModal
             modalVisible={modalVisible}
             setModalVisible={setModalVisible}
+            setPinMessageVisible={setPinMessageVisible}
+          />
+          <PinMessageModal
+            modalVisible={pinMessageVisible}
+            setModalVisible={setPinMessageVisible}
           />
         </KeyboardAvoidingView>
       </SafeAreaView>

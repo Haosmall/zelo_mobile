@@ -8,17 +8,22 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Button, Icon} from 'react-native-elements';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import messageApi from '../api/messageApi';
+import pinMessagesApi from '../api/pinMessagesApi';
 import {DEFAULT_MESSAGE_MODAL_VISIBLE, REACTIONS} from '../constants';
 import {deleteMessageOnlyMe} from '../redux/messageSlice';
+import {fetchPinMessages} from '../redux/pinSlice';
 
 const ICON_WIDTH = 30;
 const ICON_HEIGHT = 30;
 const BUTTON_RADIUS = 10;
 
 const MessageModal = props => {
-  const {modalVisible, setModalVisible} = props;
+  const {modalVisible, setModalVisible, setPinMessageVisible} = props;
+  const {currentConversation, currentConversationId} = useSelector(
+    state => state.message,
+  );
 
   const messageId = modalVisible.messageId;
 
@@ -43,6 +48,19 @@ const MessageModal = props => {
   };
   const handleAddReaction = async type => {
     await messageApi.addReaction(messageId, type);
+    handleCloseModal();
+  };
+  const handlePinMessage = async () => {
+    const response = await pinMessagesApi.addPinMessage(messageId);
+    if (response.status === 400) {
+      setPinMessageVisible({
+        isVisible: true,
+        isError: true,
+      });
+    } else {
+      dispatch(fetchPinMessages({conversationId: currentConversationId}));
+    }
+    console.log(response);
     handleCloseModal();
   };
 
@@ -144,21 +162,24 @@ const MessageModal = props => {
                   titleStyle={styles.title}
                   iconPosition="top"
                 />
-                <Button
-                  title="Ghim"
-                  containerStyle={styles.button}
-                  type="clear"
-                  icon={
-                    <Icon
-                      name="pushpino"
-                      type="antdesign"
-                      size={22}
-                      color="#dc923c"
-                    />
-                  }
-                  titleStyle={styles.title}
-                  iconPosition="top"
-                />
+                {currentConversation.type && (
+                  <Button
+                    title="Ghim"
+                    containerStyle={styles.button}
+                    onPress={handlePinMessage}
+                    type="clear"
+                    icon={
+                      <Icon
+                        name="pushpino"
+                        type="antdesign"
+                        size={22}
+                        color="#dc923c"
+                      />
+                    }
+                    titleStyle={styles.title}
+                    iconPosition="top"
+                  />
+                )}
                 {modalVisible.isMyMessage && (
                   <Button
                     title="Thu hồi"
@@ -192,11 +213,13 @@ const MessageModal = props => {
 MessageModal.propTypes = {
   modalVisible: PropTypes.object,
   setModalVisible: PropTypes.func,
+  setPinMessageVisible: PropTypes.func,
 };
 
 MessageModal.defaultProps = {
   modalVisible: DEFAULT_MESSAGE_MODAL_VISIBLE,
   setModalVisible: null,
+  setPinMessageVisible: null,
 };
 
 const styles = StyleSheet.create({

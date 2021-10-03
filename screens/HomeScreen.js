@@ -2,7 +2,7 @@
 // import {StatusBar} from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect} from 'react';
-import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {Pressable, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import io from 'socket.io-client';
 import Conversation from '../components/Conversation';
@@ -105,17 +105,19 @@ export default function HomeScreen({navigation}) {
               totalMembers,
             } = conversation;
             return (
-              <Conversation
-                name={name}
-                avatars={avatar}
-                numberUnread={numberUnread}
-                lastMessage={lastMessage}
-                handleEnterChat={handleEnterChat}
-                type={type}
-                conversationId={_id}
-                key={_id}
-                totalMembers={totalMembers}
-              />
+              <Pressable>
+                <Conversation
+                  name={name}
+                  avatars={avatar}
+                  numberUnread={numberUnread}
+                  lastMessage={lastMessage}
+                  handleEnterChat={handleEnterChat}
+                  type={type}
+                  conversationId={_id}
+                  key={_id}
+                  totalMembers={totalMembers}
+                />
+              </Pressable>
             );
           })}
 

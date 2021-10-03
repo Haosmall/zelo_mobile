@@ -28,3 +28,7 @@ export const DEFAULT_RENAME_CONVERSATION_MODAL = {
   conversationName: '',
   type: false,
 };
+export const DEFAULT_PIN_MESSAGE_MODAL = {
+  isVisible: false,
+  isError: false,
+};

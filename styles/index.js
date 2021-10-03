@@ -5,6 +5,7 @@ import {StyleSheet} from 'react-native';
 import React from 'react';
 
 export const MAIN_COLOR = '#0068FF';
+export const GREY_COLOR = '#889197';
 
 export const globalScreenOptions = {
   headerStyle: {backgroundColor: MAIN_COLOR},
