@@ -227,10 +227,12 @@ export default function MessageScreen({navigation, route}) {
             setModalVisible={setModalVisible}
             setPinMessageVisible={setPinMessageVisible}
           />
-          <PinMessageModal
-            modalVisible={pinMessageVisible}
-            setModalVisible={setPinMessageVisible}
-          />
+          {pinMessageVisible.isVisible && (
+            <PinMessageModal
+              modalVisible={pinMessageVisible}
+              setModalVisible={setPinMessageVisible}
+            />
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
     </TouchableWithoutFeedback>

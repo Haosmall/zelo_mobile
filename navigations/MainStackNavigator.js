@@ -7,6 +7,7 @@ import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {useDispatch, useSelector} from 'react-redux';
 import {setModalVisible} from '../redux/globalSlice';
 import ConversationOptionsScreen from '../screens/ConversationOptionsScreen';
+import FriendRequestScreen from '../screens/FriendRequestScreen';
 import MessageScreen from '../screens/MessageScreen';
 import {globalScreenOptions} from '../styles';
 import TabNavigator from './TabNavigator';
@@ -89,6 +90,10 @@ const MainStackNavigator = () => {
           />
           <Stack.Screen name="Nhắn tin" component={MessageScreen} />
           <Stack.Screen name="Tùy chọn" component={ConversationOptionsScreen} />
+          <Stack.Screen
+            name="Lời mời kết bạn"
+            component={FriendRequestScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </>

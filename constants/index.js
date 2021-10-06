@@ -32,3 +32,6 @@ export const DEFAULT_PIN_MESSAGE_MODAL = {
   isVisible: false,
   isError: false,
 };
+export const DEFAULT_ADD_VOTE_MODAL = {
+  isVisible: false,
+};

@@ -105,7 +105,7 @@ export default function HomeScreen({navigation}) {
               totalMembers,
             } = conversation;
             return (
-              <Pressable>
+              <Pressable key={_id}>
                 <Conversation
                   name={name}
                   avatars={avatar}
@@ -114,7 +114,6 @@ export default function HomeScreen({navigation}) {
                   handleEnterChat={handleEnterChat}
                   type={type}
                   conversationId={_id}
-                  key={_id}
                   totalMembers={totalMembers}
                 />
               </Pressable>

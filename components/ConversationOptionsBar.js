@@ -2,31 +2,56 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Button, Icon} from 'react-native-elements';
-import {DEFAULT_RENAME_CONVERSATION_MODAL} from '../constants';
+import {
+  DEFAULT_ADD_VOTE_MODAL,
+  DEFAULT_RENAME_CONVERSATION_MODAL,
+} from '../constants';
 
 const ICON_SIZE = 20;
 
 const ConversationOptionsBar = props => {
-  const {name, type, setModalVisible} = props;
+  const {name, type, setModalVisible, openAddVoteModal} = props;
+
+  const handleOpenAddVoteModal = () => {
+    openAddVoteModal({...DEFAULT_ADD_VOTE_MODAL, isVisible: true});
+  };
 
   return (
     <View style={styles.container}>
       {type && (
-        <Button
-          title="Thêm thành viên"
-          containerStyle={styles.button}
-          type="clear"
-          icon={
-            <Icon
-              name="addusergroup"
-              type="antdesign"
-              size={ICON_SIZE}
-              containerStyle={styles.iconContainer}
-            />
-          }
-          titleStyle={styles.title}
-          iconPosition="top"
-        />
+        <>
+          <Button
+            title="Thêm thành viên"
+            containerStyle={styles.button}
+            type="clear"
+            icon={
+              <Icon
+                name="addusergroup"
+                type="antdesign"
+                size={ICON_SIZE}
+                containerStyle={styles.iconContainer}
+              />
+            }
+            titleStyle={styles.title}
+            iconPosition="top"
+          />
+          <Button
+            title="Tạo bình chọn"
+            containerStyle={styles.button}
+            type="clear"
+            icon={
+              <Icon
+                name="chart"
+                type="simple-line-icon"
+                size={ICON_SIZE}
+                containerStyle={styles.iconContainer}
+              />
+            }
+            titleStyle={styles.title}
+            iconPosition="top"
+            onPress={handleOpenAddVoteModal}
+          />
+        </>
       )}
       <Button
         title={type ? 'Đặt tên nhóm' : 'Đặt biệt danh'}
@@ -74,6 +99,7 @@ ConversationOptionsBar.propTypes = {
   name: PropTypes.string,
   type: PropTypes.bool,
   setModalVisible: PropTypes.func,
+  openAddVoteModal: PropTypes.func,
 };
 
 ConversationOptionsBar.defaultProps = {
@@ -81,6 +107,7 @@ ConversationOptionsBar.defaultProps = {
   name: '',
   type: false,
   setModalVisible: null,
+  openAddVoteModal: null,
 };
 export default ConversationOptionsBar;
 

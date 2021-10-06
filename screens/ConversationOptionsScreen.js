@@ -9,9 +9,13 @@ import {
 } from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {useSelector} from 'react-redux';
+import AddVoteModal from '../components/AddVoteModal';
 import ConversationOptionsBar from '../components/ConversationOptionsBar';
 import RenameConversationModal from '../components/RenameConversationModal';
-import {DEFAULT_RENAME_CONVERSATION_MODAL} from '../constants';
+import {
+  DEFAULT_ADD_VOTE_MODAL,
+  DEFAULT_RENAME_CONVERSATION_MODAL,
+} from '../constants';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
@@ -22,6 +26,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_RENAME_CONVERSATION_MODAL,
   );
+  const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
   const handleGoBack = () => {
     navigation.goBack();
     return true;
@@ -75,6 +80,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
             name={name}
             type={type}
             setModalVisible={setModalVisible}
+            openAddVoteModal={setAddVoteVisible}
           />
         </View>
         <Text>{conversationId}</Text>
@@ -82,6 +88,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
         <Text>{name}</Text>
         <Text>{type.toString()}</Text>
       </ScrollView>
+      <AddVoteModal
+        modalVisible={addVoteVisible}
+        setModalVisible={setAddVoteVisible}
+      />
       <RenameConversationModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

@@ -3,8 +3,8 @@ import axiosClient from './axiosClient';
 const BASE_URL = '/friends';
 
 const friendApi = {
-  fetchFriends: () => {
-    return axiosClient.get(BASE_URL);
+  fetchFriends: name => {
+    return axiosClient.get(BASE_URL, {name});
   },
 
   acceptFriend: userId => {

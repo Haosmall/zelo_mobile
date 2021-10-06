@@ -1,19 +1,22 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {friendApi} from '../api';
 
 const KEY = 'friend';
 
-// export const fetchProfile = createAsyncThunk(
-// 	`${KEY}/fetchProfile`,
-// 	async (params, thunkApi) => {
-// 		const data = await meApi.fetchProfile();
-// 		return data;
-// 	}
-// );
+export const fetchFriends = createAsyncThunk(
+  `${KEY}/fetchFriends`,
+  async (params, thunkApi) => {
+    const {name = ''} = params;
+    const data = await friendApi.fetchFriends(name);
+    return data;
+  },
+);
 
 const friendSlice = createSlice({
   name: KEY,
   initialState: {
     isLoading: false,
+    listFriends: [],
   },
 
   reducers: {
@@ -24,19 +27,19 @@ const friendSlice = createSlice({
   },
   // xu ly api roi thay doi state
   extraReducers: {
-    // // Đang xử lý
-    // [fetchProfile.pending]: (state, action) => {
-    // 	state.isLoading = true;
-    // },
-    // // Xử lý khi thành công
-    // [fetchProfile.fulfilled]: (state, action) => {
-    // 	state.isLoading = false;
-    // 	state.userProfile = action.payload;
-    // },
-    // // Xử lý khi bị lỗi
-    // [fetchProfile.rejected]: (state, action) => {
-    // 	state.isLoading = false;
-    // },
+    // Đang xử lý
+    [fetchFriends.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchFriends.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.listFriends = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchFriends.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
   },
 });
 
