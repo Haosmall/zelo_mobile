@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
-  Dimensions,
   Image,
   StyleSheet,
   Text,
@@ -14,8 +13,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import test from '../assets/favicon1.png';
 import {setLogin} from '../redux/globalSlice';
 import {fetchProfile} from '../redux/meSlice';
-
-const {width} = Dimensions.get('window');
 
 export default function MeScreen() {
   const dispatch = useDispatch();

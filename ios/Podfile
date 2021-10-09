@@ -17,6 +17,8 @@ target 'zelo_mobile' do
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
 
+  pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
+
   target 'zelo_mobileTests' do
     inherit! :complete
     # Pods for testing

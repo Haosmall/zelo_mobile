@@ -19,13 +19,16 @@ export default function TabNavigator() {
       // 	const title = navigation.route.name;
       // 	dispatch(setHeaderTitle(title));
       // }}
+
       tabBarPosition="bottom"
+      keyboardDismissMode={true}
       screenOptions={({route, navigation}) => ({
         tabBarLabelStyle: {fontSize: 12},
         tabBarItemStyle: {height: 50},
         tabBarActiveTintColor: '#0275d8',
         tabBarInactiveTintColor: 'grey',
         swipeEnabled: true,
+
         // tabBarLabel: navigation.isFocused() ? route.name : "",
         tabBarLabel: ({focused, color}) => {
           return <Text style={{color}}>{route.name}</Text>;

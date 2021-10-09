@@ -2,23 +2,44 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 import {Platform, StatusBar, TouchableOpacity, View} from 'react-native';
+import {Icon} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {useDispatch, useSelector} from 'react-redux';
 import {setModalVisible} from '../redux/globalSlice';
+import AddNewFriendScreen from '../screens/AddNewFriendScreen';
 import ConversationOptionsScreen from '../screens/ConversationOptionsScreen';
+import FriendDetailsScreen from '../screens/FriendDetailsScreen';
 import FriendRequestScreen from '../screens/FriendRequestScreen';
+import FriendSearchScreen from '../screens/FriendSearchScreen';
 import MessageScreen from '../screens/MessageScreen';
 import {globalScreenOptions} from '../styles';
 import TabNavigator from './TabNavigator';
 
 const Stack = createStackNavigator();
 
-const MainStackNavigator = () => {
+const MainStackNavigator = ({navigation}) => {
   const dispatch = useDispatch();
   const {modalVisible} = useSelector(state => state.global);
 
-  const headerRightButton = () => (
+  // const headerRightButton = () => (
+  //   <View
+  //     style={{
+  //       flexDirection: 'row',
+  //       justifyContent: 'space-between',
+  //       marginRight: 20,
+  //     }}>
+  //     <TouchableOpacity
+  //       onPress={() => dispatch(setModalVisible(!modalVisible))}>
+  //       <IconAntDesign name="plus" size={22} color="white" />
+  //     </TouchableOpacity>
+  //   </View>
+  // );
+  const headerRightButton = (
+    navigation,
+    isMessageScreen,
+    iconName,
+    iconType,
+  ) => (
     <View
       style={{
         flexDirection: 'row',
@@ -26,8 +47,12 @@ const MainStackNavigator = () => {
         marginRight: 20,
       }}>
       <TouchableOpacity
-        onPress={() => dispatch(setModalVisible(!modalVisible))}>
-        <IconAntDesign name="plus" size={22} color="white" />
+        onPress={() =>
+          isMessageScreen
+            ? dispatch(setModalVisible(!modalVisible))
+            : navigation.navigate('Thêm bạn')
+        }>
+        <Icon name={iconName} type={iconType} size={22} color="white" />
       </TouchableOpacity>
     </View>
   );
@@ -54,7 +79,8 @@ const MainStackNavigator = () => {
             component={TabNavigator}
             options={({navigation, route}) => {
               let title = 'Tin nhắn';
-              let headerRight = headerRightButton;
+              let headerRight = () =>
+                headerRightButton(navigation, true, 'plus', 'antdesign');
               const state = navigation.getState()?.routes[0]?.state;
               if (state) {
                 const routeNames = state.routeNames;
@@ -64,11 +90,18 @@ const MainStackNavigator = () => {
                 switch (routeName) {
                   case 'Tin nhắn': {
                     title = 'Tin nhắn';
+
                     break;
                   }
                   case 'Bạn bè': {
                     title = 'Bạn bè';
-                    headerRight = undefined;
+                    headerRight = () =>
+                      headerRightButton(
+                        navigation,
+                        false,
+                        'person-add-outline',
+                        'ionicon',
+                      );
                     break;
                   }
                   case 'Cá nhân': {
@@ -78,7 +111,8 @@ const MainStackNavigator = () => {
                   }
                   default:
                     title = 'Tin nhắn';
-                    headerRight = headerRightButton;
+                    headerRight = () =>
+                      headerRightButton(navigation, true, 'plus', 'antdesign');
                     break;
                 }
               }
@@ -93,6 +127,12 @@ const MainStackNavigator = () => {
           <Stack.Screen
             name="Lời mời kết bạn"
             component={FriendRequestScreen}
+          />
+          <Stack.Screen name="Tìm kiếm bạn bè" component={FriendSearchScreen} />
+          <Stack.Screen name="Thêm bạn" component={AddNewFriendScreen} />
+          <Stack.Screen
+            name="Chi tiết bạn bè"
+            component={FriendDetailsScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

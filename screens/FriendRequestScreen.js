@@ -1,11 +1,8 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import React, {useEffect} from 'react';
-import {Dimensions, StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchFriends} from '../redux/friendSlice';
 import MeScreen from '../screens/MeScreen';
-
-const {width} = Dimensions.get('window');
 
 export default function FriendRequestScreen() {
   const dispatch = useDispatch();

@@ -120,7 +120,7 @@ export default function HomeScreen({navigation}) {
             );
           })}
 
-        <MessageHeaderModal />
+        <MessageHeaderModal navigation={navigation} />
       </ScrollView>
     </SafeAreaView>
   );

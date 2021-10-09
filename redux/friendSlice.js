@@ -6,8 +6,7 @@ const KEY = 'friend';
 export const fetchFriends = createAsyncThunk(
   `${KEY}/fetchFriends`,
   async (params, thunkApi) => {
-    const {name = ''} = params;
-    const data = await friendApi.fetchFriends(name);
+    const data = await friendApi.fetchFriends(params);
     return data;
   },
 );
@@ -17,12 +16,22 @@ const friendSlice = createSlice({
   initialState: {
     isLoading: false,
     listFriends: [],
+    searchFriend: {},
   },
 
   reducers: {
     // thay doi state
     setLoading: (state, action) => {
       state.isLoading = action.payload;
+    },
+    setSearchFriend: (state, action) => {
+      state.searchFriend = action.payload;
+    },
+    updateFriendStatus: (state, action) => {
+      const oldSearchFriend = state.searchFriend;
+      const status = action.payload;
+      const newSearchFriend = {...oldSearchFriend, status};
+      state.searchFriend = newSearchFriend;
     },
   },
   // xu ly api roi thay doi state
@@ -44,5 +53,5 @@ const friendSlice = createSlice({
 });
 
 const {reducer, actions} = friendSlice;
-export const {setLoading} = actions;
+export const {setLoading, setSearchFriend, updateFriendStatus} = actions;
 export default reducer;

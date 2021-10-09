@@ -1,8 +1,11 @@
 import {CardStyleInterpolators} from '@react-navigation/stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 // import {LinearGradient} from 'expo-linear-gradient';
 import React from 'react';
+
+export const WINDOW_WIDTH = Dimensions.get('window').width;
+export const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 export const MAIN_COLOR = '#0068FF';
 export const GREY_COLOR = '#889197';
