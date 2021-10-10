@@ -27,6 +27,11 @@ const friendApi = {
     return axiosClient.delete(url);
   },
 
+  fetchMyFriendRequests: () => {
+    const url = `${BASE_URL}/invites/me`;
+    return axiosClient.get(url);
+  },
+
   addFriendRequest: userId => {
     const url = `${BASE_URL}/invites/me/${userId}`;
     return axiosClient.post(url);

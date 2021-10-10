@@ -11,6 +11,7 @@ import commonFuc from '../utils/commonFuc';
 export default function TabNavigator() {
   const Tab = createMaterialTopTabNavigator();
   const {conversations} = useSelector(state => state.message);
+  const {friendRequests} = useSelector(state => state.friend);
 
   return (
     <Tab.Navigator
@@ -48,7 +49,7 @@ export default function TabNavigator() {
             }
             case 'Bạn bè': {
               iconName = 'contacts';
-              count = 9;
+              count = friendRequests.length;
               break;
             }
             case 'Cá nhân': {

@@ -2,12 +2,16 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import React, {useEffect} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import ListFriendRequest from '../components/ListFriendRequest';
+import {friendType} from '../constants';
 import MeScreen from '../screens/MeScreen';
 
 export default function FriendRequestScreen() {
   const dispatch = useDispatch();
 
-  const {listFriends} = useSelector(state => state.friend);
+  const {listFriends, friendRequests, myFriendRequests} = useSelector(
+    state => state.friend,
+  );
 
   const Tab = createMaterialTopTabNavigator();
 
@@ -25,11 +29,33 @@ export default function FriendRequestScreen() {
         swipeEnabled: true,
         // tabBarLabel: navigation.isFocused() ? route.name : "",
         tabBarLabel: ({focused, color}) => {
-          return <Text style={{color}}>{route.name}</Text>;
+          const routeName = route.name;
+          const type = routeName === 'Đã nhận';
+          const content = `${routeName} ${
+            type ? friendRequests.length : myFriendRequests.length
+          }`;
+
+          return <Text style={{color}}>{content}</Text>;
         },
       })}>
-      <Tab.Screen name="Đã nhận" component={MeScreen} />
-      <Tab.Screen name="Đã gửi" component={MeScreen} />
+      <Tab.Screen
+        name="Đã nhận"
+        children={() => (
+          <ListFriendRequest
+            listFriends={friendRequests}
+            type={friendType.FOLLOWER}
+          />
+        )}
+      />
+      <Tab.Screen
+        name="Đã gửi"
+        children={() => (
+          <ListFriendRequest
+            listFriends={myFriendRequests}
+            type={friendType.YOU_FOLLOW}
+          />
+        )}
+      />
     </Tab.Navigator>
   );
 }

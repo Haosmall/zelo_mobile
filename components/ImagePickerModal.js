@@ -14,7 +14,7 @@ import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {messageApi} from '../api';
 import {messageType} from '../constants';
 import {useSelector} from 'react-redux';
-import {REACT_APP_NODEJS_API_URL} from '../constants';
+import {REACT_APP_API_URL} from '../constants';
 
 const ImagePickerModal = props => {
   const {modalVisible, setModalVisible} = props;

@@ -11,6 +11,8 @@ import {
 import {Avatar, Icon, Input, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import ContactAction from '../components/ContactAction';
+import FriendItem from '../components/FriendItem';
+import {friendType} from '../constants';
 import {fetchFriends} from '../redux/friendSlice';
 import {GREY_COLOR, WINDOW_WIDTH} from '../styles';
 import commonFuc from '../utils/commonFuc';
@@ -109,37 +111,18 @@ export default function ContactScreen({navigation}) {
           />
         </ListItem>
 
-        {listFriends.length > 0 &&
+        {listFriends &&
           listFriends.map(friend => {
             const {_id, avatar, name} = friend;
             return (
               <Pressable key={_id}>
                 <View style={{backgroundColor: '#fff'}}>
-                  <ListItem
-                  // topDivider={false}
-                  // bottomDivider={false}
-                  >
-                    <Avatar
-                      rounded
-                      title={commonFuc.getAcronym(name)}
-                      overlayContainerStyle={styles.overlay}
-                      source={{
-                        uri: avatar,
-                      }}
-                      size="medium"
-                    />
-                    <ListItem.Content>
-                      <ListItem.Title>{name}</ListItem.Title>
-                      {/* <ListItem.Subtitle
-                        numberOfLines={
-                          1
-                        }>{`${senderName}${content}`}</ListItem.Subtitle> */}
-                    </ListItem.Content>
-                    {/* <MessageInfo
-                      createdAt={createdAt}
-                      numberUnread={numberUnread}
-                    /> */}
-                  </ListItem>
+                  <FriendItem
+                    name={name}
+                    avatar={avatar}
+                    type={friendType.FRIEND}
+                    userId={_id}
+                  />
                   <View style={styles.bottomDivider}></View>
                 </View>
               </Pressable>

@@ -53,23 +53,15 @@ export default function AddNewFriendScreen({navigation}) {
           // defaultValue="0987654321"
           renderErrorMessage={isError}
           errorMessage={errorMessage}
-          inputContainerStyle={{
-            borderBottomWidth: 0,
-            borderRadius: 50,
-            // backgroundColor: 'cyan',
-            // paddingHorizontal: 15,
-          }}
+          inputStyle={{marginRight: 16}}
+          inputContainerStyle={styles.inputSearchContainer}
           // containerStyle={{backgroundColor: 'red', paddingHorizontal: 0}}
           placeholder="Nhập số điện thoại/email"
           onChangeText={value => (inputRef.current = value)}
           rightIcon={
             <Button
               title="Tìm"
-              buttonStyle={{
-                borderRadius: 50,
-                paddingHorizontal: 25,
-                paddingVertical: 5,
-              }}
+              buttonStyle={styles.buttonSearch}
               onPress={handleSearchFriendSubmit}
             />
           }
@@ -88,17 +80,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeElement: {color: 'white', fontSize: 10},
-  iconBadge: {
-    color: 'white',
-    fontSize: 10,
-    width: 15,
-    height: 15,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF5B05',
-    marginTop: -26,
-    marginLeft: 14,
+  buttonSearch: {
+    borderRadius: 50,
+    paddingHorizontal: 25,
+    paddingVertical: 5,
+  },
+  inputSearchContainer: {
+    borderBottomWidth: 0,
+    borderRadius: 50,
+    // backgroundColor: 'cyan',
+    // paddingHorizontal: 15,
   },
 });

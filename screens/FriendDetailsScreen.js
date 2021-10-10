@@ -18,7 +18,13 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import {useDispatch, useSelector} from 'react-redux';
 import {friendApi} from '../api';
 import {DEFAULT_COVER_IMAGE, friendType} from '../constants';
-import {updateFriendStatus} from '../redux/friendSlice';
+import {
+  addNewFriendRequest,
+  cancelMyFriendRequest,
+  deleteFriendRequest,
+  fetchFriends,
+  updateFriendStatus,
+} from '../redux/friendSlice';
 import {WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
@@ -68,12 +74,14 @@ export default function FriendDetailsScreen({navigation}) {
         break;
     }
   };
+  
   const handleAddFriendRequest = async () => {
     try {
       const userId = searchFriend._id;
       const response = await friendApi.addFriendRequest(userId);
       console.log('gui ket ban thanh cong');
       dispatch(updateFriendStatus(friendType.YOU_FOLLOW));
+      dispatch(addNewFriendRequest());
     } catch (error) {
       console.log('Loi');
     }
@@ -84,16 +92,19 @@ export default function FriendDetailsScreen({navigation}) {
       const response = await friendApi.deleteMyFriendRequest(userId);
       console.log('huy yeu cau thanh cong');
       dispatch(updateFriendStatus(friendType.NOT_FRIEND));
+      dispatch(cancelMyFriendRequest(userId));
     } catch (error) {
-      console.log('Loi');
+      console.log('Loi', error);
     }
   };
+
   const handleDeleteFriendRequest = async () => {
     try {
       const userId = searchFriend._id;
       const response = await friendApi.deleteFriendRequest(userId);
       console.log('Tu choi thanh cong');
       dispatch(updateFriendStatus(friendType.NOT_FRIEND));
+      dispatch(deleteFriendRequest(userId));
     } catch (error) {
       console.log('Loi');
     }
@@ -104,6 +115,8 @@ export default function FriendDetailsScreen({navigation}) {
       const response = await friendApi.acceptFriend(userId);
       console.log('Dong y thanh cong');
       dispatch(updateFriendStatus(friendType.FRIEND));
+      dispatch(deleteFriendRequest(userId));
+      dispatch(fetchFriends());
     } catch (error) {
       console.log('Loi');
     }
