@@ -48,3 +48,20 @@ export const renameConversationValid = {
       .matches(/^(?!\s+$).+/, 'Không hợp lệ'),
   }),
 };
+
+export const validateUsername = userName => {
+  let validate = {
+    isEmail: false,
+    isPhoneNumber: false,
+  };
+
+  if (!userName) return validate;
+  const regexPhoneNumber = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
+  const regexEmail =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+  validate.isPhoneNumber = regexPhoneNumber.test(userName);
+  validate.isEmail = regexEmail.test(userName);
+
+  return validate;
+};

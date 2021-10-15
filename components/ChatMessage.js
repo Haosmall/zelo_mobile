@@ -1,12 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Text} from 'react-native';
+import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
 import ReceiverMessage from './ReceiverMessage';
 import SenderMessage from './SenderMessage';
+import VoteMessage from './VoteMessage';
 
 function ChatMessage(props) {
-  const {message, isMyMessage, setModalVisible, showReactDetails} = props;
+  const {message, isMyMessage, setModalVisible, showReactDetails, navigation} =
+    props;
 
   const {_id, createdAt, user, isDeleted, reacts, type} = message;
   const time = dateUtils.getTime(createdAt);
@@ -36,7 +40,9 @@ function ChatMessage(props) {
     showReactDetails(obj);
   };
 
-  return isMyMessage ? (
+  return type === messageType.VOTE ? (
+    <VoteMessage message={message} navigation={navigation} />
+  ) : isMyMessage ? (
     <ReceiverMessage
       message={message}
       handleOpenOptionModal={handleOpenOptionModal}
@@ -61,6 +67,7 @@ function ChatMessage(props) {
 
 ChatMessage.propTypes = {
   message: PropTypes.object,
+  navigation: PropTypes.object,
   currentUserId: PropTypes.string,
   isMyMessage: PropTypes.bool,
   setModalVisible: PropTypes.func,
@@ -69,6 +76,7 @@ ChatMessage.propTypes = {
 
 ChatMessage.defaultProps = {
   message: {},
+  navigation: {},
   currentUserId: '',
   isMyMessage: false,
   setModalVisible: null,

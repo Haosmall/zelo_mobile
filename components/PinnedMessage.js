@@ -4,7 +4,7 @@ import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import {Button, Divider, Icon, ListItem} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
-import {GREY_COLOR, MAIN_COLOR} from '../styles';
+import {GREY_COLOR, MAIN_COLOR, WINDOW_WIDTH} from '../styles';
 
 const PinnedMessage = props => {
   const {openPinMessage} = props;
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     borderRadius: 6,
     marginTop: 5,
-    width: Dimensions.get('window').width - 10,
+    width: WINDOW_WIDTH - 10,
     borderWidth: 1,
     borderColor: '#E5E6E7',
   },

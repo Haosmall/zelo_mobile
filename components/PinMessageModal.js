@@ -18,7 +18,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import pinMessagesApi from '../api/pinMessagesApi';
 import {DEFAULT_PIN_MESSAGE_MODAL} from '../constants';
 import {fetchPinMessages} from '../redux/pinSlice';
-import {GREY_COLOR} from '../styles';
+import {GREY_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
 
 const PinMessageModal = props => {
   const {modalVisible, setModalVisible} = props;
@@ -112,7 +112,7 @@ const PinMessageModal = props => {
                               <ListItem
                                 topDivider={true}
                                 containerStyle={{
-                                  width: Dimensions.get('window').width,
+                                  width: WINDOW_WIDTH,
                                   // backgroundColor: 'grey',
                                 }}>
                                 <Icon
@@ -175,7 +175,7 @@ PinMessageModal.defaultProps = {
 };
 
 const BUTTON_RADIUS = 10;
-const viewHeight = Dimensions.get('window').height - 80;
+const viewHeight = WINDOW_HEIGHT - 80;
 
 const styles = StyleSheet.create({
   container: {

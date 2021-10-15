@@ -8,6 +8,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
+  BackHandler,
 } from 'react-native';
 
 const DEFAULT_HEIGHT = 280;
@@ -69,4 +70,19 @@ export const useAnimatedBottom = (show, height = DEFAULT_HEIGHT) => {
   }, [show]);
 
   return bottom;
+};
+
+export const useGoback = navigation => {
+  const handleGoBack = () => {
+    navigation.goBack();
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleGoBack);
+
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
+    };
+  }, []);
 };

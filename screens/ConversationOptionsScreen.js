@@ -1,17 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {
-  BackHandler,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {useSelector} from 'react-redux';
+import AddVoteModal from '../components/AddVoteModal';
 import ConversationOptionsBar from '../components/ConversationOptionsBar';
 import RenameConversationModal from '../components/RenameConversationModal';
-import {DEFAULT_RENAME_CONVERSATION_MODAL} from '../constants';
+import {
+  DEFAULT_ADD_VOTE_MODAL,
+  DEFAULT_RENAME_CONVERSATION_MODAL,
+} from '../constants';
+import {useGoback} from '../hooks';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
@@ -22,17 +20,21 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_RENAME_CONVERSATION_MODAL,
   );
-  const handleGoBack = () => {
-    navigation.goBack();
-    return true;
-  };
+  const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
 
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleGoBack);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
-    };
-  }, []);
+  useGoback(navigation);
+
+  // const handleGoBack = () => {
+  //   navigation.goBack();
+  //   return true;
+  // };
+
+  // useEffect(() => {
+  //   BackHandler.addEventListener('hardwareBackPress', handleGoBack);
+  //   return () => {
+  //     BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
+  //   };
+  // }, []);
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
   const avatarSource =
@@ -75,6 +77,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
             name={name}
             type={type}
             setModalVisible={setModalVisible}
+            openAddVoteModal={setAddVoteVisible}
           />
         </View>
         <Text>{conversationId}</Text>
@@ -82,6 +85,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
         <Text>{name}</Text>
         <Text>{type.toString()}</Text>
       </ScrollView>
+      <AddVoteModal
+        modalVisible={addVoteVisible}
+        setModalVisible={setAddVoteVisible}
+      />
       <RenameConversationModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

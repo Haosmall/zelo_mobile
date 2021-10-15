@@ -6,8 +6,16 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Image as Img,
 } from 'react-native';
+import {Image} from 'react-native-elements';
 import {messageType} from '../constants';
+import globalStyles, {
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+  WINDOW_HEIGHT,
+  WINDOW_WIDTH,
+} from '../styles';
 import MessageNotifyDivider from './MessageNotifyDivider';
 
 const ReceiverMessage = props => {
@@ -35,7 +43,11 @@ const ReceiverMessage = props => {
       delayLongPress={500}>
       <View style={styles.receiverContainer}>
         <View style={styles.receiver} key={_id}>
-          <Text style={contentStyle}>{content}</Text>
+          {type === messageType.IMAGE ? (
+            <Image source={{uri: content}} style={globalStyles.imageMessage} />
+          ) : (
+            <Text style={contentStyle}>{content}</Text>
+          )}
           <Text style={styles.messageTime}>{time}</Text>
         </View>
         {reactLength > 0 && (

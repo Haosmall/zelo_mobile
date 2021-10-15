@@ -3,10 +3,10 @@ import queryString from 'query-string';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {AsyncStorage} from 'react-native';
 // import config from "../config";
-import {REACT_APP_NODEJS_API_URL} from '../constants';
+import {REACT_APP_API_URL} from '../constants';
 
 const axiosClient = axios.create({
-  baseURL: REACT_APP_NODEJS_API_URL,
+  baseURL: REACT_APP_API_URL,
   headers: {
     'content-type': 'application/json',
   },

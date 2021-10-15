@@ -7,8 +7,9 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {Avatar} from 'react-native-elements';
+import {Avatar, Image} from 'react-native-elements';
 import {messageType} from '../constants';
+import globalStyles from '../styles';
 import commonFuc from '../utils/commonFuc';
 import MessageNotifyDivider from './MessageNotifyDivider';
 
@@ -44,7 +45,11 @@ const SenderMessage = props => {
             containerStyle={styles.avatar}
           />
           <Text style={styles.messageName}>{user.name}</Text>
-          <Text style={contentStyle}>{content}</Text>
+          {type === messageType.IMAGE ? (
+            <Image source={{uri: content}} style={globalStyles.imageMessage} />
+          ) : (
+            <Text style={contentStyle}>{content}</Text>
+          )}
           <Text style={styles.messageTime}>{time}</Text>
         </View>
         {reactLength > 0 && (

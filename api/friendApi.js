@@ -3,8 +3,8 @@ import axiosClient from './axiosClient';
 const BASE_URL = '/friends';
 
 const friendApi = {
-  fetchFriends: () => {
-    return axiosClient.get(BASE_URL);
+  fetchFriends: params => {
+    return axiosClient.get(BASE_URL, {params});
   },
 
   acceptFriend: userId => {
@@ -24,6 +24,11 @@ const friendApi = {
 
   deleteFriendRequest: userId => {
     const url = `${BASE_URL}/invites/${userId}`;
+    return axiosClient.delete(url);
+  },
+
+  fetchMyFriendRequests: () => {
+    const url = `${BASE_URL}/invites/me`;
     return axiosClient.get(url);
   },
 
@@ -32,7 +37,7 @@ const friendApi = {
     return axiosClient.post(url);
   },
 
-  deleteOwnFriendRequest: userId => {
+  deleteMyFriendRequest: userId => {
     const url = `${BASE_URL}/invites/me/${userId}`;
     return axiosClient.delete(url);
   },

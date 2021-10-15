@@ -14,6 +14,7 @@ import pinMessagesApi from '../api/pinMessagesApi';
 import {DEFAULT_MESSAGE_MODAL_VISIBLE, REACTIONS} from '../constants';
 import {deleteMessageOnlyMe} from '../redux/messageSlice';
 import {fetchPinMessages} from '../redux/pinSlice';
+import commonFuc from '../utils/commonFuc';
 
 const ICON_WIDTH = 30;
 const ICON_HEIGHT = 30;
@@ -35,6 +36,7 @@ const MessageModal = props => {
   };
   const handleCopy = () => {
     Clipboard.setString(modalVisible.messageContent);
+    commonFuc.notifyMessage('Đã sao chép');
     handleCloseModal();
   };
   const handleDeleteOnlyMe = async () => {

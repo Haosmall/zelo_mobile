@@ -7,8 +7,19 @@ import {useDispatch, useSelector} from 'react-redux';
 import io from 'socket.io-client';
 import Conversation from '../components/Conversation';
 import MessageHeaderModal from '../components/MessageHeaderModal';
-import {REACT_APP_NODEJS_API_URL} from '../constants';
-import {setCurrentUserId, setKeyboardHeight} from '../redux/globalSlice';
+import {REACT_APP_SOCKET_URL} from '../constants';
+import {
+  deleteFriendRequest,
+  fetchFriendRequests,
+  fetchFriends,
+  fetchMyFriendRequests,
+  inviteFriendRequest,
+} from '../redux/friendSlice';
+import {
+  initSocket,
+  setCurrentUserId,
+  setKeyboardHeight,
+} from '../redux/globalSlice';
 import {
   addMessage,
   addReaction,
@@ -18,13 +29,15 @@ import {
   updateCurrentConversation,
 } from '../redux/messageSlice';
 
+let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
+
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
 
-let socket = io(REACT_APP_NODEJS_API_URL, {transports: ['websocket']});
-
 export default function HomeScreen({navigation}) {
   const dispatch = useDispatch();
+  dispatch(initSocket({socket}));
+
   const {conversations} = useSelector(state => state.message);
 
   const handleFetchConversations = async () => {
@@ -34,10 +47,12 @@ export default function HomeScreen({navigation}) {
     console.log('fect');
     const keyboardHeightStr = await AsyncStorage.getItem('keyboardHeight');
     dispatch(setKeyboardHeight(keyboardHeightStr));
+    dispatch(fetchFriendRequests());
+    dispatch(fetchMyFriendRequests());
   };
 
   useEffect(() => {
-    if (conversations.length === 0) return;
+    if (!conversations) return;
 
     const conversationIds = conversations.map(
       conversationEle => conversationEle._id,
@@ -56,15 +71,18 @@ export default function HomeScreen({navigation}) {
       console.log('Lang Nghe');
       dispatch(addMessage({conversationId, message}));
     });
+
     socket.on('delete-message', (conversationId, id) => {
       console.log('Thu hoi');
       console.log({conversationId, id});
       dispatch(deleteMessage({conversationId, id}));
     });
+
     socket.on('add-reaction', (conversationId, messageId, user, type) => {
       console.log('Add reaction');
       dispatch(addReaction({conversationId, messageId, user, type}));
     });
+
     socket.on(
       'rename-conversation',
       (conversationId, conversationName, message) => {
@@ -74,6 +92,16 @@ export default function HomeScreen({navigation}) {
         );
       },
     );
+    socket.on('accept-friend', details => {
+      console.log('accept-friend');
+      dispatch(deleteFriendRequest(details._id));
+      dispatch(fetchFriends());
+    });
+
+    socket.on('send-friend-invite', details => {
+      console.log('send-friend-invite');
+      dispatch(inviteFriendRequest(details));
+    });
   }, []);
 
   const handleEnterChat = (
@@ -93,7 +121,7 @@ export default function HomeScreen({navigation}) {
   return (
     <SafeAreaView>
       <ScrollView>
-        {conversations.length > 0 &&
+        {conversations &&
           conversations.map(conversation => {
             const {
               _id,
@@ -105,7 +133,7 @@ export default function HomeScreen({navigation}) {
               totalMembers,
             } = conversation;
             return (
-              <Pressable>
+              <Pressable key={_id}>
                 <Conversation
                   name={name}
                   avatars={avatar}
@@ -114,14 +142,13 @@ export default function HomeScreen({navigation}) {
                   handleEnterChat={handleEnterChat}
                   type={type}
                   conversationId={_id}
-                  key={_id}
                   totalMembers={totalMembers}
                 />
               </Pressable>
             );
           })}
 
-        <MessageHeaderModal />
+        <MessageHeaderModal navigation={navigation} />
       </ScrollView>
     </SafeAreaView>
   );

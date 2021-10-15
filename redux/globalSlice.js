@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {AsyncStorage} from 'react-native';
+import io from 'socket.io-client';
+import {REACT_APP_API_URL} from '../constants';
 
 const KEY = 'global';
 
@@ -11,6 +12,7 @@ const globalSlice = createSlice({
     modalVisible: false,
     currentUserId: '',
     keyboardHeight: 280,
+    socket: {},
   },
 
   reducers: {
@@ -35,6 +37,9 @@ const globalSlice = createSlice({
       }
       state.keyboardHeight = keyboardHeight;
     },
+    initSocket: (state, action) => {
+      state.socket = action.payload;
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {},
@@ -47,5 +52,6 @@ export const {
   setModalVisible,
   setCurrentUserId,
   setKeyboardHeight,
+  initSocket,
 } = actions;
 export default reducer;
