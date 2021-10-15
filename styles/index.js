@@ -6,6 +6,8 @@ import React from 'react';
 
 export const WINDOW_WIDTH = Dimensions.get('window').width;
 export const WINDOW_HEIGHT = Dimensions.get('window').height;
+export const SCREEN_WIDTH = Dimensions.get('screen').width;
+export const SCREEN_HEIGHT = Dimensions.get('screen').height;
 
 export const MAIN_COLOR = '#0068FF';
 export const GREY_COLOR = '#889197';
@@ -81,6 +83,10 @@ const globalStyles = StyleSheet.create({
     backgroundColor: '#FF5B05',
   },
   badgeElement: {color: 'white', fontSize: 10},
+  imageMessage: {
+    width: '100%',
+    aspectRatio: 76 / 135,
+  },
 });
 
 export default globalStyles;

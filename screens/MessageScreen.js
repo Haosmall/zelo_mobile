@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -72,6 +73,7 @@ export default function MessageScreen({navigation, route}) {
     navigation.goBack();
     return true;
   };
+  
   const handleGoToOptionScreen = () => {
     navigation.navigate('Tùy chọn', {
       conversationId,
@@ -140,6 +142,7 @@ export default function MessageScreen({navigation, route}) {
             isMyMessage={isMyMessage}
             setModalVisible={setModalVisible}
             showReactDetails={setReactProps}
+            navigation={navigation}
           />
         </View>
       </TouchableWithoutFeedback>
@@ -197,11 +200,14 @@ export default function MessageScreen({navigation, route}) {
                   }
                   inverted
                   contentContainerStyle={{paddingBottom: 15}}
+                  // ListHeaderComponent={() => <Text>sss</Text>}
+                  // stickyHeaderIndices={[0]}
                 />
               </>
             ) : (
               <ScrollView></ScrollView>
             )}
+            {/* <Text>sss</Text> */}
             <MessageBottomBar
               conversationId={conversationId}
               showStickyBoard={setStickyBoardVisible}

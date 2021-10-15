@@ -1,22 +1,20 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import {
-  Dimensions,
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import {Button, Divider, Icon, Input, ListItem} from 'react-native-elements';
+import {Button, Divider, Icon, Input} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
+import {voteApi} from '../api';
 import {DEFAULT_ADD_VOTE_MODAL} from '../constants';
-import {GREY_COLOR} from '../styles';
+import commonFuc from '../utils/commonFuc';
 
 const AddVoteModal = props => {
   const {modalVisible, setModalVisible} = props;
@@ -24,8 +22,90 @@ const AddVoteModal = props => {
   const {currentConversationId} = useSelector(state => state.message);
   const dispatch = useDispatch();
 
+  const [content, setContent] = useState('');
+  const [textValue, setTextValue] = useState('');
+  const [numInputs, setNumInputs] = useState(2);
+  const inputsRef = useRef([textValue, textValue]);
+
+  const inputs = [];
+
+  for (let i = 0; i < numInputs; i++) {
+    inputs.push(
+      <View key={i}>
+        <Input
+          placeholder={`Phương án ${i + 1}`}
+          style={styles.option}
+          containerStyle={styles.optionContainer}
+          renderErrorMessage={false}
+          value={inputsRef.current[i]}
+          onChangeText={value => setInputValue(i, value)}
+          rightIcon={{
+            type: 'antdesign',
+            name: 'close',
+            color: 'grey',
+            onPress: () => removeInput(i),
+          }}
+        />
+      </View>,
+    );
+  }
+
+  const setInputValue = (index, value) => {
+    const inputs = inputsRef.current;
+    inputs[index] = value;
+    setTextValue(value);
+  };
+
+  const addInput = () => {
+    inputsRef.current.push('');
+    setNumInputs(value => value + 1);
+  };
+
+  const removeInput = index => {
+    if (inputsRef.current.length > 2) {
+      inputsRef.current.splice(index, 1)[0];
+      setNumInputs(value => value - 1);
+    } else {
+      commonFuc.notifyMessage('Bình chọn phải có ít nhất 2 phương án');
+    }
+  };
+
   const handleCloseModal = () => {
     setModalVisible(DEFAULT_ADD_VOTE_MODAL);
+  };
+  const handleCreateVote = async () => {
+    if (/^\s*$/.test(content)) {
+      commonFuc.notifyMessage('Chưa đặt câu hỏi bình chọn');
+      return;
+    }
+
+    // filter empty value
+    const options = inputsRef.current.filter(value => !/^\s*$/.test(value));
+    if (options.length >= 2) {
+      try {
+        const vote = {
+          content,
+          options,
+          conversationId: currentConversationId,
+        };
+        const response = await voteApi.addVote(vote);
+
+        console.log(vote);
+        console.log(response);
+
+        setContent('');
+        setTextValue('');
+        setNumInputs(2);
+        inputsRef.current = ['', ''];
+      } catch (error) {
+        console.log('Loi');
+      }
+
+      handleCloseModal();
+      commonFuc.notifyMessage('Tạo bình chọn thành công');
+    } else {
+      commonFuc.notifyMessage('Bình chọn phải có ít nhất 2 phương án');
+    }
   };
 
   return (
@@ -64,51 +144,47 @@ const AddVoteModal = props => {
           <Divider />
           <ScrollView>
             <View style={styles.body}>
-              <Input placeholder="Đặt câu hỏi bình chọn" />
               <Input
-                placeholder="Phương án 1"
-                style={styles.option}
-                containerStyle={styles.optionContainer}
-                renderErrorMessage={false}
+                placeholder="Đặt câu hỏi bình chọn"
+                inputContainerStyle={{borderBottomWidth: 0}}
+                onChangeText={value => setContent(value)}
               />
-              <Input
-                placeholder="Phương án 2"
-                style={styles.option}
-                containerStyle={styles.optionContainer}
-                renderErrorMessage={false}
-              />
-              <Input
-                placeholder="Phương án 2"
-                style={styles.option}
-                containerStyle={styles.optionContainer}
-                renderErrorMessage={false}
-              />
-              <Input
-                placeholder="Phương án 2"
-                style={styles.option}
-                containerStyle={styles.optionContainer}
-                renderErrorMessage={false}
-              />
-              <Input
-                placeholder="Phương án 2"
-                style={styles.option}
-                containerStyle={styles.optionContainer}
-                renderErrorMessage={false}
-              />
-              <Input
-                placeholder="Phương án 2"
-                style={styles.option}
-                containerStyle={styles.optionContainer}
-                renderErrorMessage={false}
-              />
-              <Button title="Thêm phương án" type="clear" />
-            </View>
-            <View style={styles.footer}>
+              {inputs}
+
               <Button
-                title="Tạo"
-                containerStyle={styles.buttonClose}
-                onPress={handleCloseModal}
+                title="Thêm phương án"
+                type="clear"
+                onPress={addInput}
+                containerStyle={{marginTop: 10}}
               />
+            </View>
+            <View>
+              <Divider />
+              <View style={styles.footer}>
+                <Button
+                  title="Hủy"
+                  type="outline"
+                  containerStyle={styles.buttonClose}
+                  buttonStyle={{
+                    borderRadius: 50,
+                  }}
+                  onPress={handleCloseModal}
+                />
+                <Button
+                  title="Tạo"
+                  containerStyle={styles.buttonClose}
+                  buttonStyle={{
+                    borderRadius: 50,
+                  }}
+                  onPress={handleCreateVote}
+                />
+              </View>
+            </View>
+
+            <View>
+              {inputsRef.current.map((value, i) => {
+                return <Text key={i}>{`${i + 1} - ${value}`}</Text>;
+              })}
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -155,23 +231,21 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   body: {
-    backgroundColor: 'cyan',
+    // backgroundColor: 'cyan',
     width: '100%',
     paddingBottom: 10,
     // alignItems: 'center',
     // justifyContent: 'flex-start',
   },
   footer: {
-    backgroundColor: 'pink',
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
     width: '100%',
+
     paddingHorizontal: 15,
     paddingVertical: 20,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 2,
   },
   title: {
     fontFamily: Platform.OS === 'ios' ? 'Arial' : 'normal',
@@ -180,12 +254,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
-    width: '100%',
+    // backgroundColor: '#2196F3',
+    width: '45%',
     borderRadius: 50,
   },
   option: {
-    fontSize: 12,
+    fontSize: 15,
     // backgroundColor: 'red',
     marginVertical: 0,
     paddingVertical: 5,

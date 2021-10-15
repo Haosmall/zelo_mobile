@@ -1,3 +1,4 @@
+import {Platform, ToastAndroid, AlertIOS} from 'react-native';
 import {REACTIONS} from '../constants';
 
 const commonFuc = {
@@ -44,6 +45,21 @@ const commonFuc = {
       .map(type => REACTIONS[type - 1])
       .join('');
     return reactionVisibleInfo;
+  },
+
+  notifyMessage: message => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      AlertIOS.alert(message);
+    }
+  },
+  getNumberOfVotes: options => {
+    let numberOfVotes = 0;
+    options.map(option => {
+      numberOfVotes += option.userIds.length;
+    });
+    return numberOfVotes;
   },
 };
 

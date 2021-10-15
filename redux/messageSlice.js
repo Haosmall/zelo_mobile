@@ -30,6 +30,7 @@ const messageSlice = createSlice({
     messages: [],
     currentConversationId: '',
     currentConversation: {},
+    currentVote: {},
   },
 
   reducers: {
@@ -38,12 +39,18 @@ const messageSlice = createSlice({
       state.isLoading = action.payload;
     },
 
+    setCurrentVote: (state, action) => {
+      state.currentVote = action.payload;
+    },
+
     clearMessagePages: (state, action) => {
       state.messagePages = {};
       state.messages = [];
       state.currentConversationId = '';
       state.currentConversation = {};
+      state.currentVote = {};
     },
+
     updateCurrentConversation: (state, action) => {
       const {conversationId} = action.payload;
       const index = state.conversations.findIndex(
@@ -268,5 +275,6 @@ export const {
   deleteMessage,
   addReaction,
   renameConversation,
+  setCurrentVote,
 } = actions;
 export default reducer;

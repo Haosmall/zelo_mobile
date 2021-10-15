@@ -12,6 +12,7 @@ import FriendDetailsScreen from '../screens/FriendDetailsScreen';
 import FriendRequestScreen from '../screens/FriendRequestScreen';
 import FriendSearchScreen from '../screens/FriendSearchScreen';
 import MessageScreen from '../screens/MessageScreen';
+import VoteDetailScreen from '../screens/VoteDetailScreen';
 import {globalScreenOptions} from '../styles';
 import TabNavigator from './TabNavigator';
 
@@ -133,6 +134,10 @@ const MainStackNavigator = ({navigation}) => {
           <Stack.Screen
             name="Chi tiết bạn bè"
             component={FriendDetailsScreen}
+          />
+          <Stack.Screen
+            name="Chi tiết bình chọn"
+            component={VoteDetailScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

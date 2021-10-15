@@ -1,12 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {
-  BackHandler,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import AddVoteModal from '../components/AddVoteModal';
@@ -16,6 +9,7 @@ import {
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
 } from '../constants';
+import {useGoback} from '../hooks';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
@@ -27,17 +21,20 @@ export default function ConversationOptionsScreen({navigation, route}) {
     DEFAULT_RENAME_CONVERSATION_MODAL,
   );
   const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
-  const handleGoBack = () => {
-    navigation.goBack();
-    return true;
-  };
 
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleGoBack);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
-    };
-  }, []);
+  useGoback(navigation);
+
+  // const handleGoBack = () => {
+  //   navigation.goBack();
+  //   return true;
+  // };
+
+  // useEffect(() => {
+  //   BackHandler.addEventListener('hardwareBackPress', handleGoBack);
+  //   return () => {
+  //     BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
+  //   };
+  // }, []);
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
   const avatarSource =

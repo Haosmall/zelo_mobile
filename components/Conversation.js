@@ -3,6 +3,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ListItem} from 'react-native-elements';
 import {useSelector} from 'react-redux';
+import {messageType} from '../constants';
 import CustomAvatar from './CustomAvatar';
 import MessageInfo from './MessageInfo';
 
@@ -28,7 +29,15 @@ const Conversation = props => {
       : `${user.name}: `
     : '';
 
-  const content = isDeleted ? 'Tin nhắn đã được thu hồi' : lastMessage.content;
+  const lastMessageType = lastMessage.type;
+
+  const content = isDeleted
+    ? 'Tin nhắn đã được thu hồi'
+    : lastMessageType === messageType.IMAGE
+    ? '[Hình ảnh]'
+    : lastMessageType === messageType.VOTE
+    ? `Đã tạo cuộc bình chọn mới ${lastMessage.content}`
+    : lastMessage.content;
 
   return (
     <View style={{backgroundColor: '#fff'}}>

@@ -1,7 +1,7 @@
 // export const REACT_APP_API_URL = 'http://tienganhpro.xyz/api';
 // export const REACT_APP_SOCKET_URL = 'http://tienganhpro.xyz';
-export const REACT_APP_API_URL = 'http://192.168.1.5:3001';
-export const REACT_APP_SOCKET_URL = 'http://192.168.1.5:3001';
+export const REACT_APP_API_URL = 'http://192.168.1.7:3001';
+export const REACT_APP_SOCKET_URL = 'http://192.168.1.7:3001';
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_PAGE_SIZE = 20;
 export const REACTIONS = ['♥️', '👍', '😄', '😲', '😭', '😡'];
@@ -20,6 +20,7 @@ export const messageType = {
   IMAGE: 'IMAGE',
   VIDEO: 'VIDEO',
   FILE: 'FILE',
+  VOTE: 'VOTE',
 };
 export const friendType = {
   FRIEND: 'FRIEND',
