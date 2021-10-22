@@ -22,6 +22,7 @@ export const messageType = {
   FILE: 'FILE',
   VOTE: 'VOTE',
 };
+
 export const friendType = {
   FRIEND: 'FRIEND',
   FOLLOWER: 'FOLLOWER',

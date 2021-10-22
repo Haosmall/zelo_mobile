@@ -73,7 +73,7 @@ export default function MessageScreen({navigation, route}) {
     navigation.goBack();
     return true;
   };
-  
+
   const handleGoToOptionScreen = () => {
     navigation.navigate('Tùy chọn', {
       conversationId,
@@ -193,6 +193,7 @@ export default function MessageScreen({navigation, route}) {
                   }}
                   data={messages}
                   keyExtractor={item => item._id}
+                  // keyExtractor={(item, index) => `${item._id}-${index}`}
                   renderItem={({item, index}) => renderMessage(item, index)}
                   initialNumToRender={20}
                   ListFooterComponent={() =>

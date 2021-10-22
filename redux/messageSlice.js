@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {conversationApi, messageApi} from '../api';
+import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
 
@@ -61,6 +62,15 @@ const messageSlice = createSlice({
 
     addMessage: (state, action) => {
       const {conversationId, message} = action.payload;
+
+      if (message.type === messageType.VOTE) {
+        const currentMessages = state.messages;
+        const newMessages = currentMessages.map(messageEle =>
+          messageEle._id === message._id ? message : messageEle,
+        );
+        state.messages = newMessages;
+        return;
+      }
       // tìm conversation
       const index = state.conversations.findIndex(
         conversationEle => conversationEle._id === conversationId,
@@ -157,7 +167,7 @@ const messageSlice = createSlice({
           const userIndex = oldReacts.findIndex(
             reactEle => reactEle.user._id === user._id,
           );
-          const newReact = {user, type};
+          const newReact = {user, type: +type};
           let newReacts = oldReacts;
 
           if (userIndex === -1) {
@@ -165,7 +175,9 @@ const messageSlice = createSlice({
           } else {
             newReacts[userIndex] = newReact;
           }
+
           newMessage[index] = {...seachMessage, reacts: newReacts};
+          state.messages = [];
           state.messages = newMessage.reverse();
         }
       }

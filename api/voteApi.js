@@ -17,14 +17,14 @@ const voteApi = {
     return axiosClient.delete(url, option);
   },
 
-  selectOption: (messageId, option) => {
+  selectOption: (messageId, options) => {
     const url = `${BASE_URL}/${messageId}/choices`;
-    return axiosClient.post(url, option);
+    return axiosClient.post(url, options);
   },
 
-  deleteSelectOption: (messageId, option) => {
+  deleteSelectOption: (messageId, options) => {
     const url = `${BASE_URL}/${messageId}/choices`;
-    return axiosClient.delete(url, option);
+    return axiosClient.delete(url, {data: options});
   },
 };
 

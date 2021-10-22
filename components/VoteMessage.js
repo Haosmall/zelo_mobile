@@ -14,7 +14,7 @@ const VoteMessage = props => {
   const dispatch = useDispatch();
 
   const options = message.options;
-  const numberOfVotes = commonFuc.getNumberOfVotes(options);
+  const totalOfVotes = commonFuc.getTotalOfVotes(options);
 
   const goToVoteScreen = () => {
     dispatch(setCurrentVote(message));
@@ -26,27 +26,22 @@ const VoteMessage = props => {
       <View style={styles.container}>
         <View style={styles.textContainer}>
           <Text style={styles.text}>{message.content}</Text>
-          {numberOfVotes > 0 && (
-            <Text style={{...styles.smallText, color: MAIN_COLOR}}>
-              {numberOfVotes} Người đã bình chọn
-            </Text>
+          {totalOfVotes > 0 && (
+            <TouchableOpacity>
+              <Text style={{...styles.smallText, color: MAIN_COLOR}}>
+                {commonFuc.getNumOfPeopleVoted(options)} Người đã bình chọn
+              </Text>
+            </TouchableOpacity>
           )}
         </View>
 
         {options.map((option, index) => {
-          const percent =
-            numberOfVotes === 0
-              ? numberOfVotes
-              : (option.userIds.length * 100) / numberOfVotes;
-
-          console.log(numberOfVotes);
-
           return (
             index < 4 && (
               <VoteProgress
                 key={option._id}
-                percent={`${percent}%`}
-                option={option.name}
+                totalOfVotes={totalOfVotes}
+                option={option}
               />
             )
           );

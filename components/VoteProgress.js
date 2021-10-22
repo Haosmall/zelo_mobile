@@ -4,18 +4,34 @@ import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
 import {WINDOW_WIDTH} from '../styles';
 import {CheckBox, Icon} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import commonFuc from '../utils/commonFuc';
+import {useSelector} from 'react-redux';
 
 const VoteProgress = props => {
-  const {percent, option, maxWidth, isCheckBoxType} = props;
+  const {totalOfVotes, option, maxWidth, isCheckBoxType, onChange} = props;
+  const {userProfile} = useSelector(state => state.me);
 
-  const [checked, setChecked] = useState(true);
+  const percent = commonFuc.getPercentOfVotes(
+    totalOfVotes,
+    option.userIds.length,
+  );
+  // console.log('percent: ', percent);
+
+  const isChecked = option.userIds.includes(userProfile._id);
+  const [checked, setChecked] = useState(isChecked);
+
+  const handleOnPress = () => {
+    onChange(!checked, option.name);
+    setChecked(!checked);
+  };
+
   return (
-    <TouchableOpacity onPress={() => setChecked(!checked)}>
+    <TouchableOpacity onPress={isCheckBoxType ? handleOnPress : null}>
       <View style={styles.progressBar}>
         <View
           style={
             ([StyleSheet.absoluteFill],
-            {backgroundColor: '#bfe0ff', borderRadius: 5, width: percent})
+            {backgroundColor: '#bfe0ff', borderRadius: 5, width: `${percent}%`})
           }>
           <View
             style={{
@@ -36,7 +52,7 @@ const VoteProgress = props => {
                 }}
                 center
                 checked={checked}
-                onPress={() => setChecked(!checked)}
+                onPress={handleOnPress}
                 checkedIcon={
                   <Icon
                     name="check-circle"
@@ -60,7 +76,7 @@ const VoteProgress = props => {
                 width: '100%',
                 marginRight: isCheckBoxType ? 20 : 0,
               }}>
-              {option}
+              {option.name}
             </Text>
           </View>
         </View>
@@ -70,17 +86,19 @@ const VoteProgress = props => {
 };
 
 VoteProgress.propTypes = {
-  percent: PropTypes.string,
-  option: PropTypes.string,
+  totalOfVotes: PropTypes.number,
+  option: PropTypes.object,
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isCheckBoxType: PropTypes.bool,
+  onChange: PropTypes.func,
 };
 
 VoteProgress.defaultProps = {
-  percent: '0%',
-  option: '0%',
+  totalOfVotes: 0,
+  option: {},
   maxWidth: WINDOW_WIDTH * 0.8 - 20,
   isCheckBoxType: false,
+  onChange: null,
 };
 
 export default VoteProgress;

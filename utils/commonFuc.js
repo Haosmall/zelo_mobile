@@ -1,5 +1,6 @@
 import {Platform, ToastAndroid, AlertIOS} from 'react-native';
 import {REACTIONS} from '../constants';
+import dateUtils from './dateUtils';
 
 const commonFuc = {
   getBase64: file => {
@@ -54,12 +55,63 @@ const commonFuc = {
       AlertIOS.alert(message);
     }
   },
-  getNumberOfVotes: options => {
-    let numberOfVotes = 0;
+  getNumOfPeopleVoted: options => {
+    let userIds = [];
     options.map(option => {
-      numberOfVotes += option.userIds.length;
+      userIds.push(...option.userIds);
     });
-    return numberOfVotes;
+    return [...new Set(userIds)].length;
+  },
+  getTotalOfVotes: options => {
+    let totalOfVotes = 0;
+    options.map(option => {
+      totalOfVotes += option.userIds.length;
+    });
+    return totalOfVotes;
+  },
+
+  getPercentOfVotes: (totalOfVotes, numberOfVotes) => {
+    const percent =
+      totalOfVotes === 0 ? totalOfVotes : (numberOfVotes * 100) / totalOfVotes;
+    return percent;
+  },
+  getCurrentUserVotes: (options, userId) => {
+    let currentUserVotes = [];
+    for (const option of options) {
+      if (option.userIds.includes(userId)) {
+        currentUserVotes.push(option.name);
+      }
+    }
+    return currentUserVotes;
+  },
+  getDifferentValue: (array1, array2) => {
+    let newArray = [];
+    for (const element of array1) {
+      if (!array2.includes(element)) {
+        newArray.push(element);
+      }
+    }
+    return newArray;
+  },
+  
+  getNumberOfDays: dateString => {
+    const dateCreated = new Date(dateString);
+    const currentDay = new Date();
+
+    // One day in milliseconds
+    const oneDay = 1000 * 60 * 60 * 24;
+
+    // Calculating the time difference between two dates
+    const diffInTime = currentDay.getTime() - dateCreated.getTime();
+
+    // Calculating the no. of days between two dates
+    const diffInDays = Math.round(diffInTime / oneDay);
+
+    if (diffInDays <= 7) {
+      return `${diffInDays} ngày trước`;
+    }
+
+    return dateUtils.getDate(dateString);
   },
 };
 

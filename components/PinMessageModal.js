@@ -154,6 +154,7 @@ const PinMessageModal = props => {
               <Button
                 title="Xong"
                 containerStyle={styles.buttonClose}
+                buttonStyle={{borderRadius: 50}}
                 onPress={handleCloseModal}
               />
             </View>
