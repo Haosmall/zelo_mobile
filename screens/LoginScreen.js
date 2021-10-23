@@ -15,7 +15,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginApi, meApi} from '../api';
 import InputField from '../components/InputField';
-import {useKeyboard} from '../hooks';
+import {useKeyboardHeight} from '../hooks';
 import {setLoading, setLogin} from '../redux/globalSlice';
 import globalStyles from '../styles';
 import {loginValid} from '../utils/validator';
@@ -24,7 +24,7 @@ const LoginScreen = ({navigation}) => {
   const {isLoading} = useSelector(state => state.global);
   const [errorMessage, setErrorMessage] = useState('');
   const dispatch = useDispatch();
-  const keyboardHeight = useKeyboard();
+  const keyboardHeight = useKeyboardHeight();
 
   const handleLogin = async acount => {
     errorMessage !== '' && setErrorMessage('');

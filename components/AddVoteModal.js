@@ -45,6 +45,7 @@ const AddVoteModal = props => {
             color: 'grey',
             onPress: () => removeInput(i),
           }}
+          maxLength={120}
         />
       </View>,
     );
@@ -82,6 +83,10 @@ const AddVoteModal = props => {
     // filter empty value
     const options = inputsRef.current.filter(value => !/^\s*$/.test(value));
     if (options.length >= 2) {
+      if ([...new Set(options)].length < options.length) {
+        commonFuc.notifyMessage('Phương án không được trùng nhau');
+        return;
+      }
       try {
         const vote = {
           content,
@@ -148,6 +153,7 @@ const AddVoteModal = props => {
                 placeholder="Đặt câu hỏi bình chọn"
                 inputContainerStyle={{borderBottomWidth: 0}}
                 onChangeText={value => setContent(value)}
+                maxLength={120}
               />
               {inputs}
 

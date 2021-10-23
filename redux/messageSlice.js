@@ -63,14 +63,6 @@ const messageSlice = createSlice({
     addMessage: (state, action) => {
       const {conversationId, message} = action.payload;
 
-      if (message.type === messageType.VOTE) {
-        const currentMessages = state.messages;
-        const newMessages = currentMessages.map(messageEle =>
-          messageEle._id === message._id ? message : messageEle,
-        );
-        state.messages = newMessages;
-        return;
-      }
       // tìm conversation
       const index = state.conversations.findIndex(
         conversationEle => conversationEle._id === conversationId,
@@ -223,6 +215,22 @@ const messageSlice = createSlice({
       state.currentConversation = seachConversation;
       state.conversations = [seachConversation, ...conversationTempt];
     },
+
+    updateVoteMessage: (state, action) => {
+      const {conversationId, message} = action.payload;
+      // Update vote in message
+      const currentMessages = state.messages;
+      const newMessages = currentMessages.map(messageEle =>
+        messageEle._id === message._id ? message : messageEle,
+      );
+      state.messages = newMessages;
+
+      // Update currentVote in store
+      const voteStoreId = state.currentVote?._id;
+      if (voteStoreId === message._id) {
+        state.currentVote = message;
+      }
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {
@@ -288,5 +296,6 @@ export const {
   addReaction,
   renameConversation,
   setCurrentVote,
+  updateVoteMessage,
 } = actions;
 export default reducer;

@@ -6,7 +6,6 @@ import commonFuc from '../utils/commonFuc';
 
 const CustomAvatar = props => {
   const {avatars, name} = props;
-
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
 
@@ -15,9 +14,13 @@ const CustomAvatar = props => {
       rounded
       title={commonFuc.getAcronym(name)}
       overlayContainerStyle={styles.overlay}
-      source={{
-        uri: avatars,
-      }}
+      source={
+        avatars.length > 0
+          ? {
+              uri: avatars,
+            }
+          : null
+      }
       size="medium"
     />
   ) : (
@@ -28,9 +31,13 @@ const CustomAvatar = props => {
             rounded
             title={commonFuc.getAcronym(name)}
             overlayContainerStyle={styles.overlay}
-            source={{
-              uri: avatars[value],
-            }}
+            source={
+              avatars[value]?.length > 0
+                ? {
+                    uri: avatars[value],
+                  }
+                : null
+            }
             containerStyle={styles.avatar}
             titleStyle={styles.title}
           />
@@ -42,9 +49,13 @@ const CustomAvatar = props => {
             rounded
             title={commonFuc.getAcronym(name)}
             overlayContainerStyle={styles.overlay}
-            source={{
-              uri: avatars[3],
-            }}
+            source={
+              avatars[3]?.length > 0
+                ? {
+                    uri: avatars[3],
+                  }
+                : null
+            }
             containerStyle={styles.avatar}
             titleStyle={styles.title}
           />
@@ -67,7 +78,7 @@ const CustomAvatar = props => {
 };
 
 CustomAvatar.propTypes = {
-  avatars: PropTypes.any,
+  avatars: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   name: PropTypes.string,
 };
 

@@ -13,7 +13,10 @@ const VoteMessage = props => {
 
   const dispatch = useDispatch();
 
-  const options = message.options;
+  const options = [...message.options].sort((option1, option2) =>
+    option1.userIds.length > option2.userIds.length ? -1 : 1,
+  );
+
   const totalOfVotes = commonFuc.getTotalOfVotes(options);
 
   const goToVoteScreen = () => {
@@ -37,7 +40,7 @@ const VoteMessage = props => {
 
         {options.map((option, index) => {
           return (
-            index < 4 && (
+            index < 3 && (
               <VoteProgress
                 key={option._id}
                 totalOfVotes={totalOfVotes}

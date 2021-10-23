@@ -27,6 +27,7 @@ import {
   fetchConversations,
   renameConversation,
   updateCurrentConversation,
+  updateVoteMessage,
 } from '../redux/messageSlice';
 
 let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
@@ -102,6 +103,11 @@ export default function HomeScreen({navigation}) {
       console.log('send-friend-invite');
       dispatch(inviteFriendRequest(details));
     });
+
+     socket.on('update-vote-message', (conversationId, message) => {
+       console.log('update-vote-message');
+       dispatch(updateVoteMessage({conversationId, message}));
+     });
   }, []);
 
   const handleEnterChat = (
