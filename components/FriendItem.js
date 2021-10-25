@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Avatar, ListItem, Button} from 'react-native-elements';
+import {StyleSheet, View} from 'react-native';
+import {Avatar, Button, ListItem} from 'react-native-elements';
 import {useDispatch} from 'react-redux';
-import {friendApi} from '../api';
+import {conversationApi, friendApi} from '../api';
 import {friendType} from '../constants';
 import {
   addNewFriendRequest,
@@ -12,10 +12,15 @@ import {
   fetchFriends,
   updateFriendStatus,
 } from '../redux/friendSlice';
-import commonFuc from '../utils/commonFuc';
+import {
+  fetchListLastViewer,
+  updateCurrentConversation,
+} from '../redux/messageSlice';
+import {OVERLAY_AVATAR_COLOR} from '../styles';
+import commonFuc, {handleCreateChat} from '../utils/commonFuc';
 
 export default function FriendItem(props) {
-  const {type, name, avatar, topDivider, userId} = props;
+  const {type, name, avatar, topDivider, userId, navigation} = props;
 
   const dispatch = useDispatch();
 
@@ -32,6 +37,7 @@ export default function FriendItem(props) {
     switch (type) {
       case friendType.FRIEND:
         console.log('Nhan tin');
+        handleCreateChat(userId, navigation, dispatch);
         break;
       case friendType.FOLLOWER:
         handleAcceptFriend();
@@ -94,6 +100,28 @@ export default function FriendItem(props) {
     }
   };
 
+  const handleCreateChat = async userId => {
+    try {
+      const response = await conversationApi.addConversation(userId);
+
+      if (response?.isExists) {
+        handleEnterChat(response._id);
+      }
+    } catch (error) {
+      console.log('Có lỗi xảy ra', error);
+    }
+  };
+
+  const handleEnterChat = conversationId => {
+    // dispatch(clearMessagePages());
+    dispatch(updateCurrentConversation({conversationId}));
+    dispatch(fetchListLastViewer({conversationId}));
+    console.log('conver: ', conversationId);
+    navigation.navigate('Nhắn tin', {
+      conversationId,
+    });
+  };
+
   return (
     <ListItem
       topDivider={topDivider}
@@ -102,7 +130,7 @@ export default function FriendItem(props) {
       <Avatar
         rounded
         title={commonFuc.getAcronym(name)}
-        overlayContainerStyle={{backgroundColor: '#d9dfeb'}}
+        overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
         source={
           avatar.length > 0
             ? {

@@ -20,7 +20,7 @@ import {
 import 'react-native-gesture-handler';
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 import {Provider, useDispatch, useSelector} from 'react-redux';
-import {setLogin} from './redux/globalSlice';
+import {setCurrentUserId, setLogin} from './redux/globalSlice';
 import store from './redux/store';
 import SplashScreen from './screens/SplashScreen';
 import LoginStackNavigator from './navigations/LoginStackNavigator';
@@ -42,7 +42,13 @@ const AppScreen = () => {
   const handleCheckLogin = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      if (token) dispatch(setLogin(true));
+      if (token) {
+        dispatch(setLogin(true));
+        const currentUserId = await AsyncStorage.getItem('userId');
+        dispatch(setCurrentUserId(currentUserId));
+        const keyboardHeightStr = await AsyncStorage.getItem('keyboardHeight');
+        dispatch(setKeyboardHeight(keyboardHeightStr));
+      }
     } catch (e) {
       // error reading value
     }

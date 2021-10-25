@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Text} from 'react-native';
-import {messageType} from '../constants';
+import {DEFAULT_COVER_IMAGE, messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
 import ReceiverMessage from './ReceiverMessage';
@@ -9,8 +9,14 @@ import SenderMessage from './SenderMessage';
 import VoteMessage from './VoteMessage';
 
 function ChatMessage(props) {
-  const {message, isMyMessage, setModalVisible, showReactDetails, navigation} =
-    props;
+  const {
+    message,
+    isMyMessage,
+    setModalVisible,
+    showReactDetails,
+    navigation,
+    setImageProps,
+  } = props;
 
   const {_id, createdAt, user, isDeleted, reacts, type} = message;
   const time = dateUtils.getTime(createdAt);
@@ -40,6 +46,14 @@ function ChatMessage(props) {
     showReactDetails(obj);
   };
 
+  const handleViewImage = (url, userName) => {
+    setImageProps({
+      isVisible: true,
+      userName: userName,
+      imageUrl: url || DEFAULT_COVER_IMAGE,
+    });
+  };
+
   return type === messageType.VOTE ? (
     <VoteMessage message={message} navigation={navigation} />
   ) : isMyMessage ? (
@@ -51,6 +65,7 @@ function ChatMessage(props) {
       time={time}
       reactVisibleInfo={reactVisibleInfo}
       reactLength={reactLength}
+      handleViewImage={handleViewImage}
     />
   ) : (
     <SenderMessage
@@ -61,6 +76,7 @@ function ChatMessage(props) {
       time={time}
       reactVisibleInfo={reactVisibleInfo}
       reactLength={reactLength}
+      handleViewImage={handleViewImage}
     />
   );
 }
@@ -72,6 +88,7 @@ ChatMessage.propTypes = {
   isMyMessage: PropTypes.bool,
   setModalVisible: PropTypes.func,
   showReactDetails: PropTypes.func,
+  setImageProps: PropTypes.func,
 };
 
 ChatMessage.defaultProps = {
@@ -81,6 +98,7 @@ ChatMessage.defaultProps = {
   isMyMessage: false,
   setModalVisible: null,
   showReactDetails: null,
+  setImageProps: null,
 };
 
 export default ChatMessage;

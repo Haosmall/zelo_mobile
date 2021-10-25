@@ -1,11 +1,14 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Platform, StatusBar, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
+import PushNotification from 'react-native-push-notification';
 import {useDispatch, useSelector} from 'react-redux';
-import {setModalVisible} from '../redux/globalSlice';
+import io from 'socket.io-client';
+import {REACT_APP_SOCKET_URL} from '../constants';
+import {initSocket, setModalVisible} from '../redux/globalSlice';
 import AddNewFriendScreen from '../screens/AddNewFriendScreen';
 import ConversationOptionsScreen from '../screens/ConversationOptionsScreen';
 import FriendDetailsScreen from '../screens/FriendDetailsScreen';
@@ -16,10 +19,13 @@ import VoteDetailScreen from '../screens/VoteDetailScreen';
 import {globalScreenOptions} from '../styles';
 import TabNavigator from './TabNavigator';
 
+let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
+
 const Stack = createStackNavigator();
 
 const MainStackNavigator = ({navigation}) => {
   const dispatch = useDispatch();
+  dispatch(initSocket(socket));
   const {modalVisible} = useSelector(state => state.global);
 
   // const headerRightButton = () => (
@@ -58,6 +64,36 @@ const MainStackNavigator = ({navigation}) => {
     </View>
   );
 
+  // useEffect(() => {
+  //   socket.on('accept-friend', details => {
+  //     console.log('accept-friend');
+  //     dispatch(deleteFriendRequest(details._id));
+  //     dispatch(fetchFriends());
+  //   });
+  //   socket.on(
+  //     'create-individual-conversation-when-was-friend',
+  //     conversationId => {
+  //       console.log('create-individual-conversation-when-was-friend');
+  //       dispatch(deleteFriendRequest(details._id));
+  //       dispatch(fetchConversations());
+  //     },
+  //   );
+  //   socket.on('send-friend-invite', details => {
+  //     console.log('send-friend-invite');
+  //     dispatch(inviteFriendRequest(details));
+  //   });
+  // });
+  useEffect(() => {
+    createChannels();
+  }, []);
+
+  const createChannels = () => {
+    PushNotification.createChannel({
+      channelId: 'new-message',
+      channelName: 'Tin nhắn mới',
+    });
+  };
+
   return (
     <>
       <LinearGradient
@@ -77,7 +113,7 @@ const MainStackNavigator = ({navigation}) => {
         <Stack.Navigator screenOptions={globalScreenOptions}>
           <Stack.Screen
             name="Trang chủ"
-            component={TabNavigator}
+            // component={TabNavigator}
             options={({navigation, route}) => {
               let title = 'Tin nhắn';
               let headerRight = () =>
@@ -121,8 +157,15 @@ const MainStackNavigator = ({navigation}) => {
                 title,
                 headerRight,
               };
-            }}
-          />
+            }}>
+            {props => (
+              <TabNavigator
+                {...props}
+                socket={socket}
+                navigation={navigation}
+              />
+            )}
+          </Stack.Screen>
           <Stack.Screen name="Nhắn tin" component={MessageScreen} />
           <Stack.Screen name="Tùy chọn" component={ConversationOptionsScreen} />
           <Stack.Screen

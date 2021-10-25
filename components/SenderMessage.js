@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {Avatar, Image} from 'react-native-elements';
 import {messageType} from '../constants';
-import globalStyles from '../styles';
+import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 import MessageNotifyDivider from './MessageNotifyDivider';
 
@@ -22,6 +22,7 @@ const SenderMessage = props => {
     time,
     reactVisibleInfo,
     reactLength,
+    handleViewImage,
   } = props;
 
   const {_id, user, isDeleted, type} = message;
@@ -41,12 +42,26 @@ const SenderMessage = props => {
           <Avatar
             title={commonFuc.getAcronym(user.name)}
             rounded
-            source={{uri: user.avatar}}
+            // source={{uri: user.avatar}}
+            source={
+              user.avatar?.length > 0
+                ? {
+                    uri: user.avatar,
+                  }
+                : null
+            }
+            overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
             containerStyle={styles.avatar}
           />
           <Text style={styles.messageName}>{user.name}</Text>
           {type === messageType.IMAGE ? (
-            <Image source={{uri: content}} style={globalStyles.imageMessage} />
+            <Image
+              source={{uri: content}}
+              style={globalStyles.imageMessage}
+              onPress={() => handleViewImage(content, user.name)}
+              onLongPress={handleOpenOptionModal}
+              delayLongPress={500}
+            />
           ) : (
             <Text style={contentStyle}>{content}</Text>
           )}
@@ -68,6 +83,7 @@ SenderMessage.propTypes = {
   message: PropTypes.object,
   handleOpenOptionModal: PropTypes.func,
   handleShowReactDetails: PropTypes.func,
+  handleViewImage: PropTypes.func,
   content: PropTypes.string,
   time: PropTypes.string,
   reactVisibleInfo: PropTypes.string,
@@ -78,6 +94,7 @@ SenderMessage.defaultProps = {
   message: {},
   handleOpenOptionModal: null,
   handleShowReactDetails: null,
+  handleViewImage: null,
   content: '',
   time: '',
   reactVisibleInfo: '',

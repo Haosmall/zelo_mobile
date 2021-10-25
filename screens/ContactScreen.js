@@ -8,19 +8,26 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Avatar, Icon, Input, ListItem} from 'react-native-elements';
+import {Avatar, Icon, Input, ListItem, Divider} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import ContactAction from '../components/ContactAction';
 import FriendItem from '../components/FriendItem';
 import {friendType} from '../constants';
-import {fetchFriends} from '../redux/friendSlice';
-import {GREY_COLOR, WINDOW_WIDTH} from '../styles';
+import {
+  deleteFriendRequest,
+  fetchFriendById,
+  fetchFriends,
+  inviteFriendRequest,
+} from '../redux/friendSlice';
+import {fetchConversations} from '../redux/messageSlice';
+import {GREY_COLOR, WINDOW_WIDTH, OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
 export default function ContactScreen({navigation}) {
   const dispatch = useDispatch();
 
   const {listFriends} = useSelector(state => state.friend);
+  const {socket} = useSelector(state => state.global);
 
   const inputRef = useRef('');
   const typingTimeoutRef = useRef(null);
@@ -43,6 +50,11 @@ export default function ContactScreen({navigation}) {
   const handleSearchFriendSubmit = async userName => {
     // const response = await userApi.fetchUsers(userName);
     dispatch(fetchFriends({name: userName}));
+  };
+
+  const handleGoToPersonalScreen = async userId => {
+    await dispatch(fetchFriendById({userId}));
+    navigation.navigate('Chi tiết bạn bè');
   };
 
   return (
@@ -69,10 +81,16 @@ export default function ContactScreen({navigation}) {
           backgroundColor="#70c43b"
           handlePress={() => navigation.navigate('Lời mời kết bạn')}
         />
-        <ListItem>
+        <ContactAction
+          name="search"
+          type="ionicon"
+          title="Tìm kiếm bạn bè"
+          backgroundColor={OVERLAY_AVATAR_COLOR}
+          handlePress={() => navigation.navigate('Lời mời kết bạn')}
+        />
+        {/* <ListItem>
           <Avatar
             rounded
-            // overlayContainerStyle={{backgroundColor: 'blue'}}
             icon={{
               type: 'ionicon',
               name: 'search',
@@ -80,26 +98,11 @@ export default function ContactScreen({navigation}) {
             }}
             size="medium"
           />
-          {/* <ListItem.Content
-            style={{
-              backgroundColor: 'cyan',
-              // flexDirection: 'row',
-              // alignContent: 'flex-start',
-              // paddingHorizontal: 0,
-              justifyContent: 'flex-start',
-            }}></ListItem.Content> */}
           <Input
             ref={inputRef}
-            // leftIcon={{
-            //   type: 'ionicon',
-            //   name: 'search',
-            //   color: GREY_COLOR,
-            // }}
             renderErrorMessage={false}
             inputContainerStyle={{
               borderBottomWidth: 0,
-              // borderRadius: 50,
-              // backgroundColor: 'cyan',
               margin: 0,
             }}
             containerStyle={{
@@ -109,23 +112,26 @@ export default function ContactScreen({navigation}) {
             placeholder="Số điện thoại/email"
             onChangeText={value => handleSearchFriendChange(value)}
           />
-        </ListItem>
+        </ListItem> */}
 
         {listFriends &&
           listFriends.map(friend => {
             const {_id, avatar, name} = friend;
             return (
-              <Pressable key={_id}>
+              <TouchableOpacity
+                key={_id}
+                onPress={() => handleGoToPersonalScreen(_id)}>
                 <View style={{backgroundColor: '#fff'}}>
                   <FriendItem
                     name={name}
                     avatar={avatar}
                     type={friendType.FRIEND}
                     userId={_id}
+                    navigation={navigation}
                   />
                   <View style={styles.bottomDivider}></View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             );
           })}
       </ScrollView>

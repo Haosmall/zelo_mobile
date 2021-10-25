@@ -11,15 +11,21 @@ const MessageNotifyDivider = props => {
   const {type, content, user} = message;
 
   const contentLowercase =
-    content.charAt(0).toLocaleLowerCase() + content.slice(1);
+    content === 'PIN_MESSAGE'
+      ? 'đã ghim một tin nhắn'
+      : content.charAt(0).toLocaleLowerCase() + content.slice(1);
   const contentWithSenderName = `<p> ${
     isReceiverMessage ? 'Bạn' : user.name
   } ${contentLowercase}</p`;
 
+  const icon = contentLowercase.includes('ghim')
+    ? {name: 'pushpino', type: 'antdesign', color: '#dc923c'}
+    : {name: 'edit', type: 'material', color: '#4cacfc'};
+
   return (
     <TouchableWithoutFeedback>
       <View style={styles.container}>
-        <Icon name="edit" type="material" size={14} color="#4cacfc" />
+        <Icon name={icon.name} type={icon.type} size={14} color={icon.color} />
         {type === messageType.NOTIFY ? (
           <HTMLView
             value={contentWithSenderName}

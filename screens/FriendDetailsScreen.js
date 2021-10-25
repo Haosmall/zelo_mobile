@@ -17,7 +17,12 @@ import {ScrollView} from 'react-native-gesture-handler';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import {useDispatch, useSelector} from 'react-redux';
 import {friendApi} from '../api';
-import {DEFAULT_COVER_IMAGE, friendType} from '../constants';
+import ViewImageModal from '../components/ViewImageModal';
+import {
+  DEFAULT_COVER_IMAGE,
+  DEFAULT_IMAGE_MODAL,
+  friendType,
+} from '../constants';
 import {
   addNewFriendRequest,
   cancelMyFriendRequest,
@@ -25,8 +30,8 @@ import {
   fetchFriends,
   updateFriendStatus,
 } from '../redux/friendSlice';
-import {WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
-import commonFuc from '../utils/commonFuc';
+import {OVERLAY_AVATAR_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
+import commonFuc, {handleCreateChat} from '../utils/commonFuc';
 
 export default function FriendDetailsScreen({navigation}) {
   const {searchFriend} = useSelector(state => state.friend);
@@ -36,6 +41,7 @@ export default function FriendDetailsScreen({navigation}) {
 
   const [isImageViewVisible, setIsImageViewVisible] = useState(false);
   const [imageView, setImageView] = useState([]);
+  const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
 
   // const buttonTitle = 'Nhắn tin';
   const friendStatus = searchFriend.status;
@@ -56,6 +62,7 @@ export default function FriendDetailsScreen({navigation}) {
     switch (friendStatus) {
       case friendType.FRIEND:
         console.log('Nhan tin');
+        handleCreateChat(searchFriend._id, navigation, dispatch);
         break;
       case friendType.FOLLOWER:
         handleAcceptFriend();
@@ -74,7 +81,7 @@ export default function FriendDetailsScreen({navigation}) {
         break;
     }
   };
-  
+
   const handleAddFriendRequest = async () => {
     try {
       const userId = searchFriend._id;
@@ -129,14 +136,11 @@ export default function FriendDetailsScreen({navigation}) {
   }, [navigation]);
 
   const handleViewImage = url => {
-    const image = [
-      {
-        url: url || DEFAULT_COVER_IMAGE,
-      },
-    ];
-
-    setImageView(image);
-    setIsImageViewVisible(true);
+    setImageProps({
+      isVisible: true,
+      userName: searchFriend.name,
+      imageUrl: url || DEFAULT_COVER_IMAGE,
+    });
   };
 
   const handleDoB = () => {
@@ -179,10 +183,6 @@ export default function FriendDetailsScreen({navigation}) {
     return phoneNumber;
   };
 
-  const handleCloseModal = () => {
-    setIsImageViewVisible(false);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -199,14 +199,13 @@ export default function FriendDetailsScreen({navigation}) {
             source={searchFriend.avatar ? {uri: searchFriend.avatar} : null}
             size={120}
             rounded
-            overlayContainerStyle={{backgroundColor: '#d9dfeb'}}
+            overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
             containerStyle={styles.avatar}
             onPress={() =>
               searchFriend.avatar && handleViewImage(searchFriend.avatar)
             }
           />
         </View>
-
         <View style={styles.action}>
           <Text style={styles.name}>{searchFriend.name}</Text>
 
@@ -231,7 +230,6 @@ export default function FriendDetailsScreen({navigation}) {
             />
           </View>
         </View>
-
         <View style={styles.detailsContainer}>
           <ListItem topDivider>
             <Text style={styles.title}>Giới tính</Text>
@@ -260,57 +258,7 @@ export default function FriendDetailsScreen({navigation}) {
           </ListItem>
         </View>
 
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-        <Text> </Text>
-
-        <Modal
-          visible={isImageViewVisible}
-          transparent={true}
-          onRequestClose={handleCloseModal}>
-          <ImageViewer
-            imageUrls={imageView}
-            onCancel={handleCloseModal}
-            onSwipeDown={handleCloseModal}
-            saveToLocalByLongPress={true}
-            renderIndicator={() => (
-              <View style={styles.indicator}>
-                <TouchableOpacity onPress={handleCloseModal}>
-                  <Icon
-                    name="arrowleft"
-                    type="antdesign"
-                    size={22}
-                    color="white"
-                  />
-                </TouchableOpacity>
-                <Text style={{color: '#fff', fontSize: 18, marginLeft: 15}}>
-                  {searchFriend.name}
-                </Text>
-              </View>
-            )}
-          />
-        </Modal>
+        <ViewImageModal imageProps={imageProps} setImageProps={setImageProps} />
       </ScrollView>
     </SafeAreaView>
   );

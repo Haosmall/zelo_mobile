@@ -10,12 +10,13 @@ import {
   DEFAULT_RENAME_CONVERSATION_MODAL,
 } from '../constants';
 import {useGoback} from '../hooks';
+import {OVERLAY_AVATAR_COLOR} from '../styles';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
 
   const {currentConversation} = useSelector(state => state.message);
-  const {totalMembers, name, type, avatar} = currentConversation;
+  const {totalMembers, name, type, avatar, isNotify} = currentConversation;
 
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_RENAME_CONVERSATION_MODAL,
@@ -76,8 +77,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
           <ConversationOptionsBar
             name={name}
             type={type}
+            notify={isNotify}
             setModalVisible={setModalVisible}
             openAddVoteModal={setAddVoteVisible}
+            navigation={navigation}
           />
         </View>
         <Text>{conversationId}</Text>
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   overlay: {
-    backgroundColor: '#d9dfeb',
+    backgroundColor: OVERLAY_AVATAR_COLOR,
   },
   avatarAccessory: {
     justifyContent: 'center',

@@ -1,5 +1,11 @@
 import {Platform, ToastAndroid, AlertIOS} from 'react-native';
+import {conversationApi} from '../api';
 import {REACTIONS} from '../constants';
+import {
+  clearMessagePages,
+  fetchListLastViewer,
+  updateCurrentConversation,
+} from '../redux/messageSlice';
 import dateUtils from './dateUtils';
 
 const commonFuc = {
@@ -20,12 +26,15 @@ const commonFuc = {
   },
 
   getAcronym: name => {
-    const acronym = name
-      .split(/\s/)
-      .reduce((response, word) => (response += word.slice(0, 1)), '')
-      .toUpperCase();
+    if (name) {
+      const acronym = name
+        .split(/\s/)
+        .reduce((response, word) => (response += word.slice(0, 1)), '')
+        .toUpperCase();
 
-    return acronym;
+      return acronym;
+    }
+    return '';
   },
 
   getUniqueListBy: (arr, key) => {
@@ -93,7 +102,7 @@ const commonFuc = {
     }
     return newArray;
   },
-  
+
   getNumberOfDays: dateString => {
     const dateCreated = new Date(dateString);
     const currentDay = new Date();
@@ -113,6 +122,28 @@ const commonFuc = {
 
     return dateUtils.getDate(dateString);
   },
+};
+
+export const handleCreateChat = async (userId, navigation, dispatch) => {
+  try {
+    const response = await conversationApi.addConversation(userId);
+
+    if (response?.isExists) {
+      handleEnterChat(response._id, navigation, dispatch);
+    }
+  } catch (error) {
+    console.log('Có lỗi xảy ra', error);
+  }
+};
+
+const handleEnterChat = (conversationId, navigation, dispatch) => {
+  dispatch(clearMessagePages());
+  dispatch(updateCurrentConversation({conversationId}));
+  dispatch(fetchListLastViewer({conversationId}));
+  console.log('conver: ', conversationId);
+  navigation.navigate('Nhắn tin', {
+    conversationId,
+  });
 };
 
 export default commonFuc;

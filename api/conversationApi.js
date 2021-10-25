@@ -7,6 +7,11 @@ const conversationApi = {
     return axiosClient.get(BASE_URL, {params});
   },
 
+  fetchConversation: conversationId => {
+    const url = `${BASE_URL}/${conversationId}`;
+    return axiosClient.get(url);
+  },
+
   fetchClassifies: classifyId => {
     const url = `${BASE_URL}/classifies/${classifyId}`;
     return axiosClient.get(url);
@@ -30,6 +35,15 @@ const conversationApi = {
   updateAvatar: (groupId, avatar) => {
     const url = `${BASE_URL}/${groupId}/avatar`;
     return axiosClient.patch(url, avatar);
+  },
+
+  updateNotify: (conversationId, isNotify) => {
+    const url = `${BASE_URL}/${conversationId}/notify/${isNotify}`;
+    return axiosClient.patch(url);
+  },
+
+  fetchListLastViewer: conversationId => {
+    return axiosClient.get(`${BASE_URL}/${conversationId}/last-view`);
   },
 };
 

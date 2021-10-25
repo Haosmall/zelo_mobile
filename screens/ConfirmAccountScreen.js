@@ -20,10 +20,10 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginApi, meApi} from '../api';
 import {setLoading, setLogin} from '../redux/globalSlice';
-import globalStyles from '../styles';
+import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 
 const CELL_COUNT = 6;
-const RESEND_OTP_TIME_LIMIT = 30;
+const RESEND_OTP_TIME_LIMIT = 60;
 
 const ConfirmAccountScreen = ({navigation, route}) => {
   const {account} = route.params;
@@ -41,7 +41,7 @@ const ConfirmAccountScreen = ({navigation, route}) => {
   const ref = useBlurOnFulfill({value: otpValue, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value: otpValue,
-    setValue: setOtpValue,
+    setValue: text => setOtpValue(text),
   });
 
   //to start resent otp option
@@ -62,6 +62,7 @@ const ConfirmAccountScreen = ({navigation, route}) => {
     const {username, password} = account;
     const response = await loginApi.login({username, password});
     await AsyncStorage.setItem('token', response.token);
+    await AsyncStorage.setItem('refreshToken', response.refreshToken);
     const userProfile = await meApi.fetchProfile();
     await AsyncStorage.setItem('userId', userProfile._id);
     dispatch(setLoading(false));
@@ -72,13 +73,22 @@ const ConfirmAccountScreen = ({navigation, route}) => {
     console.log('otp is ', otpValue);
     if (otpValue.length === 6) {
       dispatch(setLoading(true));
-      const response = await handleConfirmAccount(account.username, otpValue);
-      if (response.data) {
-        dispatch(setLoading(false));
-        setErrorMessage(response.data.message);
-      } else {
+
+      try {
+        const response = await handleConfirmAccount(account.username, otpValue);
         await handleLogin();
+      } catch (error) {
+        console.log('ConfirmAccountScreen', error);
+        dispatch(setLoading(false));
+        setErrorMessage('OTP không đúng hoặc hết hạn');
       }
+
+      // if (response.data) {
+      //   dispatch(setLoading(false));
+      //   setErrorMessage(response.data.message);
+      // } else {
+      //   await handleLogin();
+      // }
     } else {
       setErrorMessage('OTP không hợp lệ');
     }
@@ -190,7 +200,7 @@ const ConfirmAccountScreen = ({navigation, route}) => {
                 title={account.name[0]}
                 rounded
                 size="large"
-                overlayContainerStyle={{backgroundColor: 'grey'}}
+                overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
                 source={account?.avatar && {uri: account?.avatar}}
               />
             </View>

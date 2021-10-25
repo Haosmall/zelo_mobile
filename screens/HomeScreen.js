@@ -4,10 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect} from 'react';
 import {Pressable, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import io from 'socket.io-client';
 import Conversation from '../components/Conversation';
 import MessageHeaderModal from '../components/MessageHeaderModal';
-import {REACT_APP_SOCKET_URL} from '../constants';
 import {
   deleteFriendRequest,
   fetchFriendRequests,
@@ -15,39 +13,35 @@ import {
   fetchMyFriendRequests,
   inviteFriendRequest,
 } from '../redux/friendSlice';
-import {
-  initSocket,
-  setCurrentUserId,
-  setKeyboardHeight,
-} from '../redux/globalSlice';
+import {setCurrentUserId, setKeyboardHeight} from '../redux/globalSlice';
 import {
   addMessage,
   addReaction,
   deleteMessage,
   fetchConversations,
+  fetchListLastViewer,
   renameConversation,
+  setListLastViewer,
+  setNotification,
   updateCurrentConversation,
   updateVoteMessage,
+  usersNotTyping,
+  usersTyping,
 } from '../redux/messageSlice';
-
-let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
 
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
 
 export default function HomeScreen({navigation}) {
   const dispatch = useDispatch();
-  dispatch(initSocket({socket}));
 
   const {conversations} = useSelector(state => state.message);
+  const {socket, currentUserId} = useSelector(state => state.global);
+  const {userProfile} = useSelector(state => state.me);
 
   const handleFetchConversations = async () => {
-    dispatch(fetchConversations());
-    const currentUserId = await AsyncStorage.getItem('userId');
-    dispatch(setCurrentUserId(currentUserId));
+    await dispatch(fetchConversations());
     console.log('fect');
-    const keyboardHeightStr = await AsyncStorage.getItem('keyboardHeight');
-    dispatch(setKeyboardHeight(keyboardHeightStr));
     dispatch(fetchFriendRequests());
     dispatch(fetchMyFriendRequests());
   };
@@ -69,8 +63,11 @@ export default function HomeScreen({navigation}) {
 
   useEffect(() => {
     socket.on('new-message', (conversationId, message) => {
-      console.log('Lang Nghe');
+      console.log('Lang Nghe', conversationId);
       dispatch(addMessage({conversationId, message}));
+      dispatch(
+        setNotification({conversationId, message, userId: currentUserId}),
+      );
     });
 
     socket.on('delete-message', (conversationId, id) => {
@@ -99,15 +96,49 @@ export default function HomeScreen({navigation}) {
       dispatch(fetchFriends());
     });
 
+    socket.on(
+      'create-individual-conversation-when-was-friend',
+      conversationId => {
+        console.log('create-individual-conversation-when-was-friend');
+        dispatch(fetchConversations());
+      },
+    );
+
     socket.on('send-friend-invite', details => {
       console.log('send-friend-invite');
       dispatch(inviteFriendRequest(details));
     });
 
-     socket.on('update-vote-message', (conversationId, message) => {
-       console.log('update-vote-message');
-       dispatch(updateVoteMessage({conversationId, message}));
-     });
+    socket.on('update-vote-message', (conversationId, message) => {
+      console.log('update-vote-message');
+      dispatch(updateVoteMessage({conversationId, message}));
+    });
+
+    socket.on('user-last-view', ({conversationId, userId, lastView}) => {
+      console.log('user-last-view', {conversationId, userId, lastView});
+      currentUserId !== userId &&
+        dispatch(fetchListLastViewer({conversationId}));
+      // userProfile._id !== userId &&
+      //   dispatch(
+      //     setListLastViewer({
+      //       conversationId,
+      //       userId,
+      //       lastView,
+      //     }),
+      //   );
+    });
+
+    socket.on('typing', (conversationId, user) => {
+      dispatch(usersTyping({conversationId, user}));
+    });
+
+    socket.on('not-typing', (conversationId, user) => {
+      dispatch(usersNotTyping({conversationId, user}));
+    });
+
+    socket.on('create-individual-conversation', conversationId => {
+      handleEnterChat(conversationId);
+    });
   }, []);
 
   const handleEnterChat = (
@@ -119,11 +150,13 @@ export default function HomeScreen({navigation}) {
   ) => {
     // dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
+    dispatch(fetchListLastViewer({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
     });
   };
+
   return (
     <SafeAreaView>
       <ScrollView>

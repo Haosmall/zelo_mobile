@@ -30,16 +30,27 @@ const LoginScreen = ({navigation}) => {
     errorMessage !== '' && setErrorMessage('');
     dispatch(setLoading(true));
 
-    const response = await loginApi.login(acount);
+    try {
+      const response = await loginApi.login(acount);
 
-    if (response.data) {
-      setErrorMessage('Tài khoản hay mật khẩu không chính xác');
-    } else {
       await AsyncStorage.setItem('token', response.token);
+      await AsyncStorage.setItem('refreshToken', response.refreshToken);
       const userProfile = await meApi.fetchProfile();
       await AsyncStorage.setItem('userId', userProfile._id);
       dispatch(setLogin(true));
+    } catch (error) {
+      setErrorMessage('Tài khoản hay mật khẩu không chính xác');
     }
+
+    // if (response.data) {
+    //   setErrorMessage('Tài khoản hay mật khẩu không chính xác');
+    // } else {
+    //   await AsyncStorage.setItem('token', response.token);
+    //   await AsyncStorage.setItem('refreshToken', response.refreshToken);
+    //   const userProfile = await meApi.fetchProfile();
+    //   await AsyncStorage.setItem('userId', userProfile._id);
+    //   dispatch(setLogin(true));
+    // }
 
     dispatch(setLoading(false));
   };

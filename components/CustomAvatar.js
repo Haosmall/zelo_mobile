@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Avatar} from 'react-native-elements';
+import {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
 const CustomAvatar = props => {
@@ -105,6 +106,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   overlay: {
-    backgroundColor: 'grey',
+    backgroundColor: OVERLAY_AVATAR_COLOR,
   },
 });

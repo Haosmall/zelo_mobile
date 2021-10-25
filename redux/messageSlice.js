@@ -1,6 +1,6 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import PushNotification from 'react-native-push-notification';
 import {conversationApi, messageApi} from '../api';
-import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
 
@@ -21,6 +21,14 @@ export const fetchMessages = createAsyncThunk(
     return {messages, conversationId, isSendMessage};
   },
 );
+export const fetchListLastViewer = createAsyncThunk(
+  `${KEY}/fetchListLastViewer`,
+  async (params, thunkApi) => {
+    const {conversationId} = params;
+    const data = await conversationApi.fetchListLastViewer(conversationId);
+    return data;
+  },
+);
 
 const messageSlice = createSlice({
   name: KEY,
@@ -32,6 +40,8 @@ const messageSlice = createSlice({
     currentConversationId: '',
     currentConversation: {},
     currentVote: {},
+    listLastViewer: [],
+    usersTyping: [],
   },
 
   reducers: {
@@ -44,14 +54,18 @@ const messageSlice = createSlice({
       state.currentVote = action.payload;
     },
 
+    // TODO:---------------------- clearMessagePages ----------------------
     clearMessagePages: (state, action) => {
       state.messagePages = {};
       state.messages = [];
       state.currentConversationId = '';
       state.currentConversation = {};
       state.currentVote = {};
+      state.listLastViewer = [];
+      state.usersTyping = [];
     },
 
+    // TODO:---------------------- updateCurrentConversation ----------------------
     updateCurrentConversation: (state, action) => {
       const {conversationId} = action.payload;
       const index = state.conversations.findIndex(
@@ -60,6 +74,7 @@ const messageSlice = createSlice({
       state.currentConversation = state.conversations[index];
     },
 
+    // TODO:---------------------- addMessage ----------------------
     addMessage: (state, action) => {
       const {conversationId, message} = action.payload;
 
@@ -98,6 +113,7 @@ const messageSlice = createSlice({
       state.conversations = [seachConversation, ...conversationTempt];
     },
 
+    //  TODO:---------------------- deleteMessage ----------------------
     deleteMessage: (state, action) => {
       const {conversationId, id} = action.payload;
       const conversations = state.conversations;
@@ -131,6 +147,7 @@ const messageSlice = createSlice({
       }
     },
 
+    // TODO:---------------------- deleteMessageOnlyMe ----------------------
     deleteMessageOnlyMe: (state, action) => {
       const messageId = action.payload;
       const messages = state.messages.reverse();
@@ -141,6 +158,8 @@ const messageSlice = createSlice({
       );
       state.messages = newMessages.reverse();
     },
+
+    // TODO:---------------------- addReaction ----------------------
     addReaction: (state, action) => {
       const {conversationId, messageId, user, type} = action.payload;
 
@@ -175,6 +194,7 @@ const messageSlice = createSlice({
       }
     },
 
+    // TODO:---------------------- renameConversation ----------------------
     renameConversation: (state, action) => {
       const {conversationId, conversationName, message} = action.payload;
       // tìm conversation
@@ -216,6 +236,7 @@ const messageSlice = createSlice({
       state.conversations = [seachConversation, ...conversationTempt];
     },
 
+    // TODO:---------------------- updateVoteMessage ----------------------
     updateVoteMessage: (state, action) => {
       const {conversationId, message} = action.payload;
       // Update vote in message
@@ -231,9 +252,110 @@ const messageSlice = createSlice({
         state.currentVote = message;
       }
     },
+
+    // TODO:---------------------- setNotification ----------------------
+    setNotification: (state, action) => {
+      const {conversationId, message, userId} = action.payload;
+      const isNotification = state.conversations.find(ele => {
+        console.log('ele: ', ele);
+        return ele._id === conversationId;
+      }).isNotify;
+
+      if (isNotification) {
+        return;
+      }
+      if (state.conversations.length <= 0) {
+        return;
+      }
+
+      console.log('userId: ', userId);
+      console.log('message.user._id: ', message.user._id);
+
+      if (userId === message.user._id) {
+        return;
+      }
+
+      console.log('isNotification: ', isNotification);
+
+      // PushNotification.cancelAllLocalNotifications();
+      PushNotification.localNotification({
+        channelId: 'new-message',
+        title: message.user.name,
+        message: message.content,
+        id: state.messages.length,
+        soundName: 'my_sound.mp3',
+        playSound: true,
+      });
+    },
+
+    // TODO:---------------------- updateNotification ----------------------
+    updateNotification: (state, action) => {
+      const {conversationId, isNotify} = action.payload;
+      const oldCurrentConversation = state.currentConversation;
+      state.currentConversation = {...oldCurrentConversation, isNotify};
+
+      const oldConversations = state.conversations;
+      const index = oldConversations.findIndex(
+        ele => ele._id === conversationId,
+      );
+
+      if (index >= 0) {
+        const oldConversation = oldConversations[index];
+        state.conversations[index] = {...oldConversation, isNotify};
+      }
+    },
+
+    // TODO:---------------------- setListLastViewer ----------------------
+    setListLastViewer: (state, action) => {
+      const {conversationId, userId, lastView} = action.payload;
+
+      if (conversationId !== state.currentConversationId) return;
+
+      const index = state.listLastViewer.findIndex(
+        userEle => userEle.user._id === userId,
+      );
+
+      if (index >= 0) {
+        state.listLastViewer[index].lastView = lastView;
+      } else {
+      }
+    },
+
+    // TODO:---------------------- usersTyping ----------------------
+    usersTyping: (state, action) => {
+      const {conversationId, user} = action.payload;
+
+      if (conversationId !== state.currentConversationId) return;
+
+      const oldUsersTyping = state.usersTyping;
+
+      const index = oldUsersTyping.findIndex(
+        userEle => userEle._id === user._id,
+      );
+
+      if (index < 0) {
+        state.usersTyping = [...oldUsersTyping, user];
+      }
+    },
+
+    // TODO:---------------------- usersNotTyping ----------------------
+    usersNotTyping: (state, action) => {
+      const {conversationId, user} = action.payload;
+
+      if (conversationId !== state.currentConversationId) return;
+
+      const oldUsersTyping = state.usersTyping;
+
+      const newUsersTyping = oldUsersTyping.filter(
+        userEle => userEle._id !== user._id,
+      );
+
+      state.usersTyping = newUsersTyping;
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {
+    // TODO:---------------------- fetchConversations ----------------------
     // Đang xử lý
     [fetchConversations.pending]: (state, action) => {
       state.isLoading = true;
@@ -248,6 +370,7 @@ const messageSlice = createSlice({
       state.isLoading = false;
     },
 
+    // TODO:---------------------- fetchMessages ----------------------
     // Đang xử lý
     [fetchMessages.pending]: (state, action) => {
       state.isLoading = true;
@@ -282,6 +405,21 @@ const messageSlice = createSlice({
     [fetchMessages.rejected]: (state, action) => {
       state.isLoading = false;
     },
+
+    // TODO:---------------------- fetchListLastViewer ----------------------
+    // Đang xử lý
+    [fetchListLastViewer.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchListLastViewer.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.listLastViewer = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchListLastViewer.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
   },
 });
 
@@ -297,5 +435,10 @@ export const {
   renameConversation,
   setCurrentVote,
   updateVoteMessage,
+  setNotification,
+  updateNotification,
+  setListLastViewer,
+  usersTyping,
+  usersNotTyping,
 } = actions;
 export default reducer;

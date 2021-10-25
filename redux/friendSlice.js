@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {friendApi} from '../api';
+import {friendApi, userApi} from '../api';
 
 const KEY = 'friend';
 
@@ -21,6 +21,14 @@ export const fetchMyFriendRequests = createAsyncThunk(
   `${KEY}/fetchMyFriendRequest`,
   async (params, thunkApi) => {
     const data = await friendApi.fetchMyFriendRequests();
+    return data;
+  },
+);
+export const fetchFriendById = createAsyncThunk(
+  `${KEY}/fetchFriendById`,
+  async (params, thunkApi) => {
+    const {userId} = params;
+    const data = await userApi.fetchUserById(userId);
     return data;
   },
 );
@@ -127,6 +135,21 @@ const friendSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchMyFriendRequests.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // ========================== fetchFriendById ==========================
+    // Đang xử lý
+    [fetchFriendById.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchFriendById.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.searchFriend = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchFriendById.rejected]: (state, action) => {
       state.isLoading = false;
     },
   },

@@ -139,13 +139,13 @@ const ImagePickerModal = props => {
     console.log('body: ', body);
     handleCloseModal();
 
-    // messageApi
-    //   .sendFileBase64Message(body, params)
-    //   .then(res => {
-    //     console.log('Send Message Success', res);
-    //     handleCloseModal();
-    //   })
-    //   .catch(err => console.log('Send Message Fail'));
+    messageApi
+      .sendFileBase64Message(body, params)
+      .then(res => {
+        console.log('Send Message Success', res);
+        handleCloseModal();
+      })
+      .catch(err => console.log('Send Message Fail'));
   };
 
   const handleCloseModal = () => {

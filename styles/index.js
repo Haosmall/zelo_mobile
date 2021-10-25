@@ -11,6 +11,7 @@ export const SCREEN_HEIGHT = Dimensions.get('screen').height;
 
 export const MAIN_COLOR = '#0068FF';
 export const GREY_COLOR = '#889197';
+export const OVERLAY_AVATAR_COLOR = '#d9dfeb';
 
 export const globalScreenOptions = {
   headerStyle: {backgroundColor: MAIN_COLOR},

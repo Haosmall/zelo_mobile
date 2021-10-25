@@ -65,6 +65,7 @@ export default function AddNewFriendScreen({navigation}) {
               onPress={handleSearchFriendSubmit}
             />
           }
+          editable
         />
       </ListItem>
 

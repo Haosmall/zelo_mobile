@@ -18,11 +18,11 @@ const ForgotPasswordScreen = ({navigation}) => {
   const handleSendOTP = async account => {
     const {username} = account;
     dispatch(setLoading(true));
-    const response = await loginApi.changePassword({username});
-    console.log(response.data);
-    if (response.data) {
-      Alert.alert('Cảnh báo', 'Tài khoản không tồn tại');
-    } else {
+
+    try {
+      const response = await loginApi.changePassword({username});
+      console.log(response.data);
+
       const user = await loginApi.fetchUser(username);
       console.log(user);
       if (user.isActived) {
@@ -32,7 +32,24 @@ const ForgotPasswordScreen = ({navigation}) => {
           account,
         });
       }
+    } catch (error) {
+      Alert.alert('Cảnh báo', 'Tài khoản không tồn tại');
     }
+
+    // if (response.data) {
+    //   Alert.alert('Cảnh báo', 'Tài khoản không tồn tại');
+    // } else {
+    //   const user = await loginApi.fetchUser(username);
+    //   console.log(user);
+    //   if (user.isActived) {
+    //     navigation.navigate('Xác nhận', {account, isForgotPassword: true});
+    //   } else {
+    //     navigation.navigate('Xác nhận tài khoản', {
+    //       account,
+    //     });
+    //   }
+    // }
+
     dispatch(setLoading(false));
   };
 

@@ -8,6 +8,11 @@ const loginApi = {
     return axiosClient.post(url, account);
   },
 
+  refreshToken: refreshToken => {
+    const url = `${BASE_URL}/refresh-token`;
+    return axiosClient.post(url, {refreshToken});
+  },
+
   register: userAccount => {
     const url = `${BASE_URL}/registry`;
     return axiosClient.post(url, userAccount);

@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
+import AnimatedEllipsis from '../components/AnimatedEllipsis';
 import ChatMessage from '../components/ChatMessage';
 import ImagePickerModal from '../components/ImagePickerModal';
 import MessageBottomBar from '../components/MessageBottomBar';
@@ -25,7 +26,9 @@ import PinMessageModal from '../components/PinMessageModal';
 import PinnedMessage from '../components/PinnedMessage';
 import ReactionModal from '../components/ReactionModal';
 import StickyBoard from '../components/StickyBoard';
+import ViewImageModal from '../components/ViewImageModal';
 import {
+  DEFAULT_IMAGE_MODAL,
   DEFAULT_MESSAGE_MODAL_VISIBLE,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
@@ -33,7 +36,11 @@ import {
   DEFAULT_REACTION_MODAL_VISIBLE,
 } from '../constants';
 import {setLoading} from '../redux/globalSlice';
-import {clearMessagePages, fetchMessages} from '../redux/messageSlice';
+import {
+  clearMessagePages,
+  fetchListLastViewer,
+  fetchMessages,
+} from '../redux/messageSlice';
 import {fetchPinMessages} from '../redux/pinSlice';
 
 const page = DEFAULT_PAGE;
@@ -43,9 +50,8 @@ export default function MessageScreen({navigation, route}) {
   // Props
   const {conversationId} = route.params;
   const dispatch = useDispatch();
-  const {messages, messagePages, currentConversation} = useSelector(
-    state => state.message,
-  );
+  const {messages, messagePages, currentConversation, usersTyping} =
+    useSelector(state => state.message);
   const {currentUserId, isLoading, keyboardHeight} = useSelector(
     state => state.global,
   );
@@ -61,6 +67,7 @@ export default function MessageScreen({navigation, route}) {
   const [pinMessageVisible, setPinMessageVisible] = useState(
     DEFAULT_PIN_MESSAGE_MODAL,
   );
+  const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
   const [stickyBoardVisible, setStickyBoardVisible] = useState(false);
   const [apiParams, setApiParams] = useState({page, size});
 
@@ -143,6 +150,7 @@ export default function MessageScreen({navigation, route}) {
             setModalVisible={setModalVisible}
             showReactDetails={setReactProps}
             navigation={navigation}
+            setImageProps={setImageProps}
           />
         </View>
       </TouchableWithoutFeedback>
@@ -208,7 +216,16 @@ export default function MessageScreen({navigation, route}) {
             ) : (
               <ScrollView></ScrollView>
             )}
-            {/* <Text>sss</Text> */}
+            {usersTyping.length > 0 && (
+              <View style={styles.typingContainer}>
+                <View style={styles.typingWrap}>
+                  <Text style={styles.typingText}>
+                    {`${usersTyping[0].name} đang nhập `}
+                  </Text>
+                  <AnimatedEllipsis style={styles.dot} />
+                </View>
+              </View>
+            )}
             <MessageBottomBar
               conversationId={conversationId}
               showStickyBoard={setStickyBoardVisible}
@@ -240,6 +257,12 @@ export default function MessageScreen({navigation, route}) {
               setModalVisible={setPinMessageVisible}
             />
           )}
+          {imageProps.isVisible && (
+            <ViewImageModal
+              imageProps={imageProps}
+              setImageProps={setImageProps}
+            />
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -255,5 +278,30 @@ const styles = StyleSheet.create({
   headerSubTitle: {
     color: '#fff',
     fontSize: 12,
+  },
+  typingContainer: {width: '100%', flexDirection: 'row'},
+  typingWrap: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    justifyContent: 'flex-start',
+
+    marginTop: -10,
+    paddingTop: 5,
+    paddingHorizontal: 15,
+
+    borderTopWidth: 1,
+    borderRightWidth: 1,
+    borderTopColor: '#E5E6E7',
+    borderRightColor: '#E5E6E7',
+    borderTopRightRadius: 10,
+  },
+  typingText: {
+    fontSize: 14,
+  },
+  dot: {
+    fontSize: 18,
+    // flexDirection: 'column',
+    color: '#aaa',
+    padding: 0,
   },
 });

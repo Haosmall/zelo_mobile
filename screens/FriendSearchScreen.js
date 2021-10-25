@@ -4,7 +4,7 @@ import {Avatar, Input, ListItem} from 'react-native-elements';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch} from 'react-redux';
 import {friendApi} from '../api';
-import {GREY_COLOR} from '../styles';
+import {GREY_COLOR, OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
 export default function FriendSearchScreen() {
@@ -118,5 +118,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5B05',
     marginTop: -26,
     marginLeft: 14,
+  },
+  overlay: {
+    backgroundColor: OVERLAY_AVATAR_COLOR,
   },
 });

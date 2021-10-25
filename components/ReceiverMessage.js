@@ -27,6 +27,7 @@ const ReceiverMessage = props => {
     time,
     reactVisibleInfo,
     reactLength,
+    handleViewImage,
   } = props;
 
   const {_id, isDeleted, type} = message;
@@ -44,7 +45,13 @@ const ReceiverMessage = props => {
       <View style={styles.receiverContainer}>
         <View style={styles.receiver} key={_id}>
           {type === messageType.IMAGE ? (
-            <Image source={{uri: content}} style={globalStyles.imageMessage} />
+            <Image
+              source={{uri: content}}
+              style={globalStyles.imageMessage}
+              onPress={() => handleViewImage(content, message.user.name)}
+              onLongPress={handleOpenOptionModal}
+              delayLongPress={500}
+            />
           ) : (
             <Text style={contentStyle}>{content}</Text>
           )}
@@ -66,6 +73,7 @@ ReceiverMessage.propTypes = {
   message: PropTypes.object,
   handleOpenOptionModal: PropTypes.func,
   handleShowReactDetails: PropTypes.func,
+  handleViewImage: PropTypes.func,
   content: PropTypes.string,
   time: PropTypes.string,
   reactVisibleInfo: PropTypes.string,
@@ -76,6 +84,7 @@ ReceiverMessage.defaultProps = {
   message: {},
   handleOpenOptionModal: null,
   handleShowReactDetails: null,
+  handleViewImage: null,
   content: '',
   time: '',
   reactVisibleInfo: '',

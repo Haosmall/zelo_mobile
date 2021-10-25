@@ -53,3 +53,8 @@ export const DEFAULT_PIN_MESSAGE_MODAL = {
 export const DEFAULT_ADD_VOTE_MODAL = {
   isVisible: false,
 };
+export const DEFAULT_IMAGE_MODAL = {
+  isVisible: false,
+  userName: '',
+  imageUrl: '',
+};

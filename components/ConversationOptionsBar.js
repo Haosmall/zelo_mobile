@@ -2,23 +2,54 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Button, Icon} from 'react-native-elements';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
 } from '../constants';
+import {fetchFriendById} from '../redux/friendSlice';
+import {updateNotification} from '../redux/messageSlice';
+import {conversationApi} from '../api';
+import commonFuc from '../utils/commonFuc';
 
 const ICON_SIZE = 20;
 
 const ConversationOptionsBar = props => {
-  const {name, type, setModalVisible, openAddVoteModal} = props;
+  const {name, type, setModalVisible, openAddVoteModal, navigation, notify} =
+    props;
+  const {currentConversation} = useSelector(state => state.message);
+
+  const dispatch = useDispatch();
 
   const handleOpenAddVoteModal = () => {
     openAddVoteModal({...DEFAULT_ADD_VOTE_MODAL, isVisible: true});
   };
 
+  const handleGoToPersonalScreen = async () => {
+    const userId = currentConversation.userId;
+    await dispatch(fetchFriendById({userId}));
+    navigation.navigate('Chi tiết bạn bè');
+  };
+
+  const handleNotifications = async () => {
+    try {
+      const conversationId = currentConversation._id;
+      // false: 0, true: 1
+      const isNotify = !notify;
+      const response = await conversationApi.updateNotify(
+        conversationId,
+        isNotify ? 1 : 0,
+      );
+      console.log('update isNotify: ', response);
+      dispatch(updateNotification({conversationId, isNotify}));
+
+      commonFuc.notifyMessage(`Đã ${notify ? 'bật' : 'tắt'} thông báo`);
+    } catch (error) {}
+  };
+
   return (
     <View style={styles.container}>
-      {type && (
+      {type ? (
         <>
           <Button
             title="Thêm thành viên"
@@ -52,6 +83,23 @@ const ConversationOptionsBar = props => {
             onPress={handleOpenAddVoteModal}
           />
         </>
+      ) : (
+        <Button
+          title="Trang cá nhân"
+          containerStyle={styles.button}
+          type="clear"
+          icon={
+            <Icon
+              name="person-outline"
+              type="ionicon"
+              size={ICON_SIZE}
+              containerStyle={styles.iconContainer}
+            />
+          }
+          titleStyle={styles.title}
+          iconPosition="top"
+          onPress={handleGoToPersonalScreen}
+        />
       )}
       <Button
         title={type ? 'Đặt tên nhóm' : 'Đặt biệt danh'}
@@ -76,12 +124,14 @@ const ConversationOptionsBar = props => {
         iconPosition="top"
       />
       <Button
-        title="Tắt thông báo"
+        title={`${notify ? 'Bật' : 'Tắt'} thông báo`}
         containerStyle={styles.button}
         type="clear"
         icon={
           <Icon
-            name="notifications-outline"
+            name={
+              notify ? 'notifications-off-outline' : 'notifications-outline'
+            }
             type="ionicon"
             size={ICON_SIZE}
             containerStyle={styles.iconContainer}
@@ -89,6 +139,7 @@ const ConversationOptionsBar = props => {
         }
         titleStyle={styles.title}
         iconPosition="top"
+        onPress={handleNotifications}
       />
     </View>
   );
@@ -98,6 +149,7 @@ ConversationOptionsBar.propTypes = {
   avatars: PropTypes.any,
   name: PropTypes.string,
   type: PropTypes.bool,
+  notify: PropTypes.bool,
   setModalVisible: PropTypes.func,
   openAddVoteModal: PropTypes.func,
 };
@@ -106,6 +158,7 @@ ConversationOptionsBar.defaultProps = {
   avatars: '',
   name: '',
   type: false,
+  notify: false,
   setModalVisible: null,
   openAddVoteModal: null,
 };

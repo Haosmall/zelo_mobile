@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
+import {useSelector} from 'react-redux';
 
 import {messageApi} from '../api';
 import {MAIN_COLOR} from '../styles';
@@ -16,6 +17,8 @@ import {MAIN_COLOR} from '../styles';
 const MessageBottomBar = props => {
   const {conversationId, showStickyBoard, showImageModal} = props;
   const [messageValue, setMessageValue] = useState('');
+  const {userProfile} = useSelector(state => state.me);
+  const {socket} = useSelector(state => state.global);
 
   const handleShowStickyBoard = () => {
     showStickyBoard(true);
@@ -36,6 +39,7 @@ const MessageBottomBar = props => {
         .sendMessage(newMessage)
         .then(res => {
           console.log('Send Message Success');
+          socket.emit('not-typing', conversationId, userProfile);
         })
         .catch(err => console.log('Send Message Fail'));
     } else {
@@ -43,6 +47,24 @@ const MessageBottomBar = props => {
     }
     setMessageValue('');
   };
+
+  const handleOnChageTextInput = value => {
+    setMessageValue(value);
+
+    if (value.length > 0) {
+      console.log(socket);
+      console.log(conversationId);
+      socket.emit('typing', conversationId, userProfile);
+    } else {
+      socket.emit('not-typing', conversationId, userProfile);
+    }
+  };
+
+  const handleOnTextInputTouch = () => {
+    console.log('conversation-last-view', conversationId);
+    socket.emit('conversation-last-view', conversationId);
+  };
+
   return (
     <View style={styles.footer}>
       <TouchableOpacity
@@ -57,11 +79,12 @@ const MessageBottomBar = props => {
       <TextInput
         placeholder="Tin nhắn, @"
         value={messageValue}
-        onChangeText={value => setMessageValue(value)}
+        onChangeText={value => handleOnChageTextInput(value)}
         onFocus={() => showStickyBoard(false)}
         style={styles.textInput}
         multiline
         editable
+        // onTouchStart={handleOnTextInputTouch}
       />
       {messageValue ? (
         <TouchableOpacity
@@ -77,7 +100,8 @@ const MessageBottomBar = props => {
             style={{
               paddingBottom: 8,
               marginRight: 10,
-            }}>
+            }}
+            onPress={handleOnTextInputTouch}>
             <Icon name="ellipsis-horizontal-outline" type="ionicon" size={22} />
           </TouchableOpacity>
           <TouchableOpacity
