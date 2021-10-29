@@ -3,6 +3,14 @@ import {friendApi, userApi} from '../api';
 
 const KEY = 'friend';
 
+const initialState = {
+  isLoading: false,
+  listFriends: [],
+  searchFriend: {},
+  friendRequests: [],
+  myFriendRequests: [],
+};
+
 export const fetchFriends = createAsyncThunk(
   `${KEY}/fetchFriends`,
   async (params, thunkApi) => {
@@ -35,13 +43,7 @@ export const fetchFriendById = createAsyncThunk(
 
 const friendSlice = createSlice({
   name: KEY,
-  initialState: {
-    isLoading: false,
-    listFriends: [],
-    searchFriend: {},
-    friendRequests: [],
-    myFriendRequests: [],
-  },
+  initialState,
 
   reducers: {
     // thay doi state
@@ -89,6 +91,10 @@ const friendSlice = createSlice({
       const details = action.payload;
       const oldFriendRequests = state.friendRequests;
       state.friendRequests = [...oldFriendRequests, details];
+    },
+
+    resetFriendSlice: (state, action) => {
+      Object.assign(state, initialState);
     },
   },
   // xu ly api roi thay doi state
@@ -164,5 +170,6 @@ export const {
   cancelMyFriendRequest,
   deleteFriendRequest,
   inviteFriendRequest,
+  resetFriendSlice,
 } = actions;
 export default reducer;

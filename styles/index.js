@@ -9,6 +9,8 @@ export const WINDOW_HEIGHT = Dimensions.get('window').height;
 export const SCREEN_WIDTH = Dimensions.get('screen').width;
 export const SCREEN_HEIGHT = Dimensions.get('screen').height;
 
+export const STICKER_SIZE = WINDOW_WIDTH * 0.2;
+
 export const MAIN_COLOR = '#0068FF';
 export const GREY_COLOR = '#889197';
 export const OVERLAY_AVATAR_COLOR = '#d9dfeb';
@@ -87,6 +89,16 @@ const globalStyles = StyleSheet.create({
   imageMessage: {
     width: '100%',
     aspectRatio: 76 / 135,
+  },
+  stickerMessage: {
+    width: STICKER_SIZE * 1.5,
+    height: STICKER_SIZE * 1.5,
+  },
+  emptyText: {
+    color: GREY_COLOR,
+    alignSelf: 'center',
+    marginTop: 8,
+    fontSize: 16,
   },
 });
 

@@ -38,13 +38,13 @@ const messageApi = {
       //   let percentCompleted = Math.round(
       //     (progressEvent.loaded * 100) / progressEvent.total,
       //   );
-      //   console.log(percentCompleted);
+      //   console.log('percentCompleted: ', percentCompleted);
       // },
     };
 
     return axiosClient.post(`${BASE_URL}/files`, file, config);
   },
-  sendFileBase64Message: (file, params) => {
+  sendFileBase64Message: (file, params, uploadProgress) => {
     const {type, conversationId} = params;
     console.log('file type: ', typeof file);
 
@@ -54,12 +54,15 @@ const messageApi = {
         conversationId,
       },
 
-      // onUploadProgress: progressEvent => {
-      //   let percentCompleted = Math.round(
-      //     (progressEvent.loaded * 100) / progressEvent.total,
-      //   );
-      //   console.log(percentCompleted);
-      // },
+      onUploadProgress: progressEvent => {
+        if (typeof uploadProgress === 'function') {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
+          console.log('percentCompleted: ', percentCompleted);
+          uploadProgress(percentCompleted);
+        }
+      },
     };
 
     return axiosClient.post(`${BASE_URL}/files/base64`, file, config);

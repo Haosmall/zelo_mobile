@@ -21,6 +21,16 @@ const meApi = {
     const url = `${BASE_URL}/cover-image`;
     return axiosClient.patch(url, image);
   },
+
+  fetchSyncContacts: () => {
+    return axiosClient.get(`${BASE_URL}/phone-books`);
+  },
+
+  syncContacts: phones => {
+    const url = `${BASE_URL}/phone-books`;
+    console.log('api: ', {phones});
+    return axiosClient.post(url, {phones});
+  },
 };
 
 export default meApi;

@@ -1,19 +1,29 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import io from 'socket.io-client';
-import {REACT_APP_API_URL} from '../constants';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {stickerApi} from '../api';
 
 const KEY = 'global';
 
+const initialState = {
+  isLoading: false,
+  isLogin: false,
+  modalVisible: false,
+  currentUserId: '',
+  keyboardHeight: 280,
+  socket: {},
+  stickers: [],
+};
+
+export const fetchStickers = createAsyncThunk(
+  `${KEY}/fetchStickers`,
+  async (params, thunkApi) => {
+    const data = await stickerApi.fetchSticker();
+    return data;
+  },
+);
+
 const globalSlice = createSlice({
   name: KEY,
-  initialState: {
-    isLoading: false,
-    isLogin: false,
-    modalVisible: false,
-    currentUserId: '',
-    keyboardHeight: 280,
-    socket: {},
-  },
+  initialState,
 
   reducers: {
     // thay doi state
@@ -40,9 +50,27 @@ const globalSlice = createSlice({
     initSocket: (state, action) => {
       state.socket = action.payload;
     },
+    resetGlobalSlice: (state, action) => {
+      Object.assign(state, initialState);
+    },
   },
   // xu ly api roi thay doi state
-  extraReducers: {},
+  extraReducers: {
+    // TODO:---------------------- fetchStickers ----------------------
+    // Đang xử lý
+    [fetchStickers.pending]: (state, action) => {
+      // state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchStickers.fulfilled]: (state, action) => {
+      // state.isLoading = false;
+      state.stickers = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchStickers.rejected]: (state, action) => {
+      // state.isLoading = false;
+    },
+  },
 });
 
 const {reducer, actions} = globalSlice;
@@ -53,5 +81,6 @@ export const {
   setCurrentUserId,
   setKeyboardHeight,
   initSocket,
+  resetGlobalSlice,
 } = actions;
 export default reducer;

@@ -3,6 +3,11 @@ import {meApi} from '../api';
 
 const KEY = 'me';
 
+const initialState = {
+  isLoading: false,
+  userProfile: {},
+};
+
 export const fetchProfile = createAsyncThunk(
   `${KEY}/fetchProfile`,
   async () => {
@@ -21,15 +26,15 @@ export const fetchProfile = createAsyncThunk(
 
 const meSlice = createSlice({
   name: KEY,
-  initialState: {
-    isLoading: false,
-    userProfile: {},
-  },
+  initialState,
 
   reducers: {
     // thay doi state
     setLoading: (state, action) => {
       state.isLoading = action.payload;
+    },
+    resetMeSlice: (state, action) => {
+      Object.assign(state, initialState);
     },
   },
   // xu ly api roi thay doi state
@@ -51,5 +56,5 @@ const meSlice = createSlice({
 });
 
 const {reducer, actions} = meSlice;
-export const {setLoading} = actions;
+export const {setLoading, resetMeSlice} = actions;
 export default reducer;

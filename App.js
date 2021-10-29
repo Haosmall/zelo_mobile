@@ -20,11 +20,13 @@ import {
 import 'react-native-gesture-handler';
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 import {Provider, useDispatch, useSelector} from 'react-redux';
-import {setCurrentUserId, setLogin} from './redux/globalSlice';
+import {io} from 'socket.io-client';
+import {REACT_APP_SOCKET_URL} from './constants';
+import {MainStackNavigator} from './navigations';
+import LoginStackNavigator from './navigations/LoginStackNavigator';
+import {initSocket, setCurrentUserId, setLogin} from './redux/globalSlice';
 import store from './redux/store';
 import SplashScreen from './screens/SplashScreen';
-import LoginStackNavigator from './navigations/LoginStackNavigator';
-import {MainStackNavigator} from './navigations';
 
 const App = () => {
   return (

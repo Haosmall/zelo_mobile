@@ -14,17 +14,22 @@ import {useDispatch, useSelector} from 'react-redux';
 import test from '../assets/favicon1.png';
 import ViewImageModal from '../components/ViewImageModal';
 import {DEFAULT_COVER_IMAGE, DEFAULT_IMAGE_MODAL} from '../constants';
-import {setLogin} from '../redux/globalSlice';
-import {fetchProfile} from '../redux/meSlice';
+import {resetFriendSlice} from '../redux/friendSlice';
+import {resetGlobalSlice, setLogin} from '../redux/globalSlice';
+import {fetchProfile, resetMeSlice} from '../redux/meSlice';
+import {resetMessageSlice} from '../redux/messageSlice';
+import {resetPinSlice} from '../redux/pinSlice';
 import {OVERLAY_AVATAR_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
 import commonFuc from '../utils/commonFuc';
+import RNRestart from 'react-native-restart';
+import UpdateUserProfileModal from '../components/UpdateUserProfileModal';
 
 export default function MeScreen() {
   const dispatch = useDispatch();
 
   const {userProfile} = useSelector(state => state.me);
 
-  const [isImageViewVisible, setIsImageViewVisible] = useState(false);
+  const [isUpdateProfile, setIsUpdateProfile] = useState(false);
   const [imageIndex, setiImageIndex] = useState(0);
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
 
@@ -36,6 +41,7 @@ export default function MeScreen() {
     handleFetchProfile();
     console.log({userProfile});
   }, []);
+
   const images = [
     {
       source: {
@@ -55,7 +61,13 @@ export default function MeScreen() {
           await AsyncStorage.removeItem('token');
           await AsyncStorage.removeItem('refreshToken');
           await AsyncStorage.removeItem('userId');
-          dispatch(setLogin(false));
+          dispatch(resetFriendSlice());
+          dispatch(resetGlobalSlice());
+          dispatch(resetMeSlice());
+          dispatch(resetMessageSlice());
+          dispatch(resetPinSlice());
+          // dispatch(setLogin(false));
+          RNRestart.Restart();
         },
       },
     ]);
@@ -128,6 +140,13 @@ export default function MeScreen() {
         </View>
         <View style={styles.action}>
           <Text style={styles.name}>{userProfile.name}</Text>
+          <Button
+            title="Đổi thông tin"
+            type="clear"
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.button}
+            onPress={() => setIsUpdateProfile(true)}
+          />
         </View>
         <View style={styles.detailsContainer}>
           <ListItem topDivider>
@@ -159,8 +178,21 @@ export default function MeScreen() {
 
         <ViewImageModal imageProps={imageProps} setImageProps={setImageProps} />
 
-        <Button title="Đăng xuất" onPress={handleLogOut} />
+        <Button
+          title="Đăng xuất"
+          onPress={handleLogOut}
+          containerStyle={[styles.buttonContainer, {marginHorizontal: 15}]}
+          buttonStyle={styles.button}
+        />
       </ScrollView>
+
+      {isUpdateProfile && (
+        <UpdateUserProfileModal
+          modalVisible={isUpdateProfile}
+          setModalVisible={setIsUpdateProfile}
+          userProfile={userProfile}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -221,7 +253,9 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
   },
   buttonContainer: {
-    margin: 10,
+    borderRadius: 50,
   },
-  button: {borderRadius: 20, minWidth: WINDOW_WIDTH / 3},
+  button: {
+    borderRadius: 50,
+  },
 });

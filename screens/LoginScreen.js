@@ -16,7 +16,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {loginApi, meApi} from '../api';
 import InputField from '../components/InputField';
 import {useKeyboardHeight} from '../hooks';
-import {setLoading, setLogin} from '../redux/globalSlice';
+import {setCurrentUserId, setLoading, setLogin} from '../redux/globalSlice';
 import globalStyles from '../styles';
 import {loginValid} from '../utils/validator';
 
@@ -37,6 +37,7 @@ const LoginScreen = ({navigation}) => {
       await AsyncStorage.setItem('refreshToken', response.refreshToken);
       const userProfile = await meApi.fetchProfile();
       await AsyncStorage.setItem('userId', userProfile._id);
+      dispatch(setCurrentUserId(userProfile._id));
       dispatch(setLogin(true));
     } catch (error) {
       setErrorMessage('Tài khoản hay mật khẩu không chính xác');

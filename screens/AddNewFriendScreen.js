@@ -5,6 +5,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch} from 'react-redux';
 import {userApi} from '../api';
 import {setSearchFriend} from '../redux/friendSlice';
+import commonFuc from '../utils/commonFuc';
 import {validateUsername} from '../utils/validator';
 
 export default function AddNewFriendScreen({navigation}) {
@@ -30,18 +31,23 @@ export default function AddNewFriendScreen({navigation}) {
       setIsError(true);
       setErrorMessage('Số điện thoại/email không hợp lệ');
     } else {
-      const response = await userApi.fetchUsers(userName);
+      try {
+        const response = await userApi.fetchUsers(userName);
 
-      if (typeof response.status === 'string') {
         dispatch(setSearchFriend(response));
         navigation.navigate('Chi tiết bạn bè');
-      } else {
-        console.log('looix');
+        // if (typeof response.status === 'string') {
+        // } else {
+        //   console.log('looix');
+        // }
+        console.log(valid);
+        console.log(response);
+        setIsError(false);
+        setErrorMessage('');
+      } catch (error) {
+        commonFuc.notifyMessage('Không tìm thấy');
+        console.log('Không tìm thấy', error);
       }
-      console.log(valid);
-      console.log(response);
-      setIsError(false);
-      setErrorMessage('');
     }
   };
 

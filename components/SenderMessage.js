@@ -7,10 +7,11 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {Avatar, Image} from 'react-native-elements';
+import {Avatar, Icon, Image} from 'react-native-elements';
 import {messageType} from '../constants';
 import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
-import commonFuc from '../utils/commonFuc';
+import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
+import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
 
 const SenderMessage = props => {
@@ -62,6 +63,26 @@ const SenderMessage = props => {
               onLongPress={handleOpenOptionModal}
               delayLongPress={500}
             />
+          ) : type === messageType.STICKER ? (
+            <Image
+              source={{uri: content}}
+              style={globalStyles.stickerMessage}
+              onLongPress={handleOpenOptionModal}
+              delayLongPress={500}
+            />
+          ) : type === messageType.FILE ? (
+            <FileMessage
+              content={content}
+              handleOpenOptionModal={handleOpenOptionModal}
+            />
+          ) : type === messageType.VIDEO ? (
+            <TouchableOpacity
+              style={globalStyles.fileMessage}
+              onLongPress={handleOpenOptionModal}
+              delayLongPress={500}>
+              {/* <Icon type="material-community" name="download" /> */}
+              <Text>{commonFuc.getFileName(content)}</Text>
+            </TouchableOpacity>
           ) : (
             <Text style={contentStyle}>{content}</Text>
           )}

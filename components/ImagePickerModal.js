@@ -3,48 +3,42 @@ import {
   Modal,
   PermissionsAndroid,
   Platform,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {Button} from 'react-native-elements';
+import {Button, Icon} from 'react-native-elements';
+import {ScrollView} from 'react-native-gesture-handler';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import Spinner from 'react-native-loading-spinner-overlay';
 import {useSelector} from 'react-redux';
 import {messageApi} from '../api';
 import {messageType} from '../constants';
+import globalStyles, {WINDOW_WIDTH} from '../styles';
+import RNFetchBlob from 'react-native-fetch-blob';
+import commonFuc from '../utils/commonFuc';
 
 const ImagePickerModal = props => {
   const {modalVisible, setModalVisible} = props;
 
   const {currentConversationId} = useSelector(state => state.message);
 
-  const [fileType, setfileType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('upload... 0%');
+
+  const onUploadProgress = percentCompleted => {
+    if (percentCompleted < 99) {
+      setLoadingText(`upload... ${percentCompleted}%`);
+    } else {
+      setIsLoading(false);
+      setLoadingText('upload... 0%');
+    }
+  };
 
   const showImagePicker = async (isVideo = false) => {
-    //Xin quyền try cập vào thư viện
-    // const permissionResult =
-    //   await ImagePicker.requestMediaLibraryPermissionsAsync();
-    // if (permissionResult.granted === false) {
-    //   alert('Bạn đã từ chối truy cập vào ảnh của bạn trên ứng dụng này! ');
-    //   return;
-    // }
-    // const mediaTypes = isVideo
-    //   ? ImagePicker.MediaTypeOptions.Videos
-    //   : ImagePicker.MediaTypeOptions.Images;
-    // const result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes,
-    // });
-    // console.log(result);
-    // if (!result.cancelled) {
-    //   // setfileType(result.type);
-    //   // console.log(result.type);
-    //   console.log(result.uri);
-    //   await handleSendImage(result.uri);
-    // }
-
     const options = {
-      mediaType: 'mixed',
+      mediaType: isVideo ? 'video' : 'photo',
       includeBase64: true,
     };
 
@@ -61,24 +55,12 @@ const ImagePickerModal = props => {
       } else {
         let source = res.assets[0];
         console.log('source = ', source.uri);
-        await handleSendImage(source);
+        await handleSendImage(source, isVideo);
       }
     });
   };
 
-  const openCamera = async () => {
-    // Xin quyền truy cập camera
-    // const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    // if (permissionResult.granted === false) {
-    //   alert('Bạn đã từ chối truy cập vào máy ảnh của bạn trên ứng dụng này! ');
-    //   return;
-    // }
-    // const result = await ImagePicker.launchCameraAsync();
-    // console.log(result);
-    // if (!result.cancelled) {
-    //   console.log(result.uri);
-    //   await handleSendImage(result.uri);
-    // }
+  const openCamera = async (isVideo = false) => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -101,7 +83,8 @@ const ImagePickerModal = props => {
     }
 
     const options = {
-      mediaType: 'photo',
+      // mediaType: 'photo',
+      mediaType: isVideo ? 'video' : 'photo',
       includeBase64: true,
     };
     launchCamera(options, async res => {
@@ -116,44 +99,84 @@ const ImagePickerModal = props => {
         alert(res.customButton);
       } else {
         let source = res.assets[0];
-        await handleSendImage(source);
+        await handleSendImage(source, isVideo);
       }
     });
   };
 
-  const handleSendImage = async file => {
+  const handleSendImage = async (file, isVideo) => {
     console.log('filePath: ', file);
 
     const params = {
-      type: messageType.IMAGE,
+      type: isVideo ? messageType.VIDEO : messageType.IMAGE,
       conversationId: currentConversationId,
     };
 
-    const fileNameSplit = file.fileName.split('.');
-    const fileName = fileNameSplit[0];
-    const fileBase64 = file.base64;
-    const fileExtension = `.${fileNameSplit[1]}`;
+    if (isVideo) {
+      if (file.fileSize > 20971520) {
+        commonFuc.notifyMessage('Tối đa 20Mb');
+      } else {
+        try {
+          setIsLoading(true);
+          const fileBase64 = await RNFetchBlob.fs.readFile(file.uri, 'base64');
+          const body = {
+            fileName: file.fileName,
+            fileExtension: file.type.replace('video/', '.'),
+            fileBase64,
+          };
 
-    const body = {fileName, fileExtension, fileBase64};
+          messageApi
+            .sendFileBase64Message(body, params, onUploadProgress)
+            .then(res => {
+              console.log('Send Message Success', res);
+              handleCloseModal();
+            })
+            .catch(err => {
+              console.log('Send Message Fail');
+              setIsLoading(false);
+            });
+        } catch (error) {
+          setIsLoading(false);
+        }
+      }
+    } else {
+      const fileNameSplit = file.fileName.split('.');
+      const fileName = fileNameSplit[0];
+      const fileBase64 = file.base64;
+      const fileExtension = `.${fileNameSplit[1]}`;
 
-    console.log('body: ', body);
-    handleCloseModal();
+      const body = {fileName, fileExtension, fileBase64};
 
-    messageApi
-      .sendFileBase64Message(body, params)
-      .then(res => {
-        console.log('Send Message Success', res);
-        handleCloseModal();
-      })
-      .catch(err => console.log('Send Message Fail'));
+      console.log('body: ', body);
+      handleCloseModal();
+      setIsLoading(true);
+      messageApi
+        .sendFileBase64Message(body, params, onUploadProgress)
+        .then(res => {
+          console.log('Send Message Success', res);
+          handleCloseModal();
+        })
+        .catch(err => {
+          console.log('Send Message Fail');
+          setIsLoading(false);
+        });
+    }
   };
 
   const handleCloseModal = () => {
     setModalVisible(false);
   };
 
+  const ICON_SIZE = 30;
+
   return (
     <SafeAreaView style={styles.centeredView}>
+      <Spinner
+        visible={isLoading}
+        textContent={loadingText}
+        textStyle={globalStyles.spinnerTextStyle}
+      />
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -164,22 +187,69 @@ const ImagePickerModal = props => {
           onPressOut={handleCloseModal}
           style={styles.container}>
           <SafeAreaView style={styles.modalView}>
-            <Button
-              title="Chụp ảnh"
-              containerStyle={styles.buttonTop}
-              type="clear"
-              icon={<IconAntDesign name="addusergroup" size={22} />}
-              titleStyle={styles.title}
-              onPress={openCamera}
-            />
-            <Button
-              title="Chọn ảnh"
-              containerStyle={styles.buttonBottom}
-              type="clear"
-              icon={<IconAntDesign name="adduser" size={22} />}
-              titleStyle={styles.title}
-              onPress={() => showImagePicker(false)}
-            />
+            <ScrollView>
+              <Pressable
+                style={{
+                  width: WINDOW_WIDTH,
+                  // backgroundColor: 'cyan',
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  flexWrap: 'wrap',
+                  padding: 15,
+                }}>
+                <Button
+                  title="Chụp ảnh"
+                  containerStyle={styles.buttonContainer}
+                  type="clear"
+                  icon={<Icon type="feather" name="camera" size={ICON_SIZE} />}
+                  titleStyle={styles.title}
+                  onPress={() => openCamera(false)}
+                  iconPosition="top"
+                />
+
+                <Button
+                  title="Chọn ảnh"
+                  containerStyle={styles.buttonContainer}
+                  type="clear"
+                  icon={
+                    <Icon
+                      type="ionicon"
+                      name="image-outline"
+                      size={ICON_SIZE}
+                    />
+                  }
+                  titleStyle={styles.title}
+                  onPress={() => showImagePicker(false)}
+                  iconPosition="top"
+                />
+
+                <Button
+                  title="Quay video"
+                  containerStyle={styles.buttonContainer}
+                  type="clear"
+                  icon={<Icon type="feather" name="video" size={ICON_SIZE} />}
+                  titleStyle={styles.title}
+                  onPress={() => openCamera(true)}
+                  iconPosition="top"
+                />
+
+                <Button
+                  title="Chọn video"
+                  containerStyle={styles.buttonContainer}
+                  type="clear"
+                  icon={
+                    <Icon
+                      type="font-awesome"
+                      name="file-video-o"
+                      size={ICON_SIZE}
+                    />
+                  }
+                  titleStyle={styles.title}
+                  onPress={() => showImagePicker(true)}
+                  iconPosition="top"
+                />
+              </Pressable>
+            </ScrollView>
           </SafeAreaView>
         </TouchableOpacity>
       </Modal>
@@ -209,13 +279,14 @@ const styles = StyleSheet.create({
     // width: "100%",
   },
   modalView: {
-    width: '100%',
+    width: WINDOW_WIDTH,
     minHeight: 200,
     backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     // padding: 35,
     alignItems: 'center',
+    justifyContent: 'center',
 
     // add shadows for iOS only
     shadowColor: 'black',
@@ -226,36 +297,17 @@ const styles = StyleSheet.create({
     // No options for shadow color, shadow offset, shadow opacity like iOS
     elevation: 10,
   },
-  button: {
-    width: '100%',
-    borderRadius: 0,
-    alignItems: 'stretch',
+  buttonContainer: {
+    borderRadius: BUTTON_RADIUS,
+    width: '45%',
   },
-  buttonTop: {
-    width: '100%',
-    borderRadius: 0,
-    alignItems: 'stretch',
-    borderTopStartRadius: BUTTON_RADIUS,
-    borderTopEndRadius: BUTTON_RADIUS,
-  },
-  buttonBottom: {
-    width: '100%',
-    borderRadius: 0,
-    alignItems: 'stretch',
-    borderBottomStartRadius: BUTTON_RADIUS,
-    borderBottomEndRadius: BUTTON_RADIUS,
-  },
+
   title: {
     fontFamily: Platform.OS === 'ios' ? 'Arial' : 'normal',
     fontWeight: '100',
     color: 'black',
   },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
+
   textStyle: {
     color: 'white',
     fontWeight: 'bold',

@@ -4,7 +4,7 @@ export const REACT_APP_SOCKET_URL = 'https://zelochat.xyz';
 // export const REACT_APP_SOCKET_URL = 'http://192.168.1.7:3001';
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_PAGE_SIZE = 20;
-export const REACTIONS = ['♥️', '👍', '😄', '😲', '😭', '😡'];
+export const REACTIONS = ['👍', '♥️', '😄', '😲', '😭', '😡'];
 export const DEFAULT_COVER_IMAGE =
   'https://res.cloudinary.com/depjgf4uu/image/upload/v1633711296/wallhaven-8ok7vk_fsct6y.jpg';
 export const NO_INTERNET_IMAGE =
@@ -21,6 +21,7 @@ export const messageType = {
   VIDEO: 'VIDEO',
   FILE: 'FILE',
   VOTE: 'VOTE',
+  STICKER: 'STICKER',
 };
 
 export const friendType = {

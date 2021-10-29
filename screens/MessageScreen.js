@@ -50,13 +50,11 @@ export default function MessageScreen({navigation, route}) {
   // Props
   const {conversationId} = route.params;
   const dispatch = useDispatch();
-  const {messages, messagePages, currentConversation, usersTyping} =
+  const {messages, messagePages, currentConversation, usersTyping, isLoading} =
     useSelector(state => state.message);
-  const {currentUserId, isLoading, keyboardHeight} = useSelector(
-    state => state.global,
-  );
-  const {totalPages} = messagePages;
-  const {totalMembers, name, type, avatar} = currentConversation;
+  const {currentUserId, keyboardHeight} = useSelector(state => state.global);
+  // const {totalPages} = messagePages;
+  const {name, type, avatar} = currentConversation;
 
   // State
   const [modalVisible, setModalVisible] = useState(
@@ -111,7 +109,7 @@ export default function MessageScreen({navigation, route}) {
   const headerLeft = () => (
     <MessageHeaderLeft
       goBack={handleGoBack}
-      totalMembers={totalMembers}
+      totalMembers={currentConversation?.totalMembers}
       name={name}
     />
   );
@@ -141,7 +139,11 @@ export default function MessageScreen({navigation, route}) {
       nextMessageTime;
 
     return (
-      <TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss();
+          setStickyBoardVisible(false);
+        }}>
         <View>
           {isSeparate && <MessageDivider dateString={messageTime} />}
           <ChatMessage
@@ -151,6 +153,7 @@ export default function MessageScreen({navigation, route}) {
             showReactDetails={setReactProps}
             navigation={navigation}
             setImageProps={setImageProps}
+            isLastMessage={index === 0}
           />
         </View>
       </TouchableWithoutFeedback>
@@ -160,16 +163,15 @@ export default function MessageScreen({navigation, route}) {
   const goToNextPage = async () => {
     console.log('Scroll Top');
     const currentPage = apiParams.page;
-    if (currentPage < totalPages) {
-      dispatch(setLoading(true));
+    if (currentPage < messagePages?.totalPages) {
       const item = messages[0];
       const nextPage = currentPage + 1;
       const newParam = {...apiParams, page: nextPage};
       await dispatch(fetchMessages({conversationId, apiParams: newParam}));
 
-      dispatch(setLoading(false));
       setApiParams(newParam);
-      console.log({currentPage, totalPages});
+      console.log('currentPage: ', currentPage);
+      console.log('messagePages.totalPages:', messagePages.totalPages);
     }
   };
 
@@ -178,11 +180,7 @@ export default function MessageScreen({navigation, route}) {
   };
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss;
-        setStickyBoardVisible(false);
-      }}>
+    <TouchableWithoutFeedback>
       <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' && 'padding'}
@@ -230,6 +228,7 @@ export default function MessageScreen({navigation, route}) {
               conversationId={conversationId}
               showStickyBoard={setStickyBoardVisible}
               showImageModal={setImageModalVisible}
+              stickyBoardVisible={stickyBoardVisible}
             />
 
             <StickyBoard

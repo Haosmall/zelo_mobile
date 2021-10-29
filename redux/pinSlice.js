@@ -3,6 +3,11 @@ import pinMessagesApi from '../api/pinMessagesApi';
 
 const KEY = 'pin';
 
+const initialState = {
+  isLoading: false,
+  pinMessages: [],
+};
+
 export const fetchPinMessages = createAsyncThunk(
   `${KEY}/fetchPinMessages`,
   async (params, thunkApi) => {
@@ -14,15 +19,15 @@ export const fetchPinMessages = createAsyncThunk(
 
 const pinSlice = createSlice({
   name: KEY,
-  initialState: {
-    isLoading: false,
-    pinMessages: [],
-  },
+  initialState,
 
   reducers: {
     // thay doi state
     setLoading: (state, action) => {
       state.isLoading = action.payload;
+    },
+    resetPinSlice: (state, action) => {
+      Object.assign(state, initialState);
     },
   },
   // xu ly api roi thay doi state
@@ -44,5 +49,5 @@ const pinSlice = createSlice({
 });
 
 const {reducer, actions} = pinSlice;
-export const {setLoading} = actions;
+export const {setLoading, resetPinSlice} = actions;
 export default reducer;

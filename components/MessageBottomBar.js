@@ -12,16 +12,37 @@ import {Icon} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 
 import {messageApi} from '../api';
-import {MAIN_COLOR} from '../styles';
+import globalStyles, {MAIN_COLOR} from '../styles';
+
+import DocumentPicker from 'react-native-document-picker';
+import {messageType} from '../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFetchBlob from 'react-native-fetch-blob';
+import commonFuc from '../utils/commonFuc';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const MessageBottomBar = props => {
-  const {conversationId, showStickyBoard, showImageModal} = props;
+  const {conversationId, showStickyBoard, showImageModal, stickyBoardVisible} =
+    props;
   const [messageValue, setMessageValue] = useState('');
+  const [singleFile, setSingleFile] = useState(null);
   const {userProfile} = useSelector(state => state.me);
   const {socket} = useSelector(state => state.global);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('upload... 0%');
+
+  const onUploadProgress = percentCompleted => {
+    if (percentCompleted < 99) {
+      setLoadingText(`upload... ${percentCompleted}%`);
+    } else {
+      setIsLoading(false);
+      setLoadingText('upload... 0%');
+    }
+  };
+
   const handleShowStickyBoard = () => {
-    showStickyBoard(true);
+    showStickyBoard(!stickyBoardVisible);
     Keyboard.dismiss();
   };
 
@@ -65,8 +86,84 @@ const MessageBottomBar = props => {
     socket.emit('conversation-last-view', conversationId);
   };
 
+  const selectFile = async () => {
+    // Opening Document Picker to select one file
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+      });
+      console.log('res stringify : ' + JSON.stringify(res));
+      handleUploadFile(res);
+    } catch (err) {
+      setSingleFile(null);
+      if (DocumentPicker.isCancel(err)) {
+        commonFuc.notifyMessage('Đã hủy');
+      } else {
+        commonFuc.notifyMessage('Có lỗi xảy ra');
+        throw err;
+      }
+    }
+  };
+
+  const handleUploadFile = async singleFile => {
+    if (singleFile) {
+      const fileToUpload = singleFile[0];
+      console.log(fileToUpload);
+
+      const type = fileToUpload.type.includes('video')
+        ? messageType.VIDEO
+        : fileToUpload.type.includes('image')
+        ? messageType.IMAGE
+        : messageType.FILE;
+
+      const params = {
+        type,
+        conversationId: conversationId,
+      };
+
+      if (fileToUpload.fileSize > 20971520) {
+        commonFuc.notifyMessage('Tối đa 20Mb');
+      } else {
+        try {
+          setIsLoading(true);
+          const fileBase64 = await RNFetchBlob.fs.readFile(
+            fileToUpload.uri,
+            'base64',
+          );
+
+          const body = {
+            fileName: fileToUpload.name.split('.')[0],
+            fileExtension: '.' + fileToUpload.name.split('.')[1],
+            fileBase64,
+          };
+
+          console.log('body:', body);
+
+          messageApi
+            .sendFileBase64Message(body, params, onUploadProgress)
+            .then(res => {
+              console.log('Send Message Success', res);
+            })
+            .catch(err => {
+              console.log('Send Message Fail', err);
+              setIsLoading(false);
+            });
+        } catch (error) {
+          commonFuc.notifyMessage('Có lõi xảy ra');
+        }
+      }
+    } else {
+      commonFuc.notifyMessage('Chưa chọn file');
+    }
+  };
+
   return (
     <View style={styles.footer}>
+      <Spinner
+        visible={isLoading}
+        textContent={loadingText}
+        textStyle={globalStyles.spinnerTextStyle}
+      />
       <TouchableOpacity
         onPress={handleShowStickyBoard}
         style={{
@@ -84,7 +181,7 @@ const MessageBottomBar = props => {
         style={styles.textInput}
         multiline
         editable
-        // onTouchStart={handleOnTextInputTouch}
+        onTouchStart={handleOnTextInputTouch}
       />
       {messageValue ? (
         <TouchableOpacity
@@ -101,7 +198,7 @@ const MessageBottomBar = props => {
               paddingBottom: 8,
               marginRight: 10,
             }}
-            onPress={handleOnTextInputTouch}>
+            onPress={selectFile}>
             <Icon name="ellipsis-horizontal-outline" type="ionicon" size={22} />
           </TouchableOpacity>
           <TouchableOpacity
@@ -123,12 +220,14 @@ MessageBottomBar.propTypes = {
   conversationId: PropTypes.string,
   showStickyBoard: PropTypes.func,
   showImageModal: PropTypes.func,
+  stickyBoardVisible: PropTypes.bool,
 };
 
 MessageBottomBar.defaultProps = {
   conversationId: '',
   showStickyBoard: null,
   showImageModal: null,
+  stickyBoardVisible: false,
 };
 
 const styles = StyleSheet.create({

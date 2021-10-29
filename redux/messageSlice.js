@@ -6,6 +6,18 @@ import dateUtils from '../utils/dateUtils';
 
 const KEY = 'message';
 
+const initialState = {
+  isLoading: false,
+  conversations: [],
+  messagePages: {},
+  messages: [],
+  currentConversationId: '',
+  currentConversation: {},
+  currentVote: {},
+  listLastViewer: [],
+  usersTyping: [],
+};
+
 export const fetchConversations = createAsyncThunk(
   `${KEY}/fetchConversations`,
   async (params, thunkApi) => {
@@ -21,6 +33,7 @@ export const fetchMessages = createAsyncThunk(
     return {messages, conversationId, isSendMessage};
   },
 );
+
 export const fetchListLastViewer = createAsyncThunk(
   `${KEY}/fetchListLastViewer`,
   async (params, thunkApi) => {
@@ -32,17 +45,7 @@ export const fetchListLastViewer = createAsyncThunk(
 
 const messageSlice = createSlice({
   name: KEY,
-  initialState: {
-    isLoading: false,
-    conversations: [],
-    messagePages: {},
-    messages: [],
-    currentConversationId: '',
-    currentConversation: {},
-    currentVote: {},
-    listLastViewer: [],
-    usersTyping: [],
-  },
+  initialState,
 
   reducers: {
     // thay doi state
@@ -115,7 +118,7 @@ const messageSlice = createSlice({
 
     //  TODO:---------------------- deleteMessage ----------------------
     deleteMessage: (state, action) => {
-      const {conversationId, id} = action.payload;
+      const {conversationId, channelId, id} = action.payload;
       const conversations = state.conversations;
       const messages = state.messages.reverse();
 
@@ -161,7 +164,7 @@ const messageSlice = createSlice({
 
     // TODO:---------------------- addReaction ----------------------
     addReaction: (state, action) => {
-      const {conversationId, messageId, user, type} = action.payload;
+      const {conversationId, channelId, messageId, user, type} = action.payload;
 
       if (conversationId === state.currentConversationId) {
         const messages = state.messages.reverse();
@@ -261,7 +264,7 @@ const messageSlice = createSlice({
         return ele._id === conversationId;
       }).isNotify;
 
-      if (isNotification) {
+      if (!isNotification) {
         return;
       }
       if (state.conversations.length <= 0) {
@@ -352,6 +355,11 @@ const messageSlice = createSlice({
 
       state.usersTyping = newUsersTyping;
     },
+
+    // TODO:---------------------- resetMessageSlice ----------------------
+    resetMessageSlice: (state, action) => {
+      Object.assign(state, initialState);
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {
@@ -440,5 +448,6 @@ export const {
   setListLastViewer,
   usersTyping,
   usersNotTyping,
+  resetMessageSlice,
 } = actions;
 export default reducer;

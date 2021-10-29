@@ -16,6 +16,7 @@ function ChatMessage(props) {
     showReactDetails,
     navigation,
     setImageProps,
+    isLastMessage,
   } = props;
 
   const {_id, createdAt, user, isDeleted, reacts, type} = message;
@@ -66,6 +67,7 @@ function ChatMessage(props) {
       reactVisibleInfo={reactVisibleInfo}
       reactLength={reactLength}
       handleViewImage={handleViewImage}
+      isLastMessage={isLastMessage}
     />
   ) : (
     <SenderMessage
@@ -86,6 +88,7 @@ ChatMessage.propTypes = {
   navigation: PropTypes.object,
   currentUserId: PropTypes.string,
   isMyMessage: PropTypes.bool,
+  isLastMessage: PropTypes.bool,
   setModalVisible: PropTypes.func,
   showReactDetails: PropTypes.func,
   setImageProps: PropTypes.func,
@@ -96,6 +99,7 @@ ChatMessage.defaultProps = {
   navigation: {},
   currentUserId: '',
   isMyMessage: false,
+  isLastMessage: false,
   setModalVisible: null,
   showReactDetails: null,
   setImageProps: null,

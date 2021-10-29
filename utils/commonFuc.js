@@ -1,4 +1,9 @@
-import {Platform, ToastAndroid, AlertIOS} from 'react-native';
+import {
+  Platform,
+  ToastAndroid,
+  AlertIOS,
+  PermissionsAndroid,
+} from 'react-native';
 import {conversationApi} from '../api';
 import {REACTIONS} from '../constants';
 import {
@@ -7,6 +12,7 @@ import {
   updateCurrentConversation,
 } from '../redux/messageSlice';
 import dateUtils from './dateUtils';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 const commonFuc = {
   getBase64: file => {
@@ -32,7 +38,7 @@ const commonFuc = {
         .reduce((response, word) => (response += word.slice(0, 1)), '')
         .toUpperCase();
 
-      return acronym;
+      return acronym.slice(0, 2);
     }
     return '';
   },
@@ -103,6 +109,14 @@ const commonFuc = {
     return newArray;
   },
 
+  getFileName: fileUrl => {
+    const splitted = fileUrl.split('/').slice(-1)[0].split('-');
+    const fileName = splitted
+      .slice(0, 2)
+      .concat(splitted.slice(2).join('-'))[2];
+    return fileName;
+  },
+
   getNumberOfDays: dateString => {
     const dateCreated = new Date(dateString);
     const currentDay = new Date();
@@ -144,6 +158,80 @@ const handleEnterChat = (conversationId, navigation, dispatch) => {
   navigation.navigate('Nhắn tin', {
     conversationId,
   });
+};
+
+export const checkPermissionDownloadFile = async fileUrl => {
+  // Function to check the platform
+  // If Platform is Android then check for permissions.
+
+  if (Platform.OS === 'ios') {
+    downloadFile(fileUrl);
+  } else {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission Required',
+          message: 'Application needs access to your storage to download File',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // Start downloading
+        downloadFile(fileUrl);
+        console.log('Storage Permission Granted.');
+      } else {
+        commonFuc.notifyMessage('Quyền lưu trữ không được cấp');
+      }
+    } catch (err) {
+      // To handle permission related exception
+      console.log('++++' + err);
+    }
+  }
+};
+
+const downloadFile = fileUrl => {
+  // Get today's date to add the time suffix in filename
+  let date = new Date();
+  // Function to get extention of the file url
+  let file_ext = getFileExtention(fileUrl);
+
+  file_ext = '.' + file_ext[0];
+  // config: To get response by passing the downloading related options
+  // fs: Root directory path to download
+  const {config, fs} = RNFetchBlob;
+  let RootDir = fs.dirs.PictureDir;
+  let options = {
+    fileCache: true,
+    addAndroidDownloads: {
+      path: RootDir + '/' + commonFuc.getFileName(fileUrl),
+      // RootDir +
+      // '/' +
+      // fileType +
+      // '_' +
+      // Math.floor(date.getTime() + date.getSeconds() / 2) +
+      // file_ext,
+      description: 'downloading file...',
+      notification: true,
+      // useDownloadManager works with Android only
+      useDownloadManager: true,
+    },
+  };
+  config(options)
+    .fetch('GET', fileUrl)
+    .then(res => {
+      // Alert after successful downloading
+      console.log('res -> ', JSON.stringify(res));
+      commonFuc.notifyMessage('Tải ảnh thành công');
+    })
+    .catch(err => {
+      commonFuc.notifyMessage('Đã có lỗi xảy ra');
+      console.log('Đã có lỗi xảy ra: ', err);
+    });
+};
+
+const getFileExtention = fileUrl => {
+  // To get the file extension
+  return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
 };
 
 export default commonFuc;

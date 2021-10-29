@@ -4,6 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import {ListItem} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import {messageType} from '../constants';
+import commonFuc from '../utils/commonFuc';
 import CustomAvatar from './CustomAvatar';
 import MessageInfo from './MessageInfo';
 
@@ -21,23 +22,57 @@ const Conversation = props => {
 
   const {userProfile} = useSelector(state => state.me);
 
-  const {createdAt, user, isDeleted} = lastMessage;
-  const userName = userProfile.name;
-  const senderName = type
-    ? userName === user.name
-      ? 'Bạn: '
-      : `${user.name}: `
-    : '';
+  // const userName = userProfile.name;
 
-  const lastMessageType = lastMessage.type;
+  const handleSenderName = (userName, lastUserName, type) => {
+    let senderName = '';
 
-  const content = isDeleted
-    ? 'Tin nhắn đã được thu hồi'
-    : lastMessageType === messageType.IMAGE
-    ? '[Hình ảnh]'
-    : lastMessageType === messageType.VOTE
-    ? `Đã tạo cuộc bình chọn mới ${lastMessage.content}`
-    : lastMessage.content;
+    if (type) {
+      senderName = userName === lastUserName ? 'Bạn: ' : `${lastUserName}: `;
+    }
+
+    return senderName;
+  };
+
+  const handleContent = (lastMessageType, lastMessageContent, isDeleted) => {
+    let content = '';
+    if (isDeleted) {
+      content = 'Tin nhắn đã được thu hồi';
+    } else {
+      switch (lastMessageType) {
+        case messageType.IMAGE:
+          content = '[Hình ảnh]';
+          break;
+        case messageType.STICKER:
+          content = '[Nhãn dán]';
+          break;
+        case messageType.VIDEO:
+          const fileNameVideo = commonFuc.getFileName(lastMessageContent);
+          content = `[Video] ${fileNameVideo}`;
+          break;
+        case messageType.FILE:
+          const fileName = commonFuc.getFileName(lastMessageContent);
+          content = `[File] ${fileName}`;
+          break;
+        case messageType.VOTE:
+          content = `Đã tạo cuộc bình chọn mới ${lastMessageContent}`;
+          break;
+
+        default:
+          content = lastMessageContent
+            ? lastMessageContent
+            : '[Không có tin nhắn]';
+          break;
+      }
+    }
+    return content;
+  };
+
+  // const senderName = type
+  //   ? userName === lastMessage?.user.name
+  //     ? 'Bạn: '
+  //     : `${lastMessage?.user.name}: `
+  //   : '';
 
   return (
     <View style={{backgroundColor: '#fff'}}>
@@ -49,11 +84,35 @@ const Conversation = props => {
         }>
         <CustomAvatar name={name} avatars={avatars} />
         <ListItem.Content>
-          <ListItem.Title>{name}</ListItem.Title>
+          <ListItem.Title
+            style={{
+              width: '100%',
+              fontWeight: numberUnread > 0 ? 'bold' : 'normal',
+            }}>
+            {name}
+          </ListItem.Title>
           <ListItem.Subtitle
-            numberOfLines={1}>{`${senderName}${content}`}</ListItem.Subtitle>
+            numberOfLines={1}
+            style={[
+              {
+                width: '100%',
+                fontWeight: numberUnread > 0 ? 'bold' : 'normal',
+              },
+              numberUnread > 0 ? {color: 'black'} : null,
+            ]}>{`${handleSenderName(
+            userProfile.name,
+            lastMessage?.user.name,
+            type,
+          )}${handleContent(
+            lastMessage?.type,
+            lastMessage?.content,
+            lastMessage?.isDeleted,
+          )}`}</ListItem.Subtitle>
         </ListItem.Content>
-        <MessageInfo createdAt={createdAt} numberUnread={numberUnread} />
+        <MessageInfo
+          createdAt={lastMessage?.createdAt}
+          numberUnread={numberUnread}
+        />
       </ListItem>
       <View style={styles.bottomDivider}></View>
     </View>

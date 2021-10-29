@@ -1,33 +1,28 @@
 import React, {useEffect, useRef} from 'react';
 import {
-  Dimensions,
-  Pressable,
+  PermissionsAndroid,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Avatar, Icon, Input, ListItem, Divider} from 'react-native-elements';
+import Contacts from 'react-native-contacts';
+import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
+import {meApi} from '../api';
 import ContactAction from '../components/ContactAction';
 import FriendItem from '../components/FriendItem';
 import {friendType} from '../constants';
-import {
-  deleteFriendRequest,
-  fetchFriendById,
-  fetchFriends,
-  inviteFriendRequest,
-} from '../redux/friendSlice';
-import {fetchConversations} from '../redux/messageSlice';
-import {GREY_COLOR, WINDOW_WIDTH, OVERLAY_AVATAR_COLOR} from '../styles';
-import commonFuc from '../utils/commonFuc';
+import {fetchFriendById, fetchFriends} from '../redux/friendSlice';
+import {setLoading} from '../redux/globalSlice';
+import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 
 export default function ContactScreen({navigation}) {
   const dispatch = useDispatch();
 
   const {listFriends} = useSelector(state => state.friend);
-  const {socket} = useSelector(state => state.global);
+  const {socket, isLoading} = useSelector(state => state.global);
 
   const inputRef = useRef('');
   const typingTimeoutRef = useRef(null);
@@ -57,8 +52,86 @@ export default function ContactScreen({navigation}) {
     navigation.navigate('Chi tiết bạn bè');
   };
 
+  const handleSyncContacts = async () => {
+    dispatch(setLoading(true));
+    const contacts = await handleGetContacts();
+    const phones = handleContactPhoneNumber(contacts);
+    // const phones = [
+    //   {
+    //     name: 'Nhật Hào',
+    //     phone: '0373668360',
+    //   },
+    //   {
+    //     name: 'Nhật',
+    //     phone: '0987654321',
+    //   },
+    // ];
+    console.log('cmh ', phones.length);
+    if (phones.length > 0) {
+      try {
+        const response = await meApi.syncContacts(phones);
+        console.log('Post Sync: ', response);
+      } catch (error) {
+        console.log('Post Sync error: ', error);
+      }
+    }
+    dispatch(setLoading(false));
+  };
+
+  const handleGetContacts = async () => {
+    let contacts = [];
+    try {
+      const permission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        {
+          title: 'Contacts',
+          message: 'This app would like to view your contacts.',
+          buttonPositive: 'Please accept bare mortal',
+        },
+      );
+
+      if (permission === 'granted') {
+        contacts = await Contacts.getAll();
+        // console.log(contacts);
+      }
+    } catch (error) {
+      console.log('Contacts: ', error);
+    }
+
+    return contacts;
+  };
+
+  const handleContactPhoneNumber = contacts => {
+    if (!contacts) return [];
+    const phonesTemp = contacts.map(contactEle => {
+      const phone = contactEle.phoneNumbers[0].number
+        .replaceAll(/\s/g, '')
+        .replaceAll(/-/g, '')
+        .replaceAll('+84', '0');
+      const name = contactEle.displayName;
+
+      return {name, phone};
+    });
+
+    const phones = phonesTemp.filter(phoneEle => phoneEle.phone.length === 10);
+
+    return phones;
+  };
+
+  const validatePhone = phone => {
+    if (!phone) return false;
+    const regex = /(0[3|5|7|8|9])+([0-9]{8})\b/g;
+
+    return regex.test(phone);
+  };
+
   return (
     <SafeAreaView>
+      <Spinner
+        visible={isLoading}
+        textContent={'Loading...'}
+        textStyle={globalStyles.spinnerTextStyle}
+      />
       <ScrollView>
         {/* <ContactAction
           name="phone-square"
@@ -77,9 +150,9 @@ export default function ContactScreen({navigation}) {
         <ContactAction
           name="phone-square"
           type="font-awesome"
-          title="Bạn từ danh bạ máy"
+          title="Đồng bộ danh bạ"
           backgroundColor="#70c43b"
-          handlePress={() => navigation.navigate('Lời mời kết bạn')}
+          handlePress={handleSyncContacts}
         />
         <ContactAction
           name="search"

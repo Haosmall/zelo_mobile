@@ -38,12 +38,12 @@ const ConversationOptionsBar = props => {
       const isNotify = !notify;
       const response = await conversationApi.updateNotify(
         conversationId,
-        isNotify ? 1 : 0,
+        isNotify ? 0 : 1,
       );
       console.log('update isNotify: ', response);
       dispatch(updateNotification({conversationId, isNotify}));
 
-      commonFuc.notifyMessage(`Đã ${notify ? 'bật' : 'tắt'} thông báo`);
+      commonFuc.notifyMessage(`Đã ${notify ? 'tắt' : 'bật'} thông báo`);
     } catch (error) {}
   };
 
@@ -124,13 +124,13 @@ const ConversationOptionsBar = props => {
         iconPosition="top"
       />
       <Button
-        title={`${notify ? 'Bật' : 'Tắt'} thông báo`}
+        title={`${notify ? 'Tắt' : 'Bật'} thông báo`}
         containerStyle={styles.button}
         type="clear"
         icon={
           <Icon
             name={
-              notify ? 'notifications-off-outline' : 'notifications-outline'
+              notify ? 'notifications-outline' : 'notifications-off-outline'
             }
             type="ionicon"
             size={ICON_SIZE}

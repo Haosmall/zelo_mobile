@@ -1,11 +1,19 @@
 // import {LinearGradient} from 'expo-linear-gradient';
 // import {StatusBar} from 'expo-status-bar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect} from 'react';
-import {Pressable, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  Pressable,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {io} from 'socket.io-client';
 import Conversation from '../components/Conversation';
 import MessageHeaderModal from '../components/MessageHeaderModal';
+import {REACT_APP_SOCKET_URL} from '../constants';
 import {
   deleteFriendRequest,
   fetchFriendRequests,
@@ -13,7 +21,7 @@ import {
   fetchMyFriendRequests,
   inviteFriendRequest,
 } from '../redux/friendSlice';
-import {setCurrentUserId, setKeyboardHeight} from '../redux/globalSlice';
+import {fetchStickers, initSocket} from '../redux/globalSlice';
 import {
   addMessage,
   addReaction,
@@ -21,29 +29,33 @@ import {
   fetchConversations,
   fetchListLastViewer,
   renameConversation,
-  setListLastViewer,
   setNotification,
   updateCurrentConversation,
   updateVoteMessage,
   usersNotTyping,
   usersTyping,
 } from '../redux/messageSlice';
+import globalStyles from '../styles';
 
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
-
+let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
 export default function HomeScreen({navigation}) {
   const dispatch = useDispatch();
 
+  const [refreshing, setRefreshing] = useState(false);
+
   const {conversations} = useSelector(state => state.message);
-  const {socket, currentUserId} = useSelector(state => state.global);
+  const {currentUserId} = useSelector(state => state.global);
   const {userProfile} = useSelector(state => state.me);
 
   const handleFetchConversations = async () => {
     await dispatch(fetchConversations());
+    await dispatch(fetchStickers());
     console.log('fect');
     dispatch(fetchFriendRequests());
     dispatch(fetchMyFriendRequests());
+    dispatch(initSocket(socket));
   };
 
   useEffect(() => {
@@ -54,6 +66,7 @@ export default function HomeScreen({navigation}) {
     );
 
     socket.emit('join-conversations', conversationIds);
+    socket.emit('join', currentUserId);
     console.log('thay doi');
   }, [conversations]);
 
@@ -70,16 +83,21 @@ export default function HomeScreen({navigation}) {
       );
     });
 
-    socket.on('delete-message', (conversationId, id) => {
+    socket.on('delete-message', ({conversationId, channelId, id}) => {
       console.log('Thu hoi');
-      console.log({conversationId, id});
-      dispatch(deleteMessage({conversationId, id}));
+      console.log({conversationId, channelId, id});
+      dispatch(deleteMessage({conversationId, channelId, id}));
     });
 
-    socket.on('add-reaction', (conversationId, messageId, user, type) => {
-      console.log('Add reaction');
-      dispatch(addReaction({conversationId, messageId, user, type}));
-    });
+    socket.on(
+      'add-reaction',
+      ({conversationId, channelId, messageId, user, type}) => {
+        console.log('Add reaction: ');
+        dispatch(
+          addReaction({conversationId, channelId, messageId, user, type}),
+        );
+      },
+    );
 
     socket.on(
       'rename-conversation',
@@ -157,9 +175,18 @@ export default function HomeScreen({navigation}) {
     });
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(fetchConversations());
+    setRefreshing(false);
+  }, []);
+
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {conversations &&
           conversations.map(conversation => {
             const {
@@ -186,6 +213,20 @@ export default function HomeScreen({navigation}) {
               </Pressable>
             );
           })}
+        {conversations.length <= 0 && (
+          <Text style={globalStyles.emptyText}>Không có tin nhắn nào</Text>
+        )}
+
+        {/* <Image
+          source={{
+            uri: 'https://i.pinimg.com/originals/86/b3/31/86b3315f71d8e1177f32d8007aa49ceb.gif',
+          }}
+          style={[globalStyles.imageMessage, {width: 300, height: 200}]}
+        />
+        <Image
+          source={{uri: 'http://www.clicktorelease.com/code/gif/1.gif'}}
+          style={{width: 100, height: 100}}
+        /> */}
 
         <MessageHeaderModal navigation={navigation} />
       </ScrollView>

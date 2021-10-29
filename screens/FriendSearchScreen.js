@@ -33,10 +33,14 @@ export default function FriendSearchScreen() {
     }, 300);
   };
   const handleSearchFriendSubmit = async userName => {
-    // const response = await userApi.fetchUsers(userName);
-    const response = await friendApi.fetchFriends({name: userName});
-    setListFriends(response);
-    console.log(response);
+    try {
+      // const response = await userApi.fetchUsers(userName);
+      const response = await friendApi.fetchFriends({name: userName});
+      setListFriends(response);
+      console.log(response);
+    } catch (error) {
+      commonFuc.notifyMessage('Không tìm thấy');
+    }
   };
 
   return (

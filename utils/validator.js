@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 export const loginValid = {
   initial: {
-    username: '0987654321',
+    username: '0798662438',
     password: '12345678',
   },
   validationSchema: Yup.object().shape({
@@ -64,4 +64,16 @@ export const validateUsername = userName => {
   validate.isEmail = regexEmail.test(userName);
 
   return validate;
+};
+
+export const userProfileValid = {
+  initial: {
+    name: '',
+  },
+  validationSchema: Yup.object().shape({
+    name: Yup.string()
+      .required('Tên không được để trống')
+      .matches(/^(?!\s+$).+/, 'Không hợp lệ')
+      .max(30, 'Tối đa 30 kí tự'),
+  }),
 };

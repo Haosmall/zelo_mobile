@@ -1,0 +1,258 @@
+import {Formik} from 'formik';
+import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
+import {
+  Modal,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {Button, CheckBox} from 'react-native-elements';
+// import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import {useDispatch, useSelector} from 'react-redux';
+import {meApi} from '../api';
+import InputField from '../components/InputField';
+import {fetchProfile} from '../redux/meSlice';
+import commonFuc from '../utils/commonFuc';
+import {userProfileValid} from '../utils/validator';
+
+const UpdateUserProfileModal = props => {
+  const {modalVisible, setModalVisible} = props;
+
+  const dispatch = useDispatch();
+
+  const {userProfile} = useSelector(state => state.me);
+  const date = userProfile?.dateOfBirth;
+
+  const [genderValue, setGenderValue] = useState(userProfile?.gender || false);
+  const [show, setShow] = useState(false);
+  const [dateOfBirth, setDateOfBirth] = useState(new Date(1598051730000));
+  const [dobTitle, setDobTitle] = useState('');
+
+  useEffect(() => {
+    const date = userProfile?.dateOfBirth;
+    const dob = new Date(date?.year, date?.month - 1, date?.day);
+    // setDateOfBirth(dob);
+    setDobTitle(handleDateOfBirth(dob));
+    setDateOfBirth(dob);
+  }, [modalVisible]);
+
+  const initialValues = {
+    name: userProfile?.name,
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+  const handleDateOfBirth = dateOfBirth => {
+    const date = dateOfBirth.getDate();
+    const month = dateOfBirth.getMonth() + 1;
+    const year = dateOfBirth.getFullYear();
+
+    console.log({date, month, year});
+    return (
+      ('00' + date).slice(-2) + '/' + ('00' + month).slice(-2) + '/' + year
+    );
+  };
+  const handleUpdateUserProfile = async profile => {
+    try {
+      const dateOfBirthObj = {
+        day: dateOfBirth.getDate(),
+        month: dateOfBirth.getMonth() + 1,
+        year: dateOfBirth.getFullYear(),
+      };
+
+      const response = await meApi.updateProfile({
+        name: profile.name,
+        gender: genderValue ? 1 : 0,
+        dateOfBirth: dateOfBirthObj,
+      });
+      dispatch(fetchProfile());
+      handleCloseModal();
+      commonFuc.notifyMessage('Cập nhật thành công');
+    } catch (error) {
+      console.error('Update profile: ', error);
+      commonFuc.notifyMessage('Đã có lỗi xảy ra');
+    }
+  };
+
+  const handleConfirm = selectedDate => {
+    const dateSelected = selectedDate || dateOfBirth;
+    setDateOfBirth(dateSelected);
+    setDobTitle(handleDateOfBirth(dateSelected));
+    hideDatePicker();
+  };
+
+  const hideDatePicker = () => {
+    setShow(false);
+  };
+
+  const handleOpenDatePicker = () => {
+    const date = userProfile?.dateOfBirth;
+    const dob = new Date(date?.year, date?.month - 1, date?.day);
+    setDateOfBirth(dob);
+    setShow(true);
+  };
+
+  return (
+    <SafeAreaView style={styles.centeredView}>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPressOut={handleCloseModal}
+          style={styles.container}>
+          <SafeAreaView style={styles.modalView}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Cập nhật thông tin</Text>
+            </View>
+            <Formik
+              initialValues={initialValues}
+              validationSchema={userProfileValid.validationSchema}
+              onSubmit={values => handleUpdateUserProfile(values)}>
+              {formikProps => {
+                const {values, errors, handleChange, handleSubmit} =
+                  formikProps;
+                return (
+                  <>
+                    <View style={styles.body}>
+                      <InputField
+                        placeholder={'Họ và tên'}
+                        autoFocus
+                        onChangeText={handleChange('name')}
+                        value={values.name}
+                        error={errors.name}
+                        style={{fontSize: 15, paddingBottom: 0}}
+                        inputContainerStyle={{
+                          borderBottomWidth: 0,
+                          width: '100%',
+                        }}
+                        maxLength={30}
+                      />
+
+                      <CheckBox
+                        center
+                        title="Nam"
+                        checkedIcon="dot-circle-o"
+                        uncheckedIcon="circle-o"
+                        checked={!genderValue}
+                        onPress={() => setGenderValue(false)}
+                        value={false}
+                      />
+                      <CheckBox
+                        center
+                        title="Nữ"
+                        checkedIcon="dot-circle-o"
+                        uncheckedIcon="circle-o"
+                        checked={genderValue}
+                        onPress={() => setGenderValue(true)}
+                        value={true}
+                      />
+
+                      <Button
+                        type="clear"
+                        title={dobTitle}
+                        onPress={handleOpenDatePicker}
+                      />
+                    </View>
+                    <View style={styles.footer}>
+                      <Button
+                        title="Hủy"
+                        onPress={handleCloseModal}
+                        type="clear"
+                        titleStyle={{color: 'black'}}
+                        containerStyle={{marginRight: 20}}
+                      />
+                      <Button
+                        title="Cập nhật"
+                        onPress={handleSubmit}
+                        type="clear"
+                      />
+                    </View>
+                  </>
+                );
+              }}
+            </Formik>
+          </SafeAreaView>
+        </TouchableOpacity>
+      </Modal>
+      {show && (
+        <DateTimePickerModal
+          isVisible={show}
+          date={dateOfBirth}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+        />
+      )}
+    </SafeAreaView>
+  );
+};
+
+UpdateUserProfileModal.propTypes = {
+  modalVisible: PropTypes.bool,
+  setModalVisible: PropTypes.func,
+  userProfile: PropTypes.object,
+};
+
+UpdateUserProfileModal.defaultProps = {
+  modalVisible: false,
+  setModalVisible: null,
+  userProfile: {},
+};
+
+const BUTTON_RADIUS = 10;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'rgba(52, 52, 52, 0.3)',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+  },
+  centeredView: {
+    // flex: 1,
+    // flexDirection: "row",
+    // justifyContent: "center",
+    // alignItems: "flex-end",
+    // width: "100%",
+  },
+  modalView: {
+    width: '100%',
+    backgroundColor: 'white',
+    borderRadius: 5,
+    // padding: 15,
+  },
+
+  header: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E6E8',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+  },
+  title: {
+    fontFamily: Platform.OS === 'ios' ? 'Arial' : 'normal',
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'left',
+    fontSize: 18,
+    borderBottomColor: 'black',
+  },
+  body: {},
+  footer: {
+    paddingHorizontal: 15,
+    paddingBottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+});
+
+export default UpdateUserProfileModal;

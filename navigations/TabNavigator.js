@@ -3,14 +3,12 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {useDispatch, useSelector} from 'react-redux';
-import {initSocket} from '../redux/globalSlice';
 import ContactScreen from '../screens/ContactScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MeScreen from '../screens/MeScreen';
 import commonFuc from '../utils/commonFuc';
 
 export default function TabNavigator(props) {
-  const {socket} = props;
   const dispatch = useDispatch();
 
   const Tab = createMaterialTopTabNavigator();

@@ -19,7 +19,7 @@ import {Avatar, Button} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginApi, meApi} from '../api';
-import {setLoading, setLogin} from '../redux/globalSlice';
+import {setCurrentUserId, setLoading, setLogin} from '../redux/globalSlice';
 import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 
 const CELL_COUNT = 6;
@@ -65,6 +65,7 @@ const ConfirmAccountScreen = ({navigation, route}) => {
     await AsyncStorage.setItem('refreshToken', response.refreshToken);
     const userProfile = await meApi.fetchProfile();
     await AsyncStorage.setItem('userId', userProfile._id);
+    dispatch(setCurrentUserId(userProfile._id));
     dispatch(setLoading(false));
     dispatch(setLogin(true));
   };

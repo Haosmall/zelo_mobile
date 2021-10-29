@@ -6,16 +6,14 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Image as Img,
 } from 'react-native';
 import {Image} from 'react-native-elements';
+import {Icon} from 'react-native-elements/dist/icons/Icon';
+import {useSelector} from 'react-redux';
 import {messageType} from '../constants';
-import globalStyles, {
-  SCREEN_HEIGHT,
-  SCREEN_WIDTH,
-  WINDOW_HEIGHT,
-  WINDOW_WIDTH,
-} from '../styles';
+import globalStyles from '../styles';
+import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
+import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
 
 const ReceiverMessage = props => {
@@ -28,44 +26,97 @@ const ReceiverMessage = props => {
     reactVisibleInfo,
     reactLength,
     handleViewImage,
+    isLastMessage,
   } = props;
 
   const {_id, isDeleted, type} = message;
+
+  const {listLastViewer} = useSelector(state => state.message);
+  const {currentUserId} = useSelector(state => state.global);
 
   const contentStyle = isDeleted
     ? styles.messageRecall
     : message.messageContent;
 
-  return type === messageType.NOTIFY ? (
-    <MessageNotifyDivider message={message} />
-  ) : (
-    <TouchableWithoutFeedback
-      onLongPress={handleOpenOptionModal}
-      delayLongPress={500}>
-      <View style={styles.receiverContainer}>
-        <View style={styles.receiver} key={_id}>
-          {type === messageType.IMAGE ? (
-            <Image
-              source={{uri: content}}
-              style={globalStyles.imageMessage}
-              onPress={() => handleViewImage(content, message.user.name)}
-              onLongPress={handleOpenOptionModal}
-              delayLongPress={500}
-            />
-          ) : (
-            <Text style={contentStyle}>{content}</Text>
-          )}
-          <Text style={styles.messageTime}>{time}</Text>
+  const checkLastView = () => {
+    let usersViewed = [];
+    if (!isLastMessage) {
+      return usersViewed;
+    }
+
+    const removeCurrentUser = listLastViewer.filter(
+      lastViewerEle => currentUserId !== lastViewerEle.user._id,
+    );
+
+    removeCurrentUser.forEach(lastViewerEle => {
+      const {lastView, user} = lastViewerEle;
+
+      if (new Date(lastView) >= new Date(message?.createdAt))
+        usersViewed.push(user);
+    });
+
+    return usersViewed;
+  };
+
+  return (
+    <View>
+      {type === messageType.NOTIFY ? (
+        <MessageNotifyDivider message={message} />
+      ) : (
+        <TouchableWithoutFeedback
+          onLongPress={handleOpenOptionModal}
+          delayLongPress={500}>
+          <View style={styles.receiverContainer}>
+            <View style={styles.receiver} key={_id}>
+              {type === messageType.IMAGE ? (
+                <Image
+                  source={{uri: content}}
+                  style={globalStyles.imageMessage}
+                  onPress={() => handleViewImage(content, message.user.name)}
+                  onLongPress={handleOpenOptionModal}
+                  delayLongPress={500}
+                />
+              ) : type === messageType.STICKER ? (
+                <Image
+                  source={{uri: content}}
+                  style={globalStyles.stickerMessage}
+                  onLongPress={handleOpenOptionModal}
+                  delayLongPress={500}
+                />
+              ) : type === messageType.FILE ? (
+                <FileMessage
+                  content={content}
+                  handleOpenOptionModal={handleOpenOptionModal}
+                />
+              ) : type === messageType.VIDEO ? (
+                <TouchableOpacity
+                  style={globalStyles.fileMessage}
+                  onLongPress={handleOpenOptionModal}
+                  delayLongPress={500}>
+                  {/* <Icon type="material-community" name="download" /> */}
+                  <Text>{commonFuc.getFileName(content)}</Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={contentStyle}>{content}</Text>
+              )}
+              <Text style={styles.messageTime}>{time}</Text>
+            </View>
+            {reactLength > 0 && (
+              <TouchableOpacity
+                style={{...styles.reactionContainer, right: 25}}
+                onPress={handleShowReactDetails}>
+                <Text style={styles.reactionText}>{reactVisibleInfo}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+      {checkLastView().length > 0 && (
+        <View style={styles.lastView}>
+          <Text style={{fontSize: 12}}>Đã xem</Text>
         </View>
-        {reactLength > 0 && (
-          <TouchableOpacity
-            style={{...styles.reactionContainer, right: 25}}
-            onPress={handleShowReactDetails}>
-            <Text style={styles.reactionText}>{reactVisibleInfo}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
+      )}
+    </View>
   );
 };
 
@@ -78,6 +129,7 @@ ReceiverMessage.propTypes = {
   time: PropTypes.string,
   reactVisibleInfo: PropTypes.string,
   reactLength: PropTypes.number,
+  isLastMessage: PropTypes.bool,
 };
 
 ReceiverMessage.defaultProps = {
@@ -89,6 +141,7 @@ ReceiverMessage.defaultProps = {
   time: '',
   reactVisibleInfo: '',
   reactLength: 0,
+  isLastMessage: false,
 };
 export default ReceiverMessage;
 
@@ -181,4 +234,11 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   reactionText: {fontSize: 11},
+  lastView: {
+    alignSelf: 'flex-end',
+    marginRight: 15,
+    // backgroundColor: 'cyan',
+    marginTop: -3,
+    marginBottom: 8,
+  },
 });
