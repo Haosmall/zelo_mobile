@@ -8,7 +8,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  View,
 } from 'react-native';
+import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {io} from 'socket.io-client';
 import Conversation from '../components/Conversation';
@@ -16,6 +18,7 @@ import MessageHeaderModal from '../components/MessageHeaderModal';
 import {REACT_APP_SOCKET_URL} from '../constants';
 import {
   deleteFriendRequest,
+  fetchFriendById,
   fetchFriendRequests,
   fetchFriends,
   fetchMyFriendRequests,
@@ -110,8 +113,16 @@ export default function HomeScreen({navigation}) {
     );
     socket.on('accept-friend', details => {
       console.log('accept-friend');
-      dispatch(deleteFriendRequest(details._id));
+      dispatch(cancelMyFriendRequest(details._id));
       dispatch(fetchFriends());
+      dispatch(fetchFriendById({userId: details._id}));
+    });
+
+    socket.on('deleted-invite-was-send', userId => {
+      console.log('deleted-invite-was-send');
+      dispatch(deleteFriendRequest(userId));
+      dispatch(fetchFriends());
+      dispatch(fetchFriendById({userId}));
     });
 
     socket.on(
@@ -125,6 +136,7 @@ export default function HomeScreen({navigation}) {
     socket.on('send-friend-invite', details => {
       console.log('send-friend-invite');
       dispatch(inviteFriendRequest(details));
+      dispatch(fetchFriendById({userId: details._id}));
     });
 
     socket.on('update-vote-message', (conversationId, message) => {
@@ -214,7 +226,10 @@ export default function HomeScreen({navigation}) {
             );
           })}
         {conversations.length <= 0 && (
-          <Text style={globalStyles.emptyText}>Không có tin nhắn nào</Text>
+          <View style={globalStyles.emty}>
+            <Icon name="warning" type="antdesign" />
+            <Text style={globalStyles.emptyText}>Không có tin nhắn nào</Text>
+          </View>
         )}
 
         {/* <Image

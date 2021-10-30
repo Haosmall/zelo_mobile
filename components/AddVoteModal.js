@@ -187,11 +187,11 @@ const AddVoteModal = props => {
               </View>
             </View>
 
-            <View>
+            {/* <View>
               {inputsRef.current.map((value, i) => {
                 return <Text key={i}>{`${i + 1} - ${value}`}</Text>;
               })}
-            </View>
+            </View> */}
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>

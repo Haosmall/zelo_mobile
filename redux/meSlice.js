@@ -6,12 +6,21 @@ const KEY = 'me';
 const initialState = {
   isLoading: false,
   userProfile: {},
+  phoneBooks: [],
 };
 
 export const fetchProfile = createAsyncThunk(
   `${KEY}/fetchProfile`,
   async () => {
     const data = await meApi.fetchProfile();
+    return data;
+  },
+);
+
+export const fetchSyncContacts = createAsyncThunk(
+  `${KEY}/fetchSyncContacts`,
+  async () => {
+    const data = await meApi.fetchSyncContacts();
     return data;
   },
 );
@@ -39,6 +48,7 @@ const meSlice = createSlice({
   },
   // xu ly api roi thay doi state
   extraReducers: {
+    // TODO:<=========================== fetchProfile ===========================>
     // Đang xử lý
     [fetchProfile.pending]: (state, action) => {
       state.isLoading = true;
@@ -50,6 +60,31 @@ const meSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchProfile.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:<=========================== fetchSyncContacts ===========================>
+    // Đang xử lý
+    [fetchSyncContacts.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchSyncContacts.fulfilled]: (state, action) => {
+      state.isLoading = false;
+
+      const phoneBooks = [...action.payload].sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
+      state.phoneBooks = phoneBooks;
+    },
+    // Xử lý khi bị lỗi
+    [fetchSyncContacts.rejected]: (state, action) => {
       state.isLoading = false;
     },
   },

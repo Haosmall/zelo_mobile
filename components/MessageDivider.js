@@ -39,7 +39,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingVertical: 1,
     paddingHorizontal: 10,
-    marginVertical: 5,
+    // marginVertical: 5,
+    marginBottom: 10,
   },
   loading: {
     backgroundColor: 'rgba(52, 52, 52, 0.3)',

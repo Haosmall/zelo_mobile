@@ -9,10 +9,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setModalVisible} from '../redux/globalSlice';
 import AddNewFriendScreen from '../screens/AddNewFriendScreen';
 import ConversationOptionsScreen from '../screens/ConversationOptionsScreen';
+import FileScreen from '../screens/FileScreen';
 import FriendDetailsScreen from '../screens/FriendDetailsScreen';
 import FriendRequestScreen from '../screens/FriendRequestScreen';
 import FriendSearchScreen from '../screens/FriendSearchScreen';
 import MessageScreen from '../screens/MessageScreen';
+import PhonebookScreen from '../screens/PhonebookScreen';
 import VoteDetailScreen from '../screens/VoteDetailScreen';
 import {globalScreenOptions} from '../styles';
 import TabNavigator from './TabNavigator';
@@ -148,6 +150,7 @@ const MainStackNavigator = ({navigation}) => {
             name="Lời mời kết bạn"
             component={FriendRequestScreen}
           />
+          <Stack.Screen name="Ảnh, video, file đã gửi" component={FileScreen} />
           <Stack.Screen name="Tìm kiếm bạn bè" component={FriendSearchScreen} />
           <Stack.Screen name="Thêm bạn" component={AddNewFriendScreen} />
           <Stack.Screen
@@ -158,6 +161,7 @@ const MainStackNavigator = ({navigation}) => {
             name="Chi tiết bình chọn"
             component={VoteDetailScreen}
           />
+          <Stack.Screen name="Bạn từ danh bạ máy" component={PhonebookScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

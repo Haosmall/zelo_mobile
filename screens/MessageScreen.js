@@ -41,7 +41,7 @@ import {
   fetchListLastViewer,
   fetchMessages,
 } from '../redux/messageSlice';
-import {fetchPinMessages} from '../redux/pinSlice';
+import {fetchPinMessages, resetPinSlice} from '../redux/pinSlice';
 
 const page = DEFAULT_PAGE;
 const size = DEFAULT_PAGE_SIZE;
@@ -54,7 +54,6 @@ export default function MessageScreen({navigation, route}) {
     useSelector(state => state.message);
   const {currentUserId, keyboardHeight} = useSelector(state => state.global);
   // const {totalPages} = messagePages;
-  const {name, type, avatar} = currentConversation;
 
   // State
   const [modalVisible, setModalVisible] = useState(
@@ -75,6 +74,7 @@ export default function MessageScreen({navigation, route}) {
 
   const handleGoBack = () => {
     dispatch(clearMessagePages());
+    dispatch(resetPinSlice());
     navigation.goBack();
     return true;
   };
@@ -110,7 +110,7 @@ export default function MessageScreen({navigation, route}) {
     <MessageHeaderLeft
       goBack={handleGoBack}
       totalMembers={currentConversation?.totalMembers}
-      name={name}
+      name={currentConversation?.name}
     />
   );
 

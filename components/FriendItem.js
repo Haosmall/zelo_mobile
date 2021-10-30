@@ -33,6 +33,34 @@ export default function FriendItem(props) {
       ? 'Hủy yêu cầu'
       : 'Kết bạn';
 
+  const getButtonTitle = () => {
+    let title = 'Kết bạn';
+    switch (type) {
+      case friendType.FRIEND:
+        title = 'Nhắn tin';
+        break;
+      case friendType.FOLLOWER:
+        title = 'Đồng ý';
+        break;
+      case friendType.YOU_FOLLOW:
+        title = 'Hủy yêu cầu';
+        break;
+      case friendType.DONT_HAVE_ACCOUNT:
+        title = 'Mời';
+        break;
+      case friendType.ADD_TO_GROUP:
+        title = 'Thêm';
+        break;
+      case 'DETAILS':
+        title = 'Chi tiết';
+        break;
+      default:
+        title = 'Kết bạn';
+        break;
+    }
+    return title;
+  };
+
   const handleOnPress = () => {
     switch (type) {
       case friendType.FRIEND:
@@ -50,6 +78,20 @@ export default function FriendItem(props) {
       case friendType.NOT_FRIEND:
         console.log('Ket ban');
         handleAddFriendRequest();
+        break;
+      case friendType.ADD_TO_GROUP:
+        console.log('Them Vao nhom');
+        handleAddToGroup();
+        break;
+      case friendType.REMOVE_FROM_GROUP:
+        console.log('Them Vao nhom');
+        handleRemoveFromGroup();
+        break;
+      case friendType.DONT_HAVE_ACCOUNT:
+        console.log('Moi tao tk');
+        handleAddFriendRequest();
+        break;
+      case 'DETAILS':
         break;
       default:
         console.log('df Nhan tin');
@@ -122,6 +164,17 @@ export default function FriendItem(props) {
     });
   };
 
+  const handleAddToGroup = userId => {
+    console.log('add To group');
+  };
+  const handleRemoveFromGroup = userId => {
+    console.log('Remove from group');
+  };
+
+  const handleInvite = userId => {
+    console.log('Moi tao tk');
+  };
+
   return (
     <ListItem
       topDivider={topDivider}
@@ -163,8 +216,14 @@ export default function FriendItem(props) {
           />
         )}
         <Button
-          title={buttonTitle}
-          type={type === friendType.YOU_FOLLOW ? 'outline' : 'solid'}
+          title={getButtonTitle()}
+          type={
+            type === friendType.YOU_FOLLOW ||
+            type === friendType.REMOVE_FROM_GROUP ||
+            type === friendType.DONT_HAVE_ACCOUNT
+              ? 'outline'
+              : 'solid'
+          }
           buttonStyle={styles.buttonStyle}
           titleStyle={styles.buttonTitle}
           onPress={handleOnPress}

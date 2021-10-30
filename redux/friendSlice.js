@@ -9,6 +9,7 @@ const initialState = {
   searchFriend: {},
   friendRequests: [],
   myFriendRequests: [],
+  friendSuggests: [],
 };
 
 export const fetchFriends = createAsyncThunk(
@@ -37,6 +38,13 @@ export const fetchFriendById = createAsyncThunk(
   async (params, thunkApi) => {
     const {userId} = params;
     const data = await userApi.fetchUserById(userId);
+    return data;
+  },
+);
+export const fetchFriendSuggests = createAsyncThunk(
+  `${KEY}/fetchFriendSuggests`,
+  async (params, thunkApi) => {
+    const data = await friendApi.fetchFriendSuggests(params);
     return data;
   },
 );
@@ -99,7 +107,7 @@ const friendSlice = createSlice({
   },
   // xu ly api roi thay doi state
   extraReducers: {
-    // ========================== fetchFriends ==========================
+    // TODO:========================== fetchFriends ==========================
     // Đang xử lý
     [fetchFriends.pending]: (state, action) => {
       state.isLoading = true;
@@ -114,7 +122,7 @@ const friendSlice = createSlice({
       state.isLoading = false;
     },
 
-    // ========================== fetchFriendRequests ==========================
+    // TODO:========================== fetchFriendRequests ==========================
     // Đang xử lý
     [fetchFriendRequests.pending]: (state, action) => {
       state.isLoading = true;
@@ -129,7 +137,7 @@ const friendSlice = createSlice({
       state.isLoading = false;
     },
 
-    // ========================== fetchMyFriendRequests ==========================
+    // TODO:========================== fetchMyFriendRequests ==========================
     // Đang xử lý
     [fetchMyFriendRequests.pending]: (state, action) => {
       state.isLoading = true;
@@ -144,7 +152,7 @@ const friendSlice = createSlice({
       state.isLoading = false;
     },
 
-    // ========================== fetchFriendById ==========================
+    // TODO:========================== fetchFriendById ==========================
     // Đang xử lý
     [fetchFriendById.pending]: (state, action) => {
       state.isLoading = true;
@@ -156,6 +164,21 @@ const friendSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchFriendById.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:========================== fetchFriendSuggests ==========================
+    // Đang xử lý
+    [fetchFriendSuggests.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchFriendSuggests.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.friendSuggests = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchFriendSuggests.rejected]: (state, action) => {
       state.isLoading = false;
     },
   },

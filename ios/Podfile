@@ -21,6 +21,9 @@ target 'zelo_mobile' do
 
   pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
 
+  pod 'react-native-video', :path => '../node_modules/react-native-video'
+
+
   target 'zelo_mobileTests' do
     inherit! :complete
     # Pods for testing

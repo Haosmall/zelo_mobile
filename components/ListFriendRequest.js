@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import {Image} from 'react-native-elements';
+import {Icon, Image} from 'react-native-elements';
 import {EMPTY_IMAGE, friendType} from '../constants';
 import {WINDOW_HEIGHT} from '../styles';
 import FriendItem from './FriendItem';
@@ -37,7 +37,7 @@ export default function ListFriendRequest(props) {
           })}
         {listFriends.length == 0 && (
           <View style={styles.emty}>
-            <Image source={{uri: EMPTY_IMAGE}} containerStyle={styles.image} />
+            <Icon name="warning" type="antdesign" />
             <Text style={styles.text}>
               {type === friendType.FOLLOWER
                 ? 'Không có lời mời kết bạn nào'

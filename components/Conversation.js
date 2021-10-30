@@ -57,6 +57,13 @@ const Conversation = props => {
         case messageType.VOTE:
           content = `Đã tạo cuộc bình chọn mới ${lastMessageContent}`;
           break;
+        case messageType.NOTIFY:
+          content = lastMessageContent.includes('PIN_MESSAGE')
+            ? `Đã ${
+                lastMessageContent === 'NOT_PIN_MESSAGE' ? 'bỏ ' : ''
+              }ghim một tin nhắn `
+            : lastMessageContent.replace('<b>', '').replace('</b>', '');
+          break;
 
         default:
           content = lastMessageContent

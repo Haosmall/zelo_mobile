@@ -16,6 +16,7 @@ const initialState = {
   currentVote: {},
   listLastViewer: [],
   usersTyping: [],
+  files: {},
 };
 
 export const fetchConversations = createAsyncThunk(
@@ -43,6 +44,15 @@ export const fetchListLastViewer = createAsyncThunk(
   },
 );
 
+export const fetchFiles = createAsyncThunk(
+  `${KEY}/fetchFiles`,
+  async (params, thunkApi) => {
+    const {conversationId, type} = params;
+    const data = await messageApi.fetchFiles(conversationId, {type});
+    return data;
+  },
+);
+
 const messageSlice = createSlice({
   name: KEY,
   initialState,
@@ -66,6 +76,7 @@ const messageSlice = createSlice({
       state.currentVote = {};
       state.listLastViewer = [];
       state.usersTyping = [];
+      state.files = {};
     },
 
     // TODO:---------------------- updateCurrentConversation ----------------------
@@ -279,12 +290,18 @@ const messageSlice = createSlice({
       }
 
       console.log('isNotification: ', isNotification);
-
+      const messageContent = message.content;
+      const messageContentNotify =
+        messageContent === 'PIN_MESSAGE'
+          ? 'Đã ghim một tin nhắn'
+          : messageContent === 'NOT_PIN_MESSAGE'
+          ? 'Đã bỏ ghim một tin nhắn'
+          : messageContent;
       // PushNotification.cancelAllLocalNotifications();
       PushNotification.localNotification({
         channelId: 'new-message',
         title: message.user.name,
-        message: message.content,
+        message: messageContentNotify,
         id: state.messages.length,
         soundName: 'my_sound.mp3',
         playSound: true,
@@ -426,6 +443,21 @@ const messageSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchListLastViewer.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:---------------------- fetchFiles ----------------------
+    // Đang xử lý
+    [fetchFiles.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchFiles.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.files = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchFiles.rejected]: (state, action) => {
       state.isLoading = false;
     },
   },

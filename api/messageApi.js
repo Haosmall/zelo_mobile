@@ -7,6 +7,10 @@ const messageApi = {
     const url = `${BASE_URL}/${conversationId}`;
     return axiosClient.get(url, {params});
   },
+  fetchFiles: (conversationId, params) => {
+    const url = `${BASE_URL}/${conversationId}/files`;
+    return axiosClient.get(url, {params});
+  },
 
   sendMessage: message => {
     const url = `${BASE_URL}/text`;

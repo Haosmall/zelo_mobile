@@ -41,6 +41,10 @@ const friendApi = {
     const url = `${BASE_URL}/invites/me/${userId}`;
     return axiosClient.delete(url);
   },
+
+  fetchFriendSuggests: params => {
+    return axiosClient.get(`${BASE_URL}/suggest`, {params});
+  },
 };
 
 export default friendApi;

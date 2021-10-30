@@ -25,6 +25,7 @@ const MessageModal = props => {
   const {currentConversation, currentConversationId} = useSelector(
     state => state.message,
   );
+  const {pinMessages} = useSelector(state => state.pin);
 
   const messageId = modalVisible.messageId;
 
@@ -53,16 +54,21 @@ const MessageModal = props => {
     handleCloseModal();
   };
   const handlePinMessage = async () => {
-    const response = await pinMessagesApi.addPinMessage(messageId);
-    if (response.status === 400) {
+    if (pinMessages.length > 3) {
       setPinMessageVisible({
         isVisible: true,
         isError: true,
       });
     } else {
-      dispatch(fetchPinMessages({conversationId: currentConversationId}));
+      try {
+        const response = await pinMessagesApi.addPinMessage(messageId);
+
+        dispatch(fetchPinMessages({conversationId: currentConversationId}));
+        console.log(response);
+      } catch (error) {
+        commonFuc.notifyMessage('Ghim tin nhắn thất bại');
+      }
     }
-    console.log(response);
     handleCloseModal();
   };
 
@@ -164,7 +170,7 @@ const MessageModal = props => {
                   titleStyle={styles.title}
                   iconPosition="top"
                 />
-                {currentConversation.type && (
+                {currentConversation?.type && (
                   <Button
                     title="Ghim"
                     containerStyle={styles.button}

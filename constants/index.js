@@ -29,6 +29,10 @@ export const friendType = {
   FOLLOWER: 'FOLLOWER',
   YOU_FOLLOW: 'YOU_FOLLOW',
   NOT_FRIEND: 'NOT_FRIEND',
+  NOT_FRIEND: 'NOT_FRIEND',
+  DONT_HAVE_ACCOUNT: 'DONT_HAVE_ACCOUNT',
+  ADD_TO_GROUP: 'ADD_TO_GROUP',
+  REMOVE_FROM_GROUP: 'REMOVE_FROM_GROUP',
 };
 export const DEFAULT_MESSAGE_MODAL_VISIBLE = {
   isVisible: false,
@@ -57,5 +61,6 @@ export const DEFAULT_ADD_VOTE_MODAL = {
 export const DEFAULT_IMAGE_MODAL = {
   isVisible: false,
   userName: '',
-  imageUrl: '',
+  content: [],
+  isImage: true,
 };

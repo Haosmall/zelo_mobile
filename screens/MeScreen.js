@@ -77,7 +77,8 @@ export default function MeScreen() {
     setImageProps({
       isVisible: true,
       userName: userProfile.name,
-      imageUrl: url || DEFAULT_COVER_IMAGE,
+      content: [{url: url || DEFAULT_COVER_IMAGE}],
+      isImage: true,
     });
   };
 

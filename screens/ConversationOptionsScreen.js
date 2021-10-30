@@ -1,21 +1,34 @@
-import React, {useState} from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Avatar} from 'react-native-elements';
-import {useSelector} from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {Avatar, Icon, ListItem} from 'react-native-elements';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {useDispatch, useSelector} from 'react-redux';
 import AddVoteModal from '../components/AddVoteModal';
 import ConversationOptionsBar from '../components/ConversationOptionsBar';
 import RenameConversationModal from '../components/RenameConversationModal';
 import {
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
+  messageType,
 } from '../constants';
 import {useGoback} from '../hooks';
-import {OVERLAY_AVATAR_COLOR} from '../styles';
+import {fetchFiles} from '../redux/messageSlice';
+import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
 
-  const {currentConversation} = useSelector(state => state.message);
+  const {currentConversation, currentConversationId} = useSelector(
+    state => state.message,
+  );
+  const dispatch = useDispatch();
   const {totalMembers, name, type, avatar, isNotify} = currentConversation;
 
   const [modalVisible, setModalVisible] = useState(
@@ -24,6 +37,18 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
 
   useGoback(navigation);
+
+  useEffect(() => {}, []);
+
+  const handleGoToFileScreen = async () => {
+    await dispatch(
+      fetchFiles({
+        conversationId: currentConversationId,
+        type: messageType.ALL,
+      }),
+    );
+    navigation.navigate('Ảnh, video, file đã gửi');
+  };
 
   // const handleGoBack = () => {
   //   navigation.goBack();
@@ -44,10 +69,11 @@ export default function ConversationOptionsScreen({navigation, route}) {
           uri: avatar,
         }
       : null;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={styles.subContainer}>
+        <Pressable style={styles.subContainer}>
           <Avatar
             rounded
             size="large"
@@ -82,11 +108,46 @@ export default function ConversationOptionsScreen({navigation, route}) {
             openAddVoteModal={setAddVoteVisible}
             navigation={navigation}
           />
-        </View>
-        <Text>{conversationId}</Text>
+        </Pressable>
+        {/* <Text>{conversationId}</Text>
         <Text>{totalMembers}</Text>
         <Text>{name}</Text>
-        <Text>{type.toString()}</Text>
+        <Text>{type.toString()}</Text> */}
+
+        <Pressable style={globalStyles.viewEle}>
+          <TouchableOpacity onPress={handleGoToFileScreen}>
+            <ListItem
+            // topDivider={false}
+            // bottomDivider={false}
+            >
+              <Icon type="antdesign" name="folderopen" />
+              <ListItem.Content>
+                <ListItem.Title
+                // style={{
+                //   width: '100%',
+                //   fontWeight: numberUnread > 0 ? 'bold' : 'normal',
+                // }}
+                >
+                  Ảnh, video, file đã gửi
+                </ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          </TouchableOpacity>
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: '#E5E6E8',
+              height: 1,
+              marginLeft: 55,
+            }}></View>
+        </Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
+        <Pressable style={globalStyles.viewEle}></Pressable>
       </ScrollView>
       <AddVoteModal
         modalVisible={addVoteVisible}

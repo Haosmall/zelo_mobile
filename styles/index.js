@@ -89,6 +89,7 @@ const globalStyles = StyleSheet.create({
   imageMessage: {
     width: '100%',
     aspectRatio: 76 / 135,
+    borderRadius: 10,
   },
   stickerMessage: {
     width: STICKER_SIZE * 1.5,
@@ -99,6 +100,23 @@ const globalStyles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 8,
     fontSize: 16,
+  },
+  video: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  viewEle: {
+    width: '100%',
+    minHeight: 100,
+    marginTop: 10,
+    backgroundColor: '#fff',
+  },
+  emty: {
+    alignItems: 'center',
+    marginTop: 50,
   },
 });
 

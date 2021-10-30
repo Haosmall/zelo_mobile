@@ -13,14 +13,22 @@ const MessageNotifyDivider = props => {
   const contentLowercase =
     content === 'PIN_MESSAGE'
       ? 'đã ghim một tin nhắn'
+      : content === 'NOT_PIN_MESSAGE'
+      ? 'đã bỏ ghim một tin nhắn'
       : content.charAt(0).toLocaleLowerCase() + content.slice(1);
   const contentWithSenderName = `<p> ${
     isReceiverMessage ? 'Bạn' : user.name
   } ${contentLowercase}</p`;
 
-  const icon = contentLowercase.includes('ghim')
-    ? {name: 'pushpino', type: 'antdesign', color: '#dc923c'}
+  const icon = contentLowercase.includes('đã ghim')
+    ? {name: 'pin-outline', type: 'material-community', color: '#dc923c'}
+    : contentLowercase.includes('đã bỏ ghim')
+    ? {name: 'pin-off-outline', type: 'material-community', color: 'red'}
     : {name: 'edit', type: 'material', color: '#4cacfc'};
+  // ? {name: 'pushpino', type: 'antdesign', color: '#dc923c'}
+  // : contentLowercase.includes('đã bỏ ghim')
+  // ? {name: 'pushpino', type: 'antdesign', color: 'red'}
+  // : {name: 'edit', type: 'material', color: '#4cacfc'};
 
   return (
     <TouchableWithoutFeedback>
@@ -59,7 +67,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingVertical: 1,
     paddingHorizontal: 10,
-    marginVertical: 5,
+    // marginVertical: 5,
+    marginBottom: 10,
   },
   text: {
     color: '#000',

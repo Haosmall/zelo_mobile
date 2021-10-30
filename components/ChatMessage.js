@@ -47,11 +47,12 @@ function ChatMessage(props) {
     showReactDetails(obj);
   };
 
-  const handleViewImage = (url, userName) => {
+  const handleViewImage = (url, userName, isImage) => {
     setImageProps({
       isVisible: true,
       userName: userName,
-      imageUrl: url || DEFAULT_COVER_IMAGE,
+      content: isImage ? [{url: url || DEFAULT_COVER_IMAGE}] : url,
+      isImage: isImage,
     });
   };
 

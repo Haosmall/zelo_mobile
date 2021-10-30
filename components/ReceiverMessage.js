@@ -15,6 +15,9 @@ import globalStyles from '../styles';
 import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
+import RNUrlPreview from 'react-native-url-preview';
+
+import VideoMessage from './VideoMessage';
 
 const ReceiverMessage = props => {
   const {
@@ -72,7 +75,9 @@ const ReceiverMessage = props => {
                 <Image
                   source={{uri: content}}
                   style={globalStyles.imageMessage}
-                  onPress={() => handleViewImage(content, message.user.name)}
+                  onPress={() =>
+                    handleViewImage(content, message.user.name, true)
+                  }
                   onLongPress={handleOpenOptionModal}
                   delayLongPress={500}
                 />
@@ -92,12 +97,20 @@ const ReceiverMessage = props => {
                 <TouchableOpacity
                   style={globalStyles.fileMessage}
                   onLongPress={handleOpenOptionModal}
-                  delayLongPress={500}>
-                  {/* <Icon type="material-community" name="download" /> */}
+                  delayLongPress={500}
+                  onPress={() =>
+                    handleViewImage(content, message.user.name, false)
+                  }>
+                  <View style={globalStyles.video}>
+                    <Icon name="play" type="antdesign" color="#fff" size={30} />
+                  </View>
                   <Text>{commonFuc.getFileName(content)}</Text>
                 </TouchableOpacity>
               ) : (
-                <Text style={contentStyle}>{content}</Text>
+                <View>
+                  <Text style={contentStyle}>{content}</Text>
+                  <RNUrlPreview text={content} />
+                </View>
               )}
               <Text style={styles.messageTime}>{time}</Text>
             </View>

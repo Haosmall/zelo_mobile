@@ -1,23 +1,34 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {Pressable, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {Button, Input, ListItem} from 'react-native-elements';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useDispatch} from 'react-redux';
+import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import {useDispatch, useSelector} from 'react-redux';
 import {userApi} from '../api';
-import {setSearchFriend} from '../redux/friendSlice';
+import {
+  fetchFriendById,
+  fetchFriendSuggests,
+  setSearchFriend,
+} from '../redux/friendSlice';
+import globalStyles from '../styles';
 import commonFuc from '../utils/commonFuc';
 import {validateUsername} from '../utils/validator';
 
 export default function AddNewFriendScreen({navigation}) {
   const dispatch = useDispatch();
+  const {friendSuggests} = useSelector(state => state.friend);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const inputRef = useRef('');
 
   useEffect(() => {
-    // dispatch(fetchFriends({}));
+    dispatch(fetchFriendSuggests());
   }, []);
+
+  const handleGoToPersonalScreen = async userId => {
+    await dispatch(fetchFriendById({userId}));
+    navigation.navigate('Chi tiết bạn bè');
+  };
 
   const handleSearchFriendSubmit = async () => {
     // const userName = 'nhathao00852@gmail.com';
@@ -75,7 +86,46 @@ export default function AddNewFriendScreen({navigation}) {
         />
       </ListItem>
 
-      <ScrollView></ScrollView>
+      <ScrollView>
+        {friendSuggests.length > 0 && (
+          <Pressable style={globalStyles.viewEle}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                marginHorizontal: 15,
+                marginVertical: 6,
+                fontSize: 16,
+              }}>
+              Gợi ý kết bạn
+            </Text>
+            <View
+              style={{
+                // backgroundColor: 'cyan',
+                width: '100%',
+                minHeight: 100,
+                flexDirection: 'row',
+                // aspectRatio: 1,
+                justifyContent: 'center',
+                alignContent: 'space-around',
+              }}>
+              {friendSuggests.map(friend => (
+                <TouchableOpacity
+                  key={friend._id}
+                  onPress={() => handleGoToPersonalScreen(friend._id)}>
+                  <View
+                    style={{
+                      backgroundColor: 'pink',
+                      width: '30%',
+                      flexDirection: 'row',
+                    }}>
+                    <Text>{friend.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Pressable>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }

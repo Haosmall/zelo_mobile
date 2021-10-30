@@ -13,6 +13,8 @@ import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
+import {useDispatch, useSelector} from 'react-redux';
+import RNUrlPreview from 'react-native-url-preview';
 
 const SenderMessage = props => {
   const {
@@ -25,6 +27,8 @@ const SenderMessage = props => {
     reactLength,
     handleViewImage,
   } = props;
+
+  const {currentConversation} = useSelector(state => state.message);
 
   const {_id, user, isDeleted, type} = message;
 
@@ -39,7 +43,15 @@ const SenderMessage = props => {
       onLongPress={handleOpenOptionModal}
       delayLongPress={500}>
       <View style={styles.senderContainer}>
-        <View style={styles.sender} key={_id}>
+        <View
+          style={[
+            styles.sender,
+            currentConversation?.leaderId &&
+              currentConversation?.leaderId === user._id && {
+                borderColor: '#89daef',
+              },
+          ]}
+          key={_id}>
           <Avatar
             title={commonFuc.getAcronym(user.name)}
             rounded
@@ -52,14 +64,33 @@ const SenderMessage = props => {
                 : null
             }
             overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
-            containerStyle={styles.avatar}
-          />
-          <Text style={styles.messageName}>{user.name}</Text>
+            containerStyle={styles.avatar}>
+            {currentConversation?.leaderId &&
+              currentConversation?.leaderId === user._id && (
+                <Avatar.Accessory
+                  size={15}
+                  type="simple-line-icon"
+                  name="key"
+                  color="yellow"
+                />
+              )}
+          </Avatar>
+          <Text
+            style={[
+              styles.messageName,
+              currentConversation?.leaderId &&
+                currentConversation?.leaderId === user._id && {
+                  // color: '#805d51',
+                  color: '#8a6a5e',
+                },
+            ]}>
+            {user.name}
+          </Text>
           {type === messageType.IMAGE ? (
             <Image
               source={{uri: content}}
               style={globalStyles.imageMessage}
-              onPress={() => handleViewImage(content, user.name)}
+              onPress={() => handleViewImage(content, user.name, true)}
               onLongPress={handleOpenOptionModal}
               delayLongPress={500}
             />
@@ -79,12 +110,18 @@ const SenderMessage = props => {
             <TouchableOpacity
               style={globalStyles.fileMessage}
               onLongPress={handleOpenOptionModal}
-              delayLongPress={500}>
-              {/* <Icon type="material-community" name="download" /> */}
+              delayLongPress={500}
+              onPress={() => handleViewImage(content, user.name, false)}>
+              <View style={globalStyles.video}>
+                <Icon name="play" type="antdesign" color="#fff" size={30} />
+              </View>
               <Text>{commonFuc.getFileName(content)}</Text>
             </TouchableOpacity>
           ) : (
-            <Text style={contentStyle}>{content}</Text>
+            <View>
+              <Text style={contentStyle}>{content}</Text>
+              <RNUrlPreview text={content} />
+            </View>
           )}
           <Text style={styles.messageTime}>{time}</Text>
         </View>

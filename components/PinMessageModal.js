@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   centeredView: {},
   modalView: {
     width: '100%',
-    height: viewHeight,
+    height: '100%',
     backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

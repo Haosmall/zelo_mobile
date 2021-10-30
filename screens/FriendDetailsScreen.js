@@ -139,7 +139,8 @@ export default function FriendDetailsScreen({navigation}) {
     setImageProps({
       isVisible: true,
       userName: searchFriend.name,
-      imageUrl: url || DEFAULT_COVER_IMAGE,
+      content: [{url: url || DEFAULT_COVER_IMAGE}],
+      isImage: true,
     });
   };
 
@@ -161,14 +162,17 @@ export default function FriendDetailsScreen({navigation}) {
   const handleEmail = () => {
     const username = searchFriend.username;
     let email = '';
-    if (friendStatus !== friendType.FRIEND) {
-      return '**********';
-    }
+
     if (username.includes('@')) {
       email = searchFriend.username;
+
+      if (friendStatus !== friendType.FRIEND) {
+        email = '**********';
+      }
     }
     return email;
   };
+
   const handlePhoneNumber = () => {
     const username = searchFriend.username;
     let phoneNumber = '';
@@ -219,6 +223,18 @@ export default function FriendDetailsScreen({navigation}) {
                 onPress={handleDeleteFriendRequest}
               />
             )}
+            {friendStatus !== friendType.FOLLOWER &&
+              friendStatus !== friendType.FRIEND && (
+                <Button
+                  containerStyle={styles.buttonContainer}
+                  title="Nhắn tin"
+                  buttonStyle={styles.button}
+                  type="outline"
+                  onPress={() =>
+                    handleCreateChat(searchFriend._id, navigation, dispatch)
+                  }
+                />
+              )}
             <Button
               containerStyle={styles.buttonContainer}
               title={buttonTitle}
