@@ -108,7 +108,7 @@ const Conversation = props => {
               numberUnread > 0 ? {color: 'black'} : null,
             ]}>{`${handleSenderName(
             userProfile.name,
-            lastMessage?.user.name,
+            lastMessage?.user?.name,
             type,
           )}${handleContent(
             lastMessage?.type,

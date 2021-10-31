@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {friendApi, userApi} from '../api';
+import {friendType} from '../constants';
 
 const KEY = 'friend';
 
@@ -76,13 +77,16 @@ const friendSlice = createSlice({
     },
 
     cancelMyFriendRequest: (state, action) => {
-      const userId = action.payload;
+      const {userId, type} = action.payload;
       const myOldFriendRequests = state.myFriendRequests;
       // delete request from list
       const myNewFriendRequests = myOldFriendRequests.filter(
         requestEle => requestEle._id !== userId,
       );
       state.myFriendRequests = myNewFriendRequests;
+      state.searchFriend.status = type
+        ? friendType.FRIEND
+        : friendType.NOT_FRIEND;
     },
 
     deleteFriendRequest: (state, action) => {
@@ -93,16 +97,29 @@ const friendSlice = createSlice({
         requestEle => requestEle._id !== userId,
       );
       state.friendRequests = newFriendRequests;
+      state.searchFriend.status = friendType.NOT_FRIEND;
     },
 
     inviteFriendRequest: (state, action) => {
       const details = action.payload;
       const oldFriendRequests = state.friendRequests;
       state.friendRequests = [...oldFriendRequests, details];
+      state.searchFriend.status = friendType.FOLLOWER;
     },
 
     resetFriendSlice: (state, action) => {
       Object.assign(state, initialState);
+    },
+
+    deleteFriend: (state, action) => {
+      const userId = action.payload;
+      const oldFriends = state.listFriends;
+      // delete from list
+      const newFriends = oldFriends.filter(
+        requestEle => requestEle._id !== userId,
+      );
+      state.listFriends = newFriends;
+      state.searchFriend.status = friendType.NOT_FRIEND;
     },
   },
   // xu ly api roi thay doi state
@@ -194,5 +211,6 @@ export const {
   deleteFriendRequest,
   inviteFriendRequest,
   resetFriendSlice,
+  deleteFriend,
 } = actions;
 export default reducer;

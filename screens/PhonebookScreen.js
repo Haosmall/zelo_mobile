@@ -17,7 +17,7 @@ import ContactAction from '../components/ContactAction';
 import FriendItem from '../components/FriendItem';
 import {friendType} from '../constants';
 import {fetchFriendById} from '../redux/friendSlice';
-import {setLoading} from '../redux/meSlice';
+import {fetchSyncContacts, setLoading} from '../redux/meSlice';
 import globalStyles from '../styles';
 
 const PhonebookScreen = ({navigation}) => {

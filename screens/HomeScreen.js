@@ -2,6 +2,7 @@
 // import {StatusBar} from 'expo-status-bar';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  FlatList,
   Pressable,
   RefreshControl,
   SafeAreaView,
@@ -17,6 +18,8 @@ import Conversation from '../components/Conversation';
 import MessageHeaderModal from '../components/MessageHeaderModal';
 import {REACT_APP_SOCKET_URL} from '../constants';
 import {
+  cancelMyFriendRequest,
+  deleteFriend,
   deleteFriendRequest,
   fetchFriendById,
   fetchFriendRequests,
@@ -78,8 +81,23 @@ export default function HomeScreen({navigation}) {
   }, []);
 
   useEffect(() => {
+    // TODO:<====================== conversation socket ======================>
+    socket.on(
+      'create-individual-conversation-when-was-friend',
+      conversationId => {
+        console.log('create-individual-conversation-when-was-friend');
+        dispatch(fetchConversations());
+      },
+    );
+
+    socket.on('create-individual-conversation', conversationId => {
+      // handleEnterChat(conversationId);
+      dispatch(fetchConversations());
+    });
+
+    // TODO:<====================== message socket ======================>
     socket.on('new-message', (conversationId, message) => {
-      console.log('Lang Nghe', conversationId);
+      console.log('new-message', conversationId);
       dispatch(addMessage({conversationId, message}));
       dispatch(
         setNotification({conversationId, message, userId: currentUserId}),
@@ -87,11 +105,18 @@ export default function HomeScreen({navigation}) {
     });
 
     socket.on('delete-message', ({conversationId, channelId, id}) => {
-      console.log('Thu hoi');
+      console.log('delete-message');
       console.log({conversationId, channelId, id});
       dispatch(deleteMessage({conversationId, channelId, id}));
     });
 
+    // TODO:<====================== vote socket ======================>
+    socket.on('update-vote-message', (conversationId, message) => {
+      console.log('update-vote-message');
+      dispatch(updateVoteMessage({conversationId, message}));
+    });
+
+    // TODO:<====================== reaction socket ======================>
     socket.on(
       'add-reaction',
       ({conversationId, channelId, messageId, user, type}) => {
@@ -102,48 +127,16 @@ export default function HomeScreen({navigation}) {
       },
     );
 
-    socket.on(
-      'rename-conversation',
-      (conversationId, conversationName, message) => {
-        console.log('Rename conversation');
-        dispatch(
-          renameConversation({conversationId, conversationName, message}),
-        );
-      },
-    );
-    socket.on('accept-friend', details => {
-      console.log('accept-friend');
-      dispatch(cancelMyFriendRequest(details._id));
-      dispatch(fetchFriends());
-      dispatch(fetchFriendById({userId: details._id}));
+    // TODO:<====================== typing socket ======================>
+    socket.on('typing', (conversationId, user) => {
+      dispatch(usersTyping({conversationId, user}));
     });
 
-    socket.on('deleted-invite-was-send', userId => {
-      console.log('deleted-invite-was-send');
-      dispatch(deleteFriendRequest(userId));
-      dispatch(fetchFriends());
-      dispatch(fetchFriendById({userId}));
+    socket.on('not-typing', (conversationId, user) => {
+      dispatch(usersNotTyping({conversationId, user}));
     });
 
-    socket.on(
-      'create-individual-conversation-when-was-friend',
-      conversationId => {
-        console.log('create-individual-conversation-when-was-friend');
-        dispatch(fetchConversations());
-      },
-    );
-
-    socket.on('send-friend-invite', details => {
-      console.log('send-friend-invite');
-      dispatch(inviteFriendRequest(details));
-      dispatch(fetchFriendById({userId: details._id}));
-    });
-
-    socket.on('update-vote-message', (conversationId, message) => {
-      console.log('update-vote-message');
-      dispatch(updateVoteMessage({conversationId, message}));
-    });
-
+    // TODO:<====================== lastview socket ======================>
     socket.on('user-last-view', ({conversationId, userId, lastView}) => {
       console.log('user-last-view', {conversationId, userId, lastView});
       currentUserId !== userId &&
@@ -158,16 +151,47 @@ export default function HomeScreen({navigation}) {
       //   );
     });
 
-    socket.on('typing', (conversationId, user) => {
-      dispatch(usersTyping({conversationId, user}));
+    // TODO:<====================== friend socket ======================>
+    socket.on(
+      'rename-conversation',
+      (conversationId, conversationName, message) => {
+        console.log('Rename conversation');
+        dispatch(
+          renameConversation({conversationId, conversationName, message}),
+        );
+      },
+    );
+
+    socket.on('deleted-friend', userId => {
+      console.log('deleted-friend');
+      dispatch(deleteFriend(userId));
     });
 
-    socket.on('not-typing', (conversationId, user) => {
-      dispatch(usersNotTyping({conversationId, user}));
+    socket.on('accept-friend', details => {
+      console.log('accept-friend');
+      dispatch(cancelMyFriendRequest({userId: details._id, type: true}));
+      dispatch(fetchFriends());
+      dispatch(fetchFriendById({userId: details._id}));
     });
 
-    socket.on('create-individual-conversation', conversationId => {
-      handleEnterChat(conversationId);
+    socket.on('deleted-invite-was-send', userId => {
+      console.log('deleted-invite-was-send');
+      dispatch(deleteFriendRequest(userId));
+      dispatch(fetchFriends());
+      dispatch(fetchFriendById({userId}));
+    });
+
+    socket.on('deleted-friend-invite', userId => {
+      console.log('deleted-friend-invite');
+      dispatch(cancelMyFriendRequest({userId, type: false}));
+      dispatch(fetchFriends());
+      dispatch(fetchFriendById({userId}));
+    });
+
+    socket.on('send-friend-invite', details => {
+      console.log('send-friend-invite');
+      dispatch(inviteFriendRequest(details));
+      dispatch(fetchFriendById({userId: details._id}));
     });
   }, []);
 
@@ -195,44 +219,42 @@ export default function HomeScreen({navigation}) {
 
   return (
     <SafeAreaView>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        {conversations &&
-          conversations.map(conversation => {
-            const {
-              _id,
-              avatar,
-              numberUnread,
-              lastMessage,
-              name,
-              type,
-              totalMembers,
-            } = conversation;
+      {conversations.length > 0 ? (
+        <FlatList
+          data={conversations}
+          keyExtractor={conversation => conversation._id}
+          initialNumToRender={12}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          renderItem={({item}) => {
+            console.log(item);
             return (
-              <Pressable key={_id}>
+              <Pressable key={item?._id}>
                 <Conversation
-                  name={name}
-                  avatars={avatar}
-                  numberUnread={numberUnread}
-                  lastMessage={lastMessage}
+                  name={item?.name}
+                  avatars={item?.avatar}
+                  numberUnread={item?.numberUnread}
+                  lastMessage={item?.lastMessage}
                   handleEnterChat={handleEnterChat}
-                  type={type}
-                  conversationId={_id}
-                  totalMembers={totalMembers}
+                  type={item?.type}
+                  conversationId={item?._id}
+                  totalMembers={item?.totalMembers}
                 />
               </Pressable>
             );
-          })}
-        {conversations.length <= 0 && (
+          }}
+        />
+      ) : (
+        <ScrollView>
           <View style={globalStyles.emty}>
             <Icon name="warning" type="antdesign" />
             <Text style={globalStyles.emptyText}>Không có tin nhắn nào</Text>
           </View>
-        )}
+        </ScrollView>
+      )}
 
-        {/* <Image
+      {/* <Image
           source={{
             uri: 'https://i.pinimg.com/originals/86/b3/31/86b3315f71d8e1177f32d8007aa49ceb.gif',
           }}
@@ -243,8 +265,7 @@ export default function HomeScreen({navigation}) {
           style={{width: 100, height: 100}}
         /> */}
 
-        <MessageHeaderModal navigation={navigation} />
-      </ScrollView>
+      <MessageHeaderModal navigation={navigation} />
     </SafeAreaView>
   );
 }

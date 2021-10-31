@@ -21,6 +21,7 @@ import {
 import {useGoback} from '../hooks';
 import {fetchFiles} from '../redux/messageSlice';
 import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
+import commonFuc from '../utils/commonFuc';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
@@ -64,7 +65,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
   const avatarSource =
-    typeof avatar === 'string'
+    typeof avatar === 'string' && avatar
       ? {
           uri: avatar,
         }
@@ -79,6 +80,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
             size="large"
             source={avatarSource}
             overlayContainerStyle={styles.overlay}
+            title={type ? null : commonFuc.getAcronym(name)}
             icon={{
               name: 'groups',
               type: 'material',

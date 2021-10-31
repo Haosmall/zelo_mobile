@@ -1,5 +1,6 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {
+  Alert,
   Dimensions,
   Modal,
   Platform,
@@ -26,6 +27,7 @@ import {
 import {
   addNewFriendRequest,
   cancelMyFriendRequest,
+  deleteFriend,
   deleteFriendRequest,
   fetchFriends,
   updateFriendStatus,
@@ -187,6 +189,31 @@ export default function FriendDetailsScreen({navigation}) {
     return phoneNumber;
   };
 
+  const handleUnFriend = () => {
+    Alert.alert(
+      'Cảnh báo',
+      `Bạn có muốn xóa kết bạn với ${searchFriend.name} không?`,
+      [
+        {
+          text: 'Không',
+        },
+        {
+          text: 'Có',
+          onPress: async () => {
+            try {
+              const response = await friendApi.deleteFriend(searchFriend._id);
+              console.log(response);
+              dispatch(deleteFriend(searchFriend._id));
+            } catch (error) {
+              commonFuc.notifyMessage('Có lỗi xảy ra');
+              console.error('Xoa kêt ban loi: ', error);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -274,6 +301,17 @@ export default function FriendDetailsScreen({navigation}) {
           </ListItem>
         </View>
 
+        {friendStatus === friendType.FRIEND && (
+          <Button
+            containerStyle={styles.buttonContainer}
+            title="Xóa kết bạn"
+            buttonStyle={[styles.button, {borderColor: 'red'}]}
+            titleStyle={{color: 'red'}}
+            type="outline"
+            onPress={handleUnFriend}
+          />
+        )}
+
         <ViewImageModal imageProps={imageProps} setImageProps={setImageProps} />
       </ScrollView>
     </SafeAreaView>
@@ -337,6 +375,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     margin: 10,
+    borderRadius: 20,
   },
   button: {borderRadius: 20, minWidth: WINDOW_WIDTH / 3},
 });

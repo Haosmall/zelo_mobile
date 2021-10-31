@@ -13,6 +13,7 @@ import {
   updateFriendStatus,
 } from '../redux/friendSlice';
 import {
+  fetchConversations,
   fetchListLastViewer,
   updateCurrentConversation,
 } from '../redux/messageSlice';
@@ -145,10 +146,10 @@ export default function FriendItem(props) {
   const handleCreateChat = async userId => {
     try {
       const response = await conversationApi.addConversation(userId);
-
-      if (response?.isExists) {
-        handleEnterChat(response._id);
-      }
+      await dispatch(fetchConversations());
+      // if (response?.isExists) {
+      handleEnterChat(response._id);
+      // }
     } catch (error) {
       console.log('Có lỗi xảy ra', error);
     }
