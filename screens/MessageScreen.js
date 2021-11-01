@@ -114,17 +114,26 @@ export default function MessageScreen({navigation, route}) {
     />
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     console.log('Message: ', currentUserId);
     dispatch(fetchMessages({conversationId, apiParams}));
     dispatch(fetchPinMessages({conversationId}));
-
+  }, []);
+  useEffect(() => {
     navigation.setOptions({
       title: '',
       headerLeft,
       headerRight,
     });
-  }, [navigation]);
+  }, [currentConversation]);
+
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     title: '',
+  //     headerLeft,
+  //     headerRight,
+  //   });
+  // }, [navigation]);
 
   const renderMessage = (currentMessage, index) => {
     const isMyMessage = currentUserId === currentMessage.user._id;

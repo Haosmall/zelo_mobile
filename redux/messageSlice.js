@@ -17,6 +17,7 @@ const initialState = {
   listLastViewer: [],
   usersTyping: [],
   files: {},
+  members: [],
 };
 
 export const fetchConversations = createAsyncThunk(
@@ -53,6 +54,15 @@ export const fetchFiles = createAsyncThunk(
   },
 );
 
+export const fetchMembers = createAsyncThunk(
+  `${KEY}/fetchMembers`,
+  async (params, thunkApi) => {
+    const {conversationId} = params;
+    const data = await conversationApi.fetchMembers(conversationId);
+    return data;
+  },
+);
+
 const messageSlice = createSlice({
   name: KEY,
   initialState,
@@ -69,23 +79,31 @@ const messageSlice = createSlice({
 
     // TODO:---------------------- clearMessagePages ----------------------
     clearMessagePages: (state, action) => {
-      state.messagePages = {};
-      state.messages = [];
-      state.currentConversationId = '';
-      state.currentConversation = {};
-      state.currentVote = {};
-      state.listLastViewer = [];
-      state.usersTyping = [];
-      state.files = {};
+      // state.messagePages = {};
+      // state.messages = [];
+      // state.currentConversationId = '';
+      // state.currentConversation = {};
+      // state.currentVote = {};
+      // state.listLastViewer = [];
+      // state.usersTyping = [];
+      // state.files = {};
+      // state.members = [];
+
+      Object.assign(state, {
+        ...initialState,
+        isLoading: false,
+        conversations: state.conversations,
+      });
     },
 
     // TODO:---------------------- updateCurrentConversation ----------------------
     updateCurrentConversation: (state, action) => {
       const {conversationId} = action.payload;
-      const index = state.conversations.findIndex(
+      const newConversation = state.conversations.find(
         conversationEle => conversationEle._id === conversationId,
       );
-      state.currentConversation = state.conversations[index];
+
+      state.currentConversation = newConversation;
     },
 
     // TODO:---------------------- addMessage ----------------------
@@ -271,7 +289,7 @@ const messageSlice = createSlice({
     setNotification: (state, action) => {
       const {conversationId, message, userId} = action.payload;
       const isNotification = state.conversations.find(ele => {
-        console.log('ele: ', ele);
+        // console.log('ele: ', ele);
         return ele._id === conversationId;
       }).isNotify;
 
@@ -458,6 +476,21 @@ const messageSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchFiles.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:---------------------- fetchMembers ----------------------
+    // Đang xử lý
+    [fetchMembers.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchMembers.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.members = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchMembers.rejected]: (state, action) => {
       state.isLoading = false;
     },
   },

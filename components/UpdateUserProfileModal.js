@@ -16,6 +16,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {meApi} from '../api';
 import InputField from '../components/InputField';
+import {ERROR_MESSAGE} from '../constants';
 import {fetchProfile} from '../redux/meSlice';
 import commonFuc from '../utils/commonFuc';
 import {userProfileValid} from '../utils/validator';
@@ -76,7 +77,7 @@ const UpdateUserProfileModal = props => {
       commonFuc.notifyMessage('Cập nhật thành công');
     } catch (error) {
       console.error('Update profile: ', error);
-      commonFuc.notifyMessage('Đã có lỗi xảy ra');
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 

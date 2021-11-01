@@ -14,6 +14,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import {meApi} from '../api';
 import ContactAction from '../components/ContactAction';
+import EmptyData from '../components/EmptyData';
 import FriendItem from '../components/FriendItem';
 import {friendType} from '../constants';
 import {fetchFriendById} from '../redux/friendSlice';
@@ -137,10 +138,7 @@ const PhonebookScreen = ({navigation}) => {
           )}
         />
       ) : (
-        <View style={styles.emty}>
-          <Icon name="warning" type="antdesign" />
-          <Text style={styles.text}>Không có số điện thoại nào</Text>
-        </View>
+        <EmptyData content="Không có số điện thoại nào" />
       )}
       {/* <ScrollView>
         {phoneBooks &&

@@ -1,25 +1,32 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Alert,
   Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  Clipboard,
 } from 'react-native';
 import {Avatar, Icon, ListItem} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
+import {conversationApi} from '../api';
 import AddVoteModal from '../components/AddVoteModal';
 import ConversationOptionsBar from '../components/ConversationOptionsBar';
+import OptionButton from '../components/OptionButton';
 import RenameConversationModal from '../components/RenameConversationModal';
 import {
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
+  ERROR_MESSAGE,
   messageType,
+  LEAVE_GROUP_MESSAGE,
+  DELETE_GROUP_MESSAGE,
 } from '../constants';
 import {useGoback} from '../hooks';
-import {fetchFiles} from '../redux/messageSlice';
+import {fetchFiles, fetchMembers} from '../redux/messageSlice';
 import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
@@ -29,8 +36,11 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const {currentConversation, currentConversationId} = useSelector(
     state => state.message,
   );
+
+  const {userProfile} = useSelector(state => state.me);
+  const {socket} = useSelector(state => state.global);
   const dispatch = useDispatch();
-  const {totalMembers, name, type, avatar, isNotify} = currentConversation;
+  const {type, avatar, isNotify} = currentConversation;
 
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_RENAME_CONVERSATION_MODAL,
@@ -71,6 +81,70 @@ export default function ConversationOptionsScreen({navigation, route}) {
         }
       : null;
 
+  const isLeader = () => {
+    if (currentConversation?.leaderId) {
+      return currentConversation.leaderId === userProfile._id;
+    }
+    return false;
+  };
+
+  const handleDeleteOnPress = () => {
+    Alert.alert(
+      'Cảnh báo',
+      isLeader() ? DELETE_GROUP_MESSAGE : LEAVE_GROUP_MESSAGE,
+      [
+        {
+          text: 'Không',
+        },
+        {
+          text: 'Có',
+          onPress: () => {
+            if (isLeader()) {
+              handleDeleteConversation();
+            } else {
+              handleLeaveConversation();
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleDeleteConversation = async () => {
+    console.log('giai tan');
+    try {
+      const response = await conversationApi.deleteGroup(currentConversationId);
+      navigation.popToTop();
+    } catch (error) {
+      console.error('Delete group: ', error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
+    }
+  };
+
+  const handleLeaveConversation = async () => {
+    console.log('Roi nhom');
+    try {
+      const response = await conversationApi.leaveGroup(currentConversationId);
+      socket.emit('leave-conversation', currentConversationId);
+      navigation.popToTop();
+    } catch (error) {
+      console.error('Leave conversation: ', error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    Clipboard.setString(
+      `https://zelochat.xyz/jf-link/${currentConversationId}`,
+    );
+    commonFuc.notifyMessage('Đã sao chép');
+  };
+
+  const handleGoToMemberScreen = () => {
+    dispatch(fetchMembers({conversationId: currentConversationId}));
+    navigation.navigate('Thành viên');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -80,7 +154,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
             size="large"
             source={avatarSource}
             overlayContainerStyle={styles.overlay}
-            title={type ? null : commonFuc.getAcronym(name)}
+            title={type ? null : commonFuc.getAcronym(currentConversation.name)}
             icon={{
               name: 'groups',
               type: 'material',
@@ -100,10 +174,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
           </Avatar>
 
           <Text style={{fontWeight: '600', fontSize: 16, marginVertical: 8}}>
-            {name}
+            {currentConversation.name}
           </Text>
           <ConversationOptionsBar
-            name={name}
+            name={currentConversation.name}
             type={type}
             notify={isNotify}
             setModalVisible={setModalVisible}
@@ -116,40 +190,54 @@ export default function ConversationOptionsScreen({navigation, route}) {
         <Text>{name}</Text>
         <Text>{type.toString()}</Text> */}
 
+        {/* {type && <Pressable style={globalStyles.viewEle}>
+
+
+        </Pressable>} */}
+
         <Pressable style={globalStyles.viewEle}>
-          <TouchableOpacity onPress={handleGoToFileScreen}>
-            <ListItem
-            // topDivider={false}
-            // bottomDivider={false}
-            >
-              <Icon type="antdesign" name="folderopen" />
-              <ListItem.Content>
-                <ListItem.Title
-                // style={{
-                //   width: '100%',
-                //   fontWeight: numberUnread > 0 ? 'bold' : 'normal',
-                // }}
-                >
-                  Ảnh, video, file đã gửi
-                </ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          </TouchableOpacity>
-          <View
-            style={{
-              width: '100%',
-              backgroundColor: '#E5E6E8',
-              height: 1,
-              marginLeft: 55,
-            }}></View>
+          <OptionButton
+            onPress={handleGoToFileScreen}
+            iconType="antdesign"
+            iconName="folderopen"
+            title="Ảnh, video, file đã gửi"
+          />
+
+          {type && (
+            <>
+              <OptionButton
+                onPress={handleCopyLink}
+                iconType="feather"
+                iconName="link"
+                title="Link tham gia nhóm"
+                subtitle={`https://zelochat.xyz/jf-link/${currentConversationId}`}
+              />
+              <OptionButton
+                // onPress={handleGoToFileScreen}
+                iconType="feather"
+                iconName="users"
+                title={`Xem thành viên (${currentConversation.totalMembers})`}
+                onPress={handleGoToMemberScreen}
+              />
+            </>
+          )}
         </Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
-        <Pressable style={globalStyles.viewEle}></Pressable>
+
+        {type && (
+          <Pressable style={globalStyles.viewEle}>
+            <OptionButton
+              onPress={handleDeleteOnPress}
+              iconType="material"
+              iconName="logout"
+              iconColor="red"
+              title={isLeader() ? 'Giải tán nhóm' : 'Rời nhóm'}
+              titleStyle={{
+                color: 'red',
+              }}
+            />
+          </Pressable>
+        )}
+        <Pressable style={[globalStyles.viewEle, {height: 500}]}></Pressable>
       </ScrollView>
       <AddVoteModal
         modalVisible={addVoteVisible}

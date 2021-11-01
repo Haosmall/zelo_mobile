@@ -58,11 +58,17 @@ const Conversation = props => {
           content = `Đã tạo cuộc bình chọn mới ${lastMessageContent}`;
           break;
         case messageType.NOTIFY:
-          content = lastMessageContent.includes('PIN_MESSAGE')
-            ? `Đã ${
-                lastMessageContent === 'NOT_PIN_MESSAGE' ? 'bỏ ' : ''
-              }ghim một tin nhắn `
-            : lastMessageContent.replace('<b>', '').replace('</b>', '');
+          console.log(lastMessageContent);
+          content =
+            lastMessageContent === messageType.PIN_MESSAGE
+              ? 'Đã ghim một tin nhắn'
+              : lastMessageContent === messageType.NOT_PIN_MESSAGE
+              ? 'Đã bỏ ghim một tin nhắn'
+              : lastMessageContent === messageType.CREATE_CHANNEL
+              ? 'Đã tạo một kênh nhắn tin'
+              : lastMessageContent === messageType.DELETE_CHANNEL
+              ? 'Đã xóa một kênh nhắn tin'
+              : lastMessageContent.replace('<b>', '').replace('</b>', '');
           break;
 
         default:
@@ -89,7 +95,11 @@ const Conversation = props => {
         onPress={() =>
           handleEnterChat(conversationId, name, totalMembers, type, avatars)
         }>
-        <CustomAvatar name={name} avatars={avatars} />
+        <CustomAvatar
+          name={name}
+          avatars={avatars}
+          totalMembers={totalMembers}
+        />
         <ListItem.Content>
           <ListItem.Title
             style={{

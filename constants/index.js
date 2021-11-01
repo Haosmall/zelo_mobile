@@ -1,7 +1,7 @@
 export const REACT_APP_API_URL = 'https://zelochat.xyz/api';
 export const REACT_APP_SOCKET_URL = 'https://zelochat.xyz';
-// export const REACT_APP_API_URL = 'http://192.168.1.7:3001';
-// export const REACT_APP_SOCKET_URL = 'http://192.168.1.7:3001';
+// export const REACT_APP_API_URL = 'http://192.168.1.4:3001';
+// export const REACT_APP_SOCKET_URL = 'http://192.168.1.4:3001';
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_PAGE_SIZE = 20;
 export const REACTIONS = ['👍', '♥️', '😄', '😲', '😭', '😡'];
@@ -11,6 +11,11 @@ export const NO_INTERNET_IMAGE =
   'https://res.cloudinary.com/depjgf4uu/image/upload/v1633875955/no-internet_sgdpzu.png';
 export const EMPTY_IMAGE =
   'https://res.cloudinary.com/depjgf4uu/image/upload/v1633875942/empty_nvkxrb.png';
+
+export const ERROR_MESSAGE = 'Đã có lỗi xảy ra';
+export const LEAVE_GROUP_MESSAGE = 'Bạn có muốn rời nhóm không?';
+export const DELETE_GROUP_MESSAGE =
+  'Toàn bộ nội dung cuộc trò chuyện sẽ bị xóa, bạn có chắc chắn muốn xóa ?';
 
 export const messageType = {
   ALL: 'ALL',
@@ -22,6 +27,10 @@ export const messageType = {
   FILE: 'FILE',
   VOTE: 'VOTE',
   STICKER: 'STICKER',
+  PIN_MESSAGE: 'PIN_MESSAGE',
+  NOT_PIN_MESSAGE: 'NOT_PIN_MESSAGE',
+  CREATE_CHANNEL: 'CREATE_CHANNEL',
+  DELETE_CHANNEL: 'DELETE_CHANNEL',
 };
 
 export const friendType = {

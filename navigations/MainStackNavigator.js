@@ -13,6 +13,7 @@ import FileScreen from '../screens/FileScreen';
 import FriendDetailsScreen from '../screens/FriendDetailsScreen';
 import FriendRequestScreen from '../screens/FriendRequestScreen';
 import FriendSearchScreen from '../screens/FriendSearchScreen';
+import MemberScreen from '../screens/MemberScreen';
 import MessageScreen from '../screens/MessageScreen';
 import PhonebookScreen from '../screens/PhonebookScreen';
 import VoteDetailScreen from '../screens/VoteDetailScreen';
@@ -162,6 +163,7 @@ const MainStackNavigator = ({navigation}) => {
             component={VoteDetailScreen}
           />
           <Stack.Screen name="Bạn từ danh bạ máy" component={PhonebookScreen} />
+          <Stack.Screen name="Thành viên" component={MemberScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

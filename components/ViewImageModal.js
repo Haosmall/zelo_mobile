@@ -3,7 +3,7 @@ import React from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-elements/dist/icons/Icon';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import {DEFAULT_IMAGE_MODAL} from '../constants';
+import {DEFAULT_IMAGE_MODAL, ERROR_MESSAGE} from '../constants';
 import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
 import defaultCoverImage from '../assets/default-cover-image.jpg';
 import VideoPlayer from 'react-native-video-player';
@@ -84,7 +84,7 @@ const ViewImageModal = props => {
             }}>
             <VideoPlayer
               // source={{uri: imageProps.content}} // Can be a URL or a local file.
-              // onError={() => commonFuc.notifyMessage('Đã có lỗi xảy ra')}
+              // onError={() => commonFuc.notifyMessage(ERROR_MESSAGE)}
               // style={{width: WINDOW_WIDTH}}
               // controls
               // paused
@@ -92,7 +92,7 @@ const ViewImageModal = props => {
               // muted
               // resizeMode="cover"
               video={{uri: imageProps.content}} // Can be a URL or a local file.
-              onError={() => commonFuc.notifyMessage('Đã có lỗi xảy ra')}
+              onError={() => commonFuc.notifyMessage(ERROR_MESSAGE)}
               style={styles.video}
               autoplay
               showDuration

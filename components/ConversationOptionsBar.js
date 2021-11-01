@@ -17,7 +17,9 @@ const ICON_SIZE = 20;
 const ConversationOptionsBar = props => {
   const {name, type, setModalVisible, openAddVoteModal, navigation, notify} =
     props;
-  const {currentConversation} = useSelector(state => state.message);
+  const {currentConversation, currentConversationId} = useSelector(
+    state => state.message,
+  );
 
   const dispatch = useDispatch();
 
@@ -47,6 +49,12 @@ const ConversationOptionsBar = props => {
     } catch (error) {}
   };
 
+  const handleGotoAddMemberScreen = () => {
+    navigation.navigate('Tìm kiếm bạn bè', {
+      isAddToGroup: true,
+      currentConversationId,
+    });
+  };
   return (
     <View style={styles.container}>
       {type ? (
@@ -65,6 +73,7 @@ const ConversationOptionsBar = props => {
             }
             titleStyle={styles.title}
             iconPosition="top"
+            onPress={handleGotoAddMemberScreen}
           />
           <Button
             title="Tạo bình chọn"

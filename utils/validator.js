@@ -77,3 +77,15 @@ export const userProfileValid = {
       .max(30, 'Tối đa 30 kí tự'),
   }),
 };
+
+export const groupValid = {
+  initial: {
+    name: '',
+  },
+  validationSchema: Yup.object().shape({
+    name: Yup.string()
+      .required('Tên nhóm không được để trống')
+      .matches(/^(?!\s+$).+/, 'Không hợp lệ')
+      .max(30, 'Tối đa 30 kí tự'),
+  }),
+};

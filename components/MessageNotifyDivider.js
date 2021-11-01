@@ -11,10 +11,14 @@ const MessageNotifyDivider = props => {
   const {type, content, user} = message;
 
   const contentLowercase =
-    content === 'PIN_MESSAGE'
+    content === messageType.PIN_MESSAGE
       ? 'đã ghim một tin nhắn'
-      : content === 'NOT_PIN_MESSAGE'
+      : content === messageType.NOT_PIN_MESSAGE
       ? 'đã bỏ ghim một tin nhắn'
+      : content === messageType.CREATE_CHANNEL
+      ? 'đã tạo một kênh nhắn tin'
+      : content === messageType.DELETE_CHANNEL
+      ? 'đã xóa một kênh nhắn tin'
       : content.charAt(0).toLocaleLowerCase() + content.slice(1);
   const contentWithSenderName = `<p> ${
     isReceiverMessage ? 'Bạn' : user.name

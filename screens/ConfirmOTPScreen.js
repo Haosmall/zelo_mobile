@@ -19,8 +19,10 @@ import {Button} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginApi} from '../api';
+import {ERROR_MESSAGE} from '../constants';
 import {setLoading} from '../redux/globalSlice';
 import globalStyles from '../styles';
+import commonFuc from '../utils/commonFuc';
 
 const CELL_COUNT = 6;
 const RESEND_OTP_TIME_LIMIT = 30;
@@ -40,8 +42,8 @@ const ConfirmOTPScreen = ({navigation, route}) => {
   const [otpValue, setOtpValue] = useState('');
   const ref = useBlurOnFulfill({value: otpValue, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-    otpValue,
-    setOtpValue,
+    value: otpValue,
+    setValue: setOtpValue,
   });
 
   //to start resent otp option
@@ -60,24 +62,30 @@ const ConfirmOTPScreen = ({navigation, route}) => {
 
   const handleConfirm = async () => {
     if (otpValue.length === 6) {
-      dispatch(setLoading(true));
-      const response = await loginApi.confirmPassword({
-        ...account,
-        otp: otpValue,
-      });
-      dispatch(setLoading(false));
-      console.log(response.data);
-      if (response.data?.message) {
-        setErrorMessage(response.data.message);
-      } else {
-        Alert.alert('Thông báo', 'Đổi mật khẩu thành công', [
-          {
-            text: 'Ok',
-            onPress: () => {
-              isForgotPassword && navigation.popToTop();
+      try {
+        dispatch(setLoading(true));
+        const response = await loginApi.confirmPassword({
+          ...account,
+          otp: otpValue,
+        });
+        dispatch(setLoading(false));
+        console.log(response.data);
+        if (response.data?.message) {
+          setErrorMessage(response.data.message);
+        } else {
+          Alert.alert('Thông báo', 'Đổi mật khẩu thành công', [
+            {
+              text: 'Ok',
+              onPress: () => {
+                isForgotPassword && navigation.popToTop();
+              },
             },
-          },
-        ]);
+          ]);
+        }
+      } catch (error) {
+        dispatch(setLoading(false));
+        console.error('Confirm otp: ', error);
+        commonFuc.notifyMessage(ERROR_MESSAGE);
       }
     } else {
       setErrorMessage('OTP không hợp lệ');

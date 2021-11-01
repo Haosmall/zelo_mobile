@@ -13,6 +13,7 @@ import {Button, Divider, Icon, Input} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import {voteApi} from '../api';
 import VoteProgress from '../components/VoteProgress';
+import {ERROR_MESSAGE} from '../constants';
 import {useGoback, useKeyboard} from '../hooks';
 import {MAIN_COLOR, SCREEN_WIDTH} from '../styles';
 import commonFuc from '../utils/commonFuc';
@@ -82,8 +83,8 @@ const VoteDetailScreen = ({navigation}) => {
       commonFuc.notifyMessage('Bình chọn thành công');
       navigation.goBack();
     } catch (error) {
-      console.log('Có lỗi xảy ra');
-      commonFuc.notifyMessage('Có lỗi xảy ra');
+      console.log(ERROR_MESSAGE);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 
@@ -109,8 +110,8 @@ const VoteDetailScreen = ({navigation}) => {
           setIsfocusTextInput(false);
           Keyboard.dismiss();
         } catch (error) {
-          commonFuc.notifyMessage('Đã có lỗi xảy ra');
-          console.log('Đã có lỗi xảy ra');
+          commonFuc.notifyMessage(ERROR_MESSAGE);
+          console.log(ERROR_MESSAGE);
         }
       }
     }

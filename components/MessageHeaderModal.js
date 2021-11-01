@@ -47,6 +47,9 @@ const MessageHeaderModal = ({navigation}) => {
                 <Icon name="addusergroup" type="antdesign" size={22} />
               }
               titleStyle={styles.title}
+              onPress={() =>
+                navigation.navigate('Tìm kiếm bạn bè', {isAddToGroup: true})
+              }
             />
             <Button
               title="Thêm bạn"

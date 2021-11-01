@@ -15,7 +15,7 @@ import {messageApi} from '../api';
 import globalStyles, {MAIN_COLOR} from '../styles';
 
 import DocumentPicker from 'react-native-document-picker';
-import {messageType} from '../constants';
+import {ERROR_MESSAGE, messageType} from '../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFetchBlob from 'react-native-fetch-blob';
 import commonFuc from '../utils/commonFuc';
@@ -73,7 +73,6 @@ const MessageBottomBar = props => {
     setMessageValue(value);
 
     if (value.length > 0) {
-      console.log(socket);
       console.log(conversationId);
       socket.emit('typing', conversationId, userProfile);
     } else {
@@ -99,7 +98,7 @@ const MessageBottomBar = props => {
       if (DocumentPicker.isCancel(err)) {
         commonFuc.notifyMessage('Đã hủy');
       } else {
-        commonFuc.notifyMessage('Có lỗi xảy ra');
+        commonFuc.notifyMessage(ERROR_MESSAGE);
         throw err;
       }
     }

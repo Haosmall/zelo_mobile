@@ -5,7 +5,7 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import {conversationApi} from '../api';
-import {REACTIONS} from '../constants';
+import {ERROR_MESSAGE, REACTIONS} from '../constants';
 import {
   clearMessagePages,
   fetchConversations,
@@ -139,23 +139,37 @@ const commonFuc = {
   },
 };
 
-export const handleCreateChat = async (userId, navigation, dispatch) => {
+export const handleCreateChat = async (
+  userId,
+  navigation,
+  dispatch,
+  currentConversationId,
+) => {
   try {
     const response = await conversationApi.addConversation(userId);
     await dispatch(fetchConversations());
     // if (response?.isExists) {
-    handleEnterChat(response._id, navigation, dispatch);
+    console.log('Nhan Tin: ', response._id);
+    handleEnterChat(response._id, navigation, dispatch, currentConversationId);
     // }
   } catch (error) {
-    console.log('Có lỗi xảy ra', error);
+    console.error('Có lỗi xảy ra', error);
+    commonFuc.notifyMessage(ERROR_MESSAGE);
   }
 };
 
-const handleEnterChat = (conversationId, navigation, dispatch) => {
-  dispatch(clearMessagePages());
-  dispatch(updateCurrentConversation({conversationId}));
-  dispatch(fetchListLastViewer({conversationId}));
-  console.log('conver: ', conversationId);
+const handleEnterChat = (
+  conversationId,
+  navigation,
+  dispatch,
+  currentConversationId,
+) => {
+  if (currentConversationId !== conversationId) {
+    dispatch(clearMessagePages());
+    dispatch(updateCurrentConversation({conversationId}));
+    dispatch(fetchListLastViewer({conversationId}));
+    console.log('conver: ', conversationId);
+  }
   navigation.navigate('Nhắn tin', {
     conversationId,
   });
@@ -225,7 +239,7 @@ const downloadFile = fileUrl => {
       commonFuc.notifyMessage('Tải ảnh thành công');
     })
     .catch(err => {
-      commonFuc.notifyMessage('Đã có lỗi xảy ra');
+      commonFuc.notifyMessage(ERROR_MESSAGE);
       console.log('Đã có lỗi xảy ra: ', err);
     });
 };

@@ -22,6 +22,7 @@ import ViewImageModal from '../components/ViewImageModal';
 import {
   DEFAULT_COVER_IMAGE,
   DEFAULT_IMAGE_MODAL,
+  ERROR_MESSAGE,
   friendType,
 } from '../constants';
 import {
@@ -37,6 +38,7 @@ import commonFuc, {handleCreateChat} from '../utils/commonFuc';
 
 export default function FriendDetailsScreen({navigation}) {
   const {searchFriend} = useSelector(state => state.friend);
+  const {currentConversationId} = useSelector(state => state.message);
   const dispatch = useDispatch();
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
@@ -64,7 +66,12 @@ export default function FriendDetailsScreen({navigation}) {
     switch (friendStatus) {
       case friendType.FRIEND:
         console.log('Nhan tin');
-        handleCreateChat(searchFriend._id, navigation, dispatch);
+        handleCreateChat(
+          searchFriend._id,
+          navigation,
+          dispatch,
+          currentConversationId,
+        );
         break;
       case friendType.FOLLOWER:
         handleAcceptFriend();
@@ -205,7 +212,7 @@ export default function FriendDetailsScreen({navigation}) {
               console.log(response);
               dispatch(deleteFriend(searchFriend._id));
             } catch (error) {
-              commonFuc.notifyMessage('Có lỗi xảy ra');
+              commonFuc.notifyMessage(ERROR_MESSAGE);
               console.error('Xoa kêt ban loi: ', error);
             }
           },

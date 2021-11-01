@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Avatar, Button, ListItem} from 'react-native-elements';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {conversationApi, friendApi} from '../api';
-import {friendType} from '../constants';
+import {ERROR_MESSAGE, friendType} from '../constants';
 import {
   addNewFriendRequest,
   cancelMyFriendRequest,
@@ -13,6 +13,7 @@ import {
   updateFriendStatus,
 } from '../redux/friendSlice';
 import {
+  clearMessagePages,
   fetchConversations,
   fetchListLastViewer,
   updateCurrentConversation,
@@ -21,7 +22,10 @@ import {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc, {handleCreateChat} from '../utils/commonFuc';
 
 export default function FriendItem(props) {
-  const {type, name, avatar, topDivider, userId, navigation} = props;
+  const {type, name, avatar, topDivider, userId, navigation, handleGroup} =
+    props;
+
+  const {currentConversationId} = useSelector(state => state.message);
 
   const dispatch = useDispatch();
 
@@ -52,6 +56,9 @@ export default function FriendItem(props) {
       case friendType.ADD_TO_GROUP:
         title = 'Thêm';
         break;
+      case friendType.REMOVE_FROM_GROUP:
+        title = 'Xóa';
+        break;
       case 'DETAILS':
         title = 'Chi tiết';
         break;
@@ -66,7 +73,7 @@ export default function FriendItem(props) {
     switch (type) {
       case friendType.FRIEND:
         console.log('Nhan tin');
-        handleCreateChat(userId, navigation, dispatch);
+        handleCreateChat(userId, navigation, dispatch, currentConversationId);
         break;
       case friendType.FOLLOWER:
         handleAcceptFriend();
@@ -82,11 +89,11 @@ export default function FriendItem(props) {
         break;
       case friendType.ADD_TO_GROUP:
         console.log('Them Vao nhom');
-        handleAddToGroup();
+        handleGroup();
         break;
       case friendType.REMOVE_FROM_GROUP:
-        console.log('Them Vao nhom');
-        handleRemoveFromGroup();
+        console.log('Xoa khoi nhom');
+        handleGroup();
         break;
       case friendType.DONT_HAVE_ACCOUNT:
         console.log('Moi tao tk');
@@ -151,25 +158,19 @@ export default function FriendItem(props) {
       handleEnterChat(response._id);
       // }
     } catch (error) {
-      console.log('Có lỗi xảy ra', error);
+      console.error('CreateChat', error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 
   const handleEnterChat = conversationId => {
-    // dispatch(clearMessagePages());
+    dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
     dispatch(fetchListLastViewer({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
     });
-  };
-
-  const handleAddToGroup = userId => {
-    console.log('add To group');
-  };
-  const handleRemoveFromGroup = userId => {
-    console.log('Remove from group');
   };
 
   const handleInvite = userId => {
@@ -240,6 +241,7 @@ FriendItem.propTypes = {
   avatar: PropTypes.string,
   userId: PropTypes.string,
   topDivider: PropTypes.bool,
+  handleGroup: PropTypes.func,
 };
 
 FriendItem.defaultProps = {
@@ -248,6 +250,7 @@ FriendItem.defaultProps = {
   avatar: '',
   userId: '',
   topDivider: false,
+  handleGroup: null,
 };
 
 const styles = StyleSheet.create({
@@ -257,9 +260,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
-  buttonStyle: {borderRadius: 50, paddingHorizontal: 15, paddingVertical: 5},
+  buttonStyle: {
+    borderRadius: 50,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    minWidth: 60,
+  },
   buttonTitle: {fontSize: 13},
   buttonContainer: {
     marginRight: 10,
+    minWidth: 60,
   },
 });

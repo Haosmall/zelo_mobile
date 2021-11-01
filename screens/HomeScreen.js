@@ -1,5 +1,3 @@
-// import {LinearGradient} from 'expo-linear-gradient';
-// import {StatusBar} from 'expo-status-bar';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -95,6 +93,46 @@ export default function HomeScreen({navigation}) {
       dispatch(fetchConversations());
     });
 
+    socket.on('create-conversation', conversationId => {
+      console.log('create-conversation');
+      // handleEnterChat(conversationId);
+      dispatch(fetchConversations());
+    });
+
+    socket.on(
+      'rename-conversation',
+      (conversationId, conversationName, message) => {
+        console.log('Rename conversation');
+        dispatch(
+          renameConversation({conversationId, conversationName, message}),
+        );
+      },
+    );
+
+    socket.on('added-group', conversationId => {
+      console.log('added-group');
+      // handleEnterChat(conversationId);
+      dispatch(fetchConversations());
+    });
+
+    socket.on('update-member', async(conversationId) => {
+      console.log('update-member');
+      // handleEnterChat(conversationId);
+      await dispatch(fetchConversations());
+      dispatch(updateCurrentConversation({conversationId}));
+    });
+
+    socket.on('deleted-group', conversationId => {
+      console.log('deleted-group');
+      socket.emit('leave-conversation', conversationId);
+      dispatch(fetchConversations());
+    });
+
+    socket.on('delete-conversation', conversationId => {
+      console.log('delete-conversation');
+      dispatch(fetchConversations());
+    });
+
     // TODO:<====================== message socket ======================>
     socket.on('new-message', (conversationId, message) => {
       console.log('new-message', conversationId);
@@ -109,6 +147,22 @@ export default function HomeScreen({navigation}) {
       console.log({conversationId, channelId, id});
       dispatch(deleteMessage({conversationId, channelId, id}));
     });
+
+    // TODO:<====================== channel socket ======================>
+    socket.on(
+      'new-message-of-channel',
+      (conversationId, channelId, message) => {
+        console.table('new-message-of-channel', {
+          conversationId,
+          channelId,
+          message,
+        });
+        // dispatch(addMessage({conversationId, message}));
+        // dispatch(
+        //   setNotification({conversationId, message, userId: currentUserId}),
+        // );
+      },
+    );
 
     // TODO:<====================== vote socket ======================>
     socket.on('update-vote-message', (conversationId, message) => {
@@ -152,15 +206,6 @@ export default function HomeScreen({navigation}) {
     });
 
     // TODO:<====================== friend socket ======================>
-    socket.on(
-      'rename-conversation',
-      (conversationId, conversationName, message) => {
-        console.log('Rename conversation');
-        dispatch(
-          renameConversation({conversationId, conversationName, message}),
-        );
-      },
-    );
 
     socket.on('deleted-friend', userId => {
       console.log('deleted-friend');
@@ -227,26 +272,26 @@ export default function HomeScreen({navigation}) {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          renderItem={({item}) => {
-            console.log(item);
-            return (
-              <Pressable key={item?._id}>
-                <Conversation
-                  name={item?.name}
-                  avatars={item?.avatar}
-                  numberUnread={item?.numberUnread}
-                  lastMessage={item?.lastMessage}
-                  handleEnterChat={handleEnterChat}
-                  type={item?.type}
-                  conversationId={item?._id}
-                  totalMembers={item?.totalMembers}
-                />
-              </Pressable>
-            );
-          }}
+          renderItem={({item}) => (
+            <Pressable key={item?._id}>
+              <Conversation
+                name={item?.name}
+                avatars={item?.avatar}
+                numberUnread={item?.numberUnread}
+                lastMessage={item?.lastMessage}
+                handleEnterChat={handleEnterChat}
+                type={item?.type}
+                conversationId={item?._id}
+                totalMembers={item?.totalMembers}
+              />
+            </Pressable>
+          )}
         />
       ) : (
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           <View style={globalStyles.emty}>
             <Icon name="warning" type="antdesign" />
             <Text style={globalStyles.emptyText}>Không có tin nhắn nào</Text>

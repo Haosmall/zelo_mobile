@@ -110,7 +110,7 @@ const globalStyles = StyleSheet.create({
   },
   viewEle: {
     width: '100%',
-    minHeight: 100,
+    // minHeight: 100,
     marginTop: 10,
     backgroundColor: '#fff',
   },
