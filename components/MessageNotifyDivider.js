@@ -19,6 +19,8 @@ const MessageNotifyDivider = props => {
       ? 'đã tạo một kênh nhắn tin'
       : content === messageType.DELETE_CHANNEL
       ? 'đã xóa một kênh nhắn tin'
+      : content === messageType.UPDATE_CHANNEL
+      ? 'đã đổi tên một kênh nhắn tin'
       : content.charAt(0).toLocaleLowerCase() + content.slice(1);
   const contentWithSenderName = `<p> ${
     isReceiverMessage ? 'Bạn' : user.name

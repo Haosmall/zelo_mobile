@@ -30,6 +30,7 @@ import {
   addMessage,
   addReaction,
   deleteMessage,
+  fetchChannels,
   fetchConversations,
   fetchListLastViewer,
   renameConversation,
@@ -115,7 +116,7 @@ export default function HomeScreen({navigation}) {
       dispatch(fetchConversations());
     });
 
-    socket.on('update-member', async(conversationId) => {
+    socket.on('update-member', async conversationId => {
       console.log('update-member');
       // handleEnterChat(conversationId);
       await dispatch(fetchConversations());
@@ -149,6 +150,18 @@ export default function HomeScreen({navigation}) {
     });
 
     // TODO:<====================== channel socket ======================>
+    socket.on('new-channel', ({_id, name, conversationId, createdAt}) => {
+      dispatch(fetchChannels({conversationId}));
+    });
+
+    socket.on('update-channel', ({_id, name, conversationId}) => {
+      dispatch(fetchChannels({conversationId}));
+    });
+
+    socket.on('delete-channel', ({conversationId, channelId}) => {
+      dispatch(fetchChannels({conversationId}));
+    });
+
     socket.on(
       'new-message-of-channel',
       (conversationId, channelId, message) => {

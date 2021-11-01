@@ -17,6 +17,7 @@ import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import AnimatedEllipsis from '../components/AnimatedEllipsis';
 import ChatMessage from '../components/ChatMessage';
+import EmptyData from '../components/EmptyData';
 import ImagePickerModal from '../components/ImagePickerModal';
 import MessageBottomBar from '../components/MessageBottomBar';
 import MessageDivider from '../components/MessageDivider';
@@ -38,6 +39,7 @@ import {
 import {setLoading} from '../redux/globalSlice';
 import {
   clearMessagePages,
+  fetchChannels,
   fetchListLastViewer,
   fetchMessages,
 } from '../redux/messageSlice';
@@ -80,6 +82,8 @@ export default function MessageScreen({navigation, route}) {
   };
 
   const handleGoToOptionScreen = () => {
+    console.log('API: ', currentConversation._id);
+    dispatch(fetchChannels({conversationId: currentConversation._id}));
     navigation.navigate('Tùy chọn', {
       conversationId,
     });
@@ -221,7 +225,9 @@ export default function MessageScreen({navigation, route}) {
                 />
               </>
             ) : (
-              <ScrollView></ScrollView>
+              <ScrollView>
+                {/* <EmptyData content="Không có tin nhắn" /> */}
+              </ScrollView>
             )}
             {usersTyping.length > 0 && (
               <View style={styles.typingContainer}>

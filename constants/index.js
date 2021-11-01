@@ -31,6 +31,7 @@ export const messageType = {
   NOT_PIN_MESSAGE: 'NOT_PIN_MESSAGE',
   CREATE_CHANNEL: 'CREATE_CHANNEL',
   DELETE_CHANNEL: 'DELETE_CHANNEL',
+  UPDATE_CHANNEL: 'UPDATE_CHANNEL',
 };
 
 export const friendType = {

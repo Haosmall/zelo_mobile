@@ -15,6 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {conversationApi} from '../api';
 import AddVoteModal from '../components/AddVoteModal';
 import ConversationOptionsBar from '../components/ConversationOptionsBar';
+import ListChannel from '../components/ListChannel';
 import OptionButton from '../components/OptionButton';
 import RenameConversationModal from '../components/RenameConversationModal';
 import {
@@ -61,17 +62,6 @@ export default function ConversationOptionsScreen({navigation, route}) {
     navigation.navigate('Ảnh, video, file đã gửi');
   };
 
-  // const handleGoBack = () => {
-  //   navigation.goBack();
-  //   return true;
-  // };
-
-  // useEffect(() => {
-  //   BackHandler.addEventListener('hardwareBackPress', handleGoBack);
-  //   return () => {
-  //     BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
-  //   };
-  // }, []);
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
   const avatarSource =
@@ -190,10 +180,11 @@ export default function ConversationOptionsScreen({navigation, route}) {
         <Text>{name}</Text>
         <Text>{type.toString()}</Text> */}
 
-        {/* {type && <Pressable style={globalStyles.viewEle}>
-
-
-        </Pressable>} */}
+        {type && (
+          <Pressable style={globalStyles.viewEle}>
+            <ListChannel />
+          </Pressable>
+        )}
 
         <Pressable style={globalStyles.viewEle}>
           <OptionButton

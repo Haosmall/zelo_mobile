@@ -68,6 +68,8 @@ const Conversation = props => {
               ? 'Đã tạo một kênh nhắn tin'
               : lastMessageContent === messageType.DELETE_CHANNEL
               ? 'Đã xóa một kênh nhắn tin'
+              : lastMessageContent === messageType.UPDATE_CHANNEL
+              ? 'Đã đổi tên một kênh nhắn tin'
               : lastMessageContent.replace('<b>', '').replace('</b>', '');
           break;
 

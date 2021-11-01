@@ -68,11 +68,13 @@ export default function TabNavigator(props) {
             <View style={{flex: 1}}>
               <IconAntDesign name={iconName} size={22} color={color} />
               {count > 0 && (
-                <View style={styles.iconBadge}>
-                  <Text style={styles.badgeElement}>
-                    {count > 99 ? 'N' : count}
-                  </Text>
-                </View>
+                <>
+                  <View style={styles.iconBadge}>
+                    <Text style={styles.badgeElement}>
+                      {count > 99 ? 'N' : count}
+                    </Text>
+                  </View>
+                </>
               )}
             </View>
           );

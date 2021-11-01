@@ -4,9 +4,9 @@ import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
 
 const EmptyData = props => {
-  const {content, contanerStyle, contentStyle} = props;
+  const {content, containerStyle, contentStyle} = props;
   return (
-    <View style={[styles.emty, contanerStyle]}>
+    <View style={[styles.emty, containerStyle]}>
       <Icon name="warning" type="antdesign" />
       <Text style={[styles.text, contentStyle]}>{content}</Text>
     </View>
@@ -15,13 +15,13 @@ const EmptyData = props => {
 
 EmptyData.propTypes = {
   content: PropTypes.string,
-  contanerStyle: PropTypes.object,
+  containerStyle: PropTypes.object,
   contentStyle: PropTypes.object,
 };
 
 EmptyData.defaultProps = {
   content: 'Không có dữ liệu',
-  contanerStyle: {},
+  containerStyle: {},
   contentStyle: {},
 };
 

@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import PushNotification from 'react-native-push-notification';
-import {conversationApi, messageApi} from '../api';
+import {channelApi, conversationApi, messageApi} from '../api';
+import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
 
@@ -18,6 +19,7 @@ const initialState = {
   usersTyping: [],
   files: {},
   members: [],
+  channels: [],
 };
 
 export const fetchConversations = createAsyncThunk(
@@ -59,6 +61,15 @@ export const fetchMembers = createAsyncThunk(
   async (params, thunkApi) => {
     const {conversationId} = params;
     const data = await conversationApi.fetchMembers(conversationId);
+    return data;
+  },
+);
+
+export const fetchChannels = createAsyncThunk(
+  `${KEY}/fetchChannels`,
+  async (params, thunkApi) => {
+    const {conversationId} = params;
+    const data = await channelApi.fetchChannels(conversationId);
     return data;
   },
 );
@@ -310,10 +321,16 @@ const messageSlice = createSlice({
       console.log('isNotification: ', isNotification);
       const messageContent = message.content;
       const messageContentNotify =
-        messageContent === 'PIN_MESSAGE'
+        messageContent === messageType.PIN_MESSAGE
           ? 'Đã ghim một tin nhắn'
-          : messageContent === 'NOT_PIN_MESSAGE'
+          : messageContent === messageType.NOT_PIN_MESSAGE
           ? 'Đã bỏ ghim một tin nhắn'
+          : messageContent === messageType.CREATE_CHANNEL
+          ? 'Đã tạo một kênh nhắn tin'
+          : messageContent === messageType.DELETE_CHANNEL
+          ? 'Đã xóa một kênh nhắn tin'
+          : messageContent === messageType.UPDATE_CHANNEL
+          ? 'Đã đổi tên một kênh nhắn tin'
           : messageContent;
       // PushNotification.cancelAllLocalNotifications();
       PushNotification.localNotification({
@@ -491,6 +508,21 @@ const messageSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchMembers.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:---------------------- fetchChannels ----------------------
+    // Đang xử lý
+    [fetchChannels.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchChannels.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.channels = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchChannels.rejected]: (state, action) => {
       state.isLoading = false;
     },
   },
