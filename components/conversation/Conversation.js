@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {ListItem} from 'react-native-elements';
+import {CheckBox, Icon, ListItem} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import {messageType} from '../../constants';
 import commonFuc from '../../utils/commonFuc';
@@ -18,6 +18,8 @@ const Conversation = props => {
     type,
     totalMembers,
     conversationId,
+    isForward,
+    checked,
   } = props;
 
   const {userProfile} = useSelector(state => state.me);
@@ -96,6 +98,7 @@ const Conversation = props => {
         // topDivider={false}
         // bottomDivider={false}
         onPress={() =>
+          handleEnterChat &&
           handleEnterChat(conversationId, name, totalMembers, type, avatars)
         }>
         <CustomAvatar
@@ -129,10 +132,38 @@ const Conversation = props => {
             lastMessage?.isDeleted,
           )}`}</ListItem.Subtitle>
         </ListItem.Content>
-        <MessageInfo
-          createdAt={lastMessage?.createdAt}
-          numberUnread={numberUnread}
-        />
+        {isForward ? (
+          <CheckBox
+            containerStyle={{
+              // backgroundColor: 'red',
+              justifyContent: 'center',
+              padding: 0,
+              marginLeft: 0,
+              margin: 0,
+            }}
+            center
+            checked={checked}
+            checkedIcon={
+              <Icon
+                name="check-circle"
+                type="material-community"
+                color="#1194ff"
+              />
+            }
+            uncheckedIcon={
+              <Icon
+                name="circle-outline"
+                type="material-community"
+                color="#a1aaaf"
+              />
+            }
+          />
+        ) : (
+          <MessageInfo
+            createdAt={lastMessage?.createdAt}
+            numberUnread={numberUnread}
+          />
+        )}
       </ListItem>
       <View style={styles.bottomDivider}></View>
     </View>
@@ -148,6 +179,8 @@ Conversation.propTypes = {
   name: PropTypes.string,
   conversationId: PropTypes.string,
   type: PropTypes.bool,
+  isForward: PropTypes.bool,
+  checked: PropTypes.bool,
 };
 
 Conversation.defaultProps = {
@@ -159,6 +192,8 @@ Conversation.defaultProps = {
   name: '',
   conversationId: '',
   type: false,
+  isForward: false,
+  checked: false,
 };
 
 export default Conversation;

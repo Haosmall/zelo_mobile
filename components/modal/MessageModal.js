@@ -2,7 +2,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
 import {Modal, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native';
-import {Button, Icon} from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import messageApi from '../../api/messageApi';
 import pinMessagesApi from '../../api/pinMessagesApi';
@@ -10,13 +10,13 @@ import {DEFAULT_MESSAGE_MODAL_VISIBLE, REACTIONS} from '../../constants';
 import {deleteMessageOnlyMe} from '../../redux/messageSlice';
 import {fetchPinMessages} from '../../redux/pinSlice';
 import commonFuc from '../../utils/commonFuc';
+import MessageModalButton from '../MessageModalButton';
 
-const ICON_WIDTH = 30;
-const ICON_HEIGHT = 30;
 const BUTTON_RADIUS = 10;
 
 const MessageModal = props => {
-  const {modalVisible, setModalVisible, setPinMessageVisible} = props;
+  const {modalVisible, setModalVisible, setPinMessageVisible, navigation} =
+    props;
   const {currentConversation, currentConversationId} = useSelector(
     state => state.message,
   );
@@ -67,6 +67,11 @@ const MessageModal = props => {
     handleCloseModal();
   };
 
+  const handleForward = () => {
+    navigation.navigate('Chia sẻ', {messageId});
+    handleCloseModal();
+  };
+
   return (
     <SafeAreaView style={styles.centeredView}>
       <Modal
@@ -95,113 +100,69 @@ const MessageModal = props => {
           <SafeAreaView style={styles.modalView}>
             {!modalVisible.isRecall && (
               <>
-                <Button
+                <MessageModalButton
                   title="Trả lời"
                   containerStyle={{
-                    ...styles.button,
                     borderTopStartRadius: BUTTON_RADIUS,
                   }}
-                  type="clear"
-                  icon={
-                    <Icon
-                      name="action-undo"
-                      type="simple-line-icon"
-                      size={22}
-                      color="#ab8ef0"
-                    />
-                  }
-                  titleStyle={styles.title}
-                  iconPosition="top"
+                  iconName="action-undo"
+                  iconType="simple-line-icon"
+                  iconColor="#ab8ef0"
                 />
-                <Button
+
+                <MessageModalButton
                   title="Chuyển tiếp"
-                  containerStyle={styles.button}
-                  type="clear"
-                  icon={
-                    <Icon
-                      name="action-redo"
-                      type="simple-line-icon"
-                      size={22}
-                      color="#5e9be5"
-                    />
-                  }
-                  titleStyle={styles.title}
-                  iconPosition="top"
+                  iconName="action-redo"
+                  iconType="simple-line-icon"
+                  iconColor="#5e9be5"
+                  onPress={handleForward}
                 />
               </>
             )}
-            <Button
+
+            <MessageModalButton
               title="Xóa"
               containerStyle={{
-                ...styles.button,
                 borderTopEndRadius: BUTTON_RADIUS,
               }}
+              iconName="trash"
+              iconType="feather"
+              iconColor="#c45547"
               onPress={handleDeleteOnlyMe}
-              type="clear"
-              icon={
-                <Icon name="trash" type="feather" size={22} color="#c45547" />
-              }
-              titleStyle={styles.title}
-              iconPosition="top"
             />
             {!modalVisible.isRecall && (
               <>
-                <Button
+                <MessageModalButton
                   title="Copy"
                   containerStyle={{
-                    ...styles.button,
                     borderBottomStartRadius: BUTTON_RADIUS,
                   }}
+                  iconName="content-copy"
+                  iconType="material"
+                  iconColor="#899ada"
                   onPress={handleCopy}
-                  type="clear"
-                  icon={
-                    <Icon
-                      name="content-copy"
-                      type="material"
-                      size={22}
-                      color="#899ada"
-                    />
-                  }
-                  titleStyle={styles.title}
-                  iconPosition="top"
                 />
+
                 {currentConversation?.type && (
-                  <Button
+                  <MessageModalButton
                     title="Ghim"
-                    containerStyle={styles.button}
+                    iconName="pushpino"
+                    iconType="antdesign"
+                    iconColor="#dc923c"
                     onPress={handlePinMessage}
-                    type="clear"
-                    icon={
-                      <Icon
-                        name="pushpino"
-                        type="antdesign"
-                        size={22}
-                        color="#dc923c"
-                      />
-                    }
-                    titleStyle={styles.title}
-                    iconPosition="top"
                   />
                 )}
                 {modalVisible.isMyMessage && (
-                  <Button
+                  <MessageModalButton
                     title="Thu hồi"
+                    iconName="rotate-ccw"
+                    iconType="feather"
+                    iconColor="#5292af"
+                    onPress={handleDelete}
                     containerStyle={{
                       ...styles.button,
                       borderBottomEndRadius: BUTTON_RADIUS,
                     }}
-                    onPress={handleDelete}
-                    type="clear"
-                    icon={
-                      <Icon
-                        name="rotate-ccw"
-                        type="feather"
-                        size={22}
-                        color="#5292af"
-                      />
-                    }
-                    titleStyle={styles.title}
-                    iconPosition="top"
                   />
                 )}
               </>

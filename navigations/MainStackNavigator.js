@@ -10,6 +10,7 @@ import {setModalVisible} from '../redux/globalSlice';
 import AddNewFriendScreen from '../screens/AddNewFriendScreen';
 import ConversationOptionsScreen from '../screens/ConversationOptionsScreen';
 import FileScreen from '../screens/FileScreen';
+import ForwardMessageScreen from '../screens/ForwardMessageScreen';
 import FriendDetailsScreen from '../screens/FriendDetailsScreen';
 import FriendRequestScreen from '../screens/FriendRequestScreen';
 import FriendSearchScreen from '../screens/FriendSearchScreen';
@@ -164,6 +165,7 @@ const MainStackNavigator = ({navigation}) => {
           />
           <Stack.Screen name="Bạn từ danh bạ máy" component={PhonebookScreen} />
           <Stack.Screen name="Thành viên" component={MemberScreen} />
+          <Stack.Screen name="Chia sẻ" component={ForwardMessageScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

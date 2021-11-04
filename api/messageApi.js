@@ -28,26 +28,7 @@ const messageApi = {
     const url = `${BASE_URL}/${messageId}/reacts/${type}`;
     return axiosClient.post(url);
   },
-  sendFileMessage: (file, params) => {
-    const {type, conversationId} = params;
-    console.log('file type: ', typeof file);
 
-    const config = {
-      params: {
-        type,
-        conversationId,
-      },
-
-      // onUploadProgress: progressEvent => {
-      //   let percentCompleted = Math.round(
-      //     (progressEvent.loaded * 100) / progressEvent.total,
-      //   );
-      //   console.log('percentCompleted: ', percentCompleted);
-      // },
-    };
-
-    return axiosClient.post(`${BASE_URL}/files`, file, config);
-  },
   sendFileBase64Message: (file, params, uploadProgress) => {
     const {type, conversationId} = params;
     console.log('file type: ', typeof file);
@@ -70,6 +51,11 @@ const messageApi = {
     };
 
     return axiosClient.post(`${BASE_URL}/files/base64`, file, config);
+  },
+
+  forwardMessage: (messageId, conversationId) => {
+    const url = `${BASE_URL}/${messageId}/share/${conversationId}`;
+    return axiosClient.post(url);
   },
 };
 

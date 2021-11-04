@@ -261,6 +261,7 @@ export default function MessageScreen({navigation, route}) {
             modalVisible={modalVisible}
             setModalVisible={setModalVisible}
             setPinMessageVisible={setPinMessageVisible}
+            navigation={navigation}
           />
           {pinMessageVisible.isVisible && (
             <PinMessageModal
