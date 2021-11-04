@@ -103,18 +103,24 @@ const MemberScreen = ({navigation}) => {
                     )}
                   </ListItem.Content>
 
-                  {userProfile._id === currentConversation.leaderId && (
-                    <View style={styles.buttonWrap}>
-                      <Button
-                        containerStyle={styles.buttonContainer}
-                        buttonStyle={[styles.buttonStyle, {borderColor: 'red'}]}
-                        titleStyle={[styles.buttonTitle, {color: 'red'}]}
-                        title="Xóa"
-                        type="outline"
-                        onPress={() => handleDeleteMember(item._id, item.name)}
-                      />
-                    </View>
-                  )}
+                  {userProfile._id === currentConversation.leaderId &&
+                    item._id !== currentConversation.leaderId && (
+                      <View style={styles.buttonWrap}>
+                        <Button
+                          containerStyle={styles.buttonContainer}
+                          buttonStyle={[
+                            styles.buttonStyle,
+                            {borderColor: 'red'},
+                          ]}
+                          titleStyle={[styles.buttonTitle, {color: 'red'}]}
+                          title="Xóa"
+                          type="outline"
+                          onPress={() =>
+                            handleDeleteMember(item._id, item.name)
+                          }
+                        />
+                      </View>
+                    )}
                 </ListItem>
                 <View
                   style={{

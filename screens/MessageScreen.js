@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   BackHandler,
   FlatList,
@@ -16,18 +16,17 @@ import {
 import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import AnimatedEllipsis from '../components/AnimatedEllipsis';
-import ChatMessage from '../components/ChatMessage';
-import EmptyData from '../components/EmptyData';
-import ImagePickerModal from '../components/ImagePickerModal';
-import MessageBottomBar from '../components/MessageBottomBar';
-import MessageDivider from '../components/MessageDivider';
-import MessageHeaderLeft from '../components/MessageHeaderLeft';
-import MessageModal from '../components/MessageModal';
-import PinMessageModal from '../components/PinMessageModal';
-import PinnedMessage from '../components/PinnedMessage';
-import ReactionModal from '../components/ReactionModal';
+import ChatMessage from '../components/message/ChatMessage';
+import ImagePickerModal from '../components/modal/ImagePickerModal';
+import MessageBottomBar from '../components/message/MessageBottomBar';
+import MessageDivider from '../components/message/MessageDivider';
+import MessageHeaderLeft from '../components/message/MessageHeaderLeft';
+import MessageModal from '../components/modal/MessageModal';
+import PinMessageModal from '../components/modal/PinMessageModal';
+import PinnedMessage from '../components/message/PinnedMessage';
+import ReactionModal from '../components/modal/ReactionModal';
 import StickyBoard from '../components/StickyBoard';
-import ViewImageModal from '../components/ViewImageModal';
+import ViewImageModal from '../components/modal/ViewImageModal';
 import {
   DEFAULT_IMAGE_MODAL,
   DEFAULT_MESSAGE_MODAL_VISIBLE,
@@ -36,11 +35,9 @@ import {
   DEFAULT_PIN_MESSAGE_MODAL,
   DEFAULT_REACTION_MODAL_VISIBLE,
 } from '../constants';
-import {setLoading} from '../redux/globalSlice';
 import {
   clearMessagePages,
   fetchChannels,
-  fetchListLastViewer,
   fetchMessages,
 } from '../redux/messageSlice';
 import {fetchPinMessages, resetPinSlice} from '../redux/pinSlice';

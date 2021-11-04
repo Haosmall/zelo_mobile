@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import PropTypes from 'prop-types';
-import dateUtils from '../utils/dateUtils';
-import {MAIN_COLOR} from '../styles';
+import dateUtils from '../../utils/dateUtils';
+import {MAIN_COLOR} from '../../styles';
 
 const MessageDivider = props => {
   const {dateString, isLoading} = props;

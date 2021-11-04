@@ -8,9 +8,9 @@ const channelApi = {
     return axiosClient.get(url);
   },
 
-  fetchMessages: channelId => {
+  fetchMessages: (channelId, params) => {
     const url = `messages/channel/${channelId}`;
-    return axiosClient.get(url);
+    return axiosClient.get(url, {params});
   },
 
   createChannel: (name, conversationId) => {

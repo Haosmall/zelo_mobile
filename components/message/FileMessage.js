@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements/dist/icons/Icon';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
+import commonFuc, {checkPermissionDownloadFile} from '../../utils/commonFuc';
 
 const FileMessage = props => {
   const {content, handleOpenOptionModal} = props;

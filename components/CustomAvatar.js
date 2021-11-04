@@ -33,8 +33,9 @@ const CustomAvatar = props => {
           <View key={value}>
             <Avatar
               rounded
-              title={commonFuc.getAcronym(name)}
+              // title={commonFuc.getAcronym(name)}
               overlayContainerStyle={styles.overlay}
+              icon={{name: 'person'}}
               source={
                 avatars[value - 1]?.length > 0
                   ? {
@@ -51,9 +52,9 @@ const CustomAvatar = props => {
             <Avatar
               rounded
               title={totalMembers - 3 > 99 ? '99+' : `+${totalMembers - 3}`}
-              overlayContainerStyle={styles.overlay}
+              overlayContainerStyle={{backgroundColor: '#7562d8'}}
               source={null}
-              containerStyle={styles.avatar}
+              containerStyle={[styles.avatar]}
               titleStyle={styles.title}
             />
           </View>

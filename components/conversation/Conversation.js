@@ -3,9 +3,9 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ListItem} from 'react-native-elements';
 import {useSelector} from 'react-redux';
-import {messageType} from '../constants';
-import commonFuc from '../utils/commonFuc';
-import CustomAvatar from './CustomAvatar';
+import {messageType} from '../../constants';
+import commonFuc from '../../utils/commonFuc';
+import CustomAvatar from '../CustomAvatar';
 import MessageInfo from './MessageInfo';
 
 const Conversation = props => {
@@ -59,18 +59,19 @@ const Conversation = props => {
           break;
         case messageType.NOTIFY:
           console.log(lastMessageContent);
-          content =
-            lastMessageContent === messageType.PIN_MESSAGE
-              ? 'Đã ghim một tin nhắn'
-              : lastMessageContent === messageType.NOT_PIN_MESSAGE
-              ? 'Đã bỏ ghim một tin nhắn'
-              : lastMessageContent === messageType.CREATE_CHANNEL
-              ? 'Đã tạo một kênh nhắn tin'
-              : lastMessageContent === messageType.DELETE_CHANNEL
-              ? 'Đã xóa một kênh nhắn tin'
-              : lastMessageContent === messageType.UPDATE_CHANNEL
-              ? 'Đã đổi tên một kênh nhắn tin'
-              : lastMessageContent.replace('<b>', '').replace('</b>', '');
+          content = commonFuc.getNotifyContent(lastMessageContent, false);
+          // content =
+          //   lastMessageContent === messageType.PIN_MESSAGE
+          //     ? 'Đã ghim một tin nhắn'
+          //     : lastMessageContent === messageType.NOT_PIN_MESSAGE
+          //     ? 'Đã bỏ ghim một tin nhắn'
+          //     : lastMessageContent === messageType.CREATE_CHANNEL
+          //     ? 'Đã tạo một kênh nhắn tin'
+          //     : lastMessageContent === messageType.DELETE_CHANNEL
+          //     ? 'Đã xóa một kênh nhắn tin'
+          //     : lastMessageContent === messageType.UPDATE_CHANNEL
+          //     ? 'Đã đổi tên một kênh nhắn tin'
+          //     : lastMessageContent.replace('<b>', '').replace('</b>', '');
           break;
 
         default:

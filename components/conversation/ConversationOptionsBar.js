@@ -1,16 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Button, Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  DEFAULT_ADD_VOTE_MODAL,
-  DEFAULT_RENAME_CONVERSATION_MODAL,
-} from '../constants';
-import {fetchFriendById} from '../redux/friendSlice';
-import {updateNotification} from '../redux/messageSlice';
-import {conversationApi} from '../api';
-import commonFuc from '../utils/commonFuc';
+import {conversationApi} from '../../api';
+import {DEFAULT_ADD_VOTE_MODAL} from '../../constants';
+import {fetchFriendById} from '../../redux/friendSlice';
+import {updateNotification} from '../../redux/messageSlice';
+import commonFuc from '../../utils/commonFuc';
 
 const ICON_SIZE = 20;
 
@@ -40,7 +37,7 @@ const ConversationOptionsBar = props => {
       const isNotify = !notify;
       const response = await conversationApi.updateNotify(
         conversationId,
-        isNotify ? 0 : 1,
+        isNotify ? 1 : 0,
       );
       console.log('update isNotify: ', response);
       dispatch(updateNotification({conversationId, isNotify}));

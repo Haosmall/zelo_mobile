@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import {Formik} from 'formik';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {
   Modal,
   Platform,
@@ -10,13 +11,11 @@ import {
   View,
 } from 'react-native';
 import {Button} from 'react-native-elements';
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {useSelector} from 'react-redux';
-import {DEFAULT_RENAME_CONVERSATION_MODAL} from '../constants';
-import {Formik} from 'formik';
-import InputField from '../components/InputField';
-import {renameConversationValid} from '../utils/validator';
-import conversationApi from '../api/conversationApi';
+import {conversationApi} from '../../api';
+import {DEFAULT_RENAME_CONVERSATION_MODAL} from '../../constants';
+import {renameConversationValid} from '../../utils/validator';
+import InputField from '../InputField';
 
 const RenameConversationModal = props => {
   const {modalVisible, setModalVisible} = props;

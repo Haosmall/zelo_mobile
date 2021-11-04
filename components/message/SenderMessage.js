@@ -8,13 +8,14 @@ import {
   View,
 } from 'react-native';
 import {Avatar, Icon, Image} from 'react-native-elements';
-import {messageType} from '../constants';
-import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
-import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
+import HTMLView from 'react-native-htmlview';
+import RNUrlPreview from 'react-native-url-preview';
+import {useSelector} from 'react-redux';
+import {messageType} from '../../constants';
+import globalStyles, {OVERLAY_AVATAR_COLOR} from '../../styles';
+import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
-import {useDispatch, useSelector} from 'react-redux';
-import RNUrlPreview from 'react-native-url-preview';
 
 const SenderMessage = props => {
   const {
@@ -117,6 +118,11 @@ const SenderMessage = props => {
               </View>
               <Text>{commonFuc.getFileName(content)}</Text>
             </TouchableOpacity>
+          ) : type === messageType.HTML ? (
+            <HTMLView
+              value={content}
+              stylesheet={{p: {fontSize: 13, flexWrap: 'wrap'}}}
+            />
           ) : (
             <View>
               <Text style={contentStyle}>{content}</Text>

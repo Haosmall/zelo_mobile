@@ -6,23 +6,22 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import {Avatar, Button, Image, ListItem} from 'react-native-elements';
+import RNRestart from 'react-native-restart';
 import {useDispatch, useSelector} from 'react-redux';
 import test from '../assets/favicon1.png';
-import ViewImageModal from '../components/ViewImageModal';
+import UpdateUserProfileModal from '../components/modal/UpdateUserProfileModal';
+import ViewImageModal from '../components/modal/ViewImageModal';
 import {DEFAULT_COVER_IMAGE, DEFAULT_IMAGE_MODAL} from '../constants';
 import {resetFriendSlice} from '../redux/friendSlice';
-import {resetGlobalSlice, setLogin} from '../redux/globalSlice';
+import {resetGlobalSlice} from '../redux/globalSlice';
 import {fetchProfile, resetMeSlice} from '../redux/meSlice';
 import {resetMessageSlice} from '../redux/messageSlice';
 import {resetPinSlice} from '../redux/pinSlice';
 import {OVERLAY_AVATAR_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
 import commonFuc from '../utils/commonFuc';
-import RNRestart from 'react-native-restart';
-import UpdateUserProfileModal from '../components/UpdateUserProfileModal';
 
 export default function MeScreen() {
   const dispatch = useDispatch();

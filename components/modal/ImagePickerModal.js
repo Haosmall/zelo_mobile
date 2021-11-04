@@ -13,11 +13,11 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useSelector} from 'react-redux';
-import {messageApi} from '../api';
-import {messageType} from '../constants';
-import globalStyles, {WINDOW_WIDTH} from '../styles';
+import {messageApi} from '../../api';
+import {messageType} from '../../constants';
+import globalStyles, {WINDOW_WIDTH} from '../../styles';
 import RNFetchBlob from 'react-native-fetch-blob';
-import commonFuc from '../utils/commonFuc';
+import commonFuc from '../../utils/commonFuc';
 
 const ImagePickerModal = props => {
   const {modalVisible, setModalVisible} = props;

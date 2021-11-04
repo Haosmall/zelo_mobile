@@ -9,15 +9,14 @@ import {
 } from 'react-native';
 import {Image} from 'react-native-elements';
 import {Icon} from 'react-native-elements/dist/icons/Icon';
+import HTMLView from 'react-native-htmlview';
+import RNUrlPreview from 'react-native-url-preview';
 import {useSelector} from 'react-redux';
-import {messageType} from '../constants';
-import globalStyles from '../styles';
-import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
+import {messageType} from '../../constants';
+import globalStyles from '../../styles';
+import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
-import RNUrlPreview from 'react-native-url-preview';
-
-import VideoMessage from './VideoMessage';
 
 const ReceiverMessage = props => {
   const {
@@ -106,6 +105,11 @@ const ReceiverMessage = props => {
                   </View>
                   <Text>{commonFuc.getFileName(content)}</Text>
                 </TouchableOpacity>
+              ) : type === messageType.HTML ? (
+                <HTMLView
+                  value={content}
+                  stylesheet={{p: {fontSize: 13, flexWrap: 'wrap'}}}
+                />
               ) : (
                 <View>
                   <Text style={contentStyle}>{content}</Text>

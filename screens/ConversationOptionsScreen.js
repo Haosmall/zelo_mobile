@@ -1,3 +1,4 @@
+import Clipboard from '@react-native-clipboard/clipboard';
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
@@ -6,25 +7,22 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  Clipboard,
 } from 'react-native';
-import {Avatar, Icon, ListItem} from 'react-native-elements';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {Avatar} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {conversationApi} from '../api';
-import AddVoteModal from '../components/AddVoteModal';
-import ConversationOptionsBar from '../components/ConversationOptionsBar';
-import ListChannel from '../components/ListChannel';
-import OptionButton from '../components/OptionButton';
-import RenameConversationModal from '../components/RenameConversationModal';
+import AddVoteModal from '../components/modal/AddVoteModal';
+import ConversationOptionsBar from '../components/conversation/ConversationOptionsBar';
+import ListChannel from '../components/conversation/ListChannel';
+import OptionButton from '../components/conversation/OptionButton';
+import RenameConversationModal from '../components/modal/RenameConversationModal';
 import {
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
-  ERROR_MESSAGE,
-  messageType,
-  LEAVE_GROUP_MESSAGE,
   DELETE_GROUP_MESSAGE,
+  ERROR_MESSAGE,
+  LEAVE_GROUP_MESSAGE,
+  messageType,
 } from '../constants';
 import {useGoback} from '../hooks';
 import {fetchFiles, fetchMembers} from '../redux/messageSlice';
@@ -228,7 +226,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
             />
           </Pressable>
         )}
-        <Pressable style={[globalStyles.viewEle, {height: 500}]}></Pressable>
+        {/* <Pressable style={[globalStyles.viewEle, {height: 500}]}></Pressable> */}
       </ScrollView>
       <AddVoteModal
         modalVisible={addVoteVisible}

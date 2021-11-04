@@ -1,20 +1,15 @@
+import Clipboard from '@react-native-clipboard/clipboard';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
-import {
-  Clipboard,
-  Modal,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Modal, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native';
 import {Button, Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
-import messageApi from '../api/messageApi';
-import pinMessagesApi from '../api/pinMessagesApi';
-import {DEFAULT_MESSAGE_MODAL_VISIBLE, REACTIONS} from '../constants';
-import {deleteMessageOnlyMe} from '../redux/messageSlice';
-import {fetchPinMessages} from '../redux/pinSlice';
-import commonFuc from '../utils/commonFuc';
+import messageApi from '../../api/messageApi';
+import pinMessagesApi from '../../api/pinMessagesApi';
+import {DEFAULT_MESSAGE_MODAL_VISIBLE, REACTIONS} from '../../constants';
+import {deleteMessageOnlyMe} from '../../redux/messageSlice';
+import {fetchPinMessages} from '../../redux/pinSlice';
+import commonFuc from '../../utils/commonFuc';
 
 const ICON_WIDTH = 30;
 const ICON_HEIGHT = 30;

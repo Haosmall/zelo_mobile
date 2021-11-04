@@ -15,7 +15,7 @@ import FriendItem from '../components/FriendItem';
 import {friendType} from '../constants';
 import {fetchFriendById, fetchFriends} from '../redux/friendSlice';
 import {fetchSyncContacts} from '../redux/meSlice';
-import {OVERLAY_AVATAR_COLOR} from '../styles';
+import {OVERLAY_AVATAR_COLOR, OVERLAY_AVATAR_COLOR_GREY} from '../styles';
 
 export default function ContactScreen({navigation}) {
   const dispatch = useDispatch();
@@ -130,7 +130,7 @@ export default function ContactScreen({navigation}) {
                     name="search"
                     type="ionicon"
                     title="Tìm kiếm bạn bè"
-                    backgroundColor={OVERLAY_AVATAR_COLOR}
+                    backgroundColor={OVERLAY_AVATAR_COLOR_GREY}
                     handlePress={handleGoToSearchScreen}
                   />
                   <ContactAction

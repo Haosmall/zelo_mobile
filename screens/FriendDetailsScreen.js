@@ -18,7 +18,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import {useDispatch, useSelector} from 'react-redux';
 import {friendApi} from '../api';
-import ViewImageModal from '../components/ViewImageModal';
+import ViewImageModal from '../components/modal/ViewImageModal';
 import {
   DEFAULT_COVER_IMAGE,
   DEFAULT_IMAGE_MODAL,

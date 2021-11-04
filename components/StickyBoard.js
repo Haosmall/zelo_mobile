@@ -14,7 +14,7 @@ import {messageApi} from '../api';
 import {useAnimatedBottom} from '../hooks';
 import {
   GREY_COLOR,
-  OVERLAY_AVATAR_COLOR,
+  OVERLAY_AVATAR_COLOR_GREY,
   STICKER_SIZE,
   WINDOW_WIDTH,
 } from '../styles';
@@ -72,7 +72,7 @@ const StickyBoard = props => {
                         margin: 6,
                         backgroundColor:
                           currentStickerCollection._id === sticker._id
-                            ? OVERLAY_AVATAR_COLOR
+                            ? OVERLAY_AVATAR_COLOR_GREY
                             : 'transparent',
                         borderRadius: 8,
                       }}

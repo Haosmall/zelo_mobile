@@ -3,12 +3,10 @@ import React from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-elements/dist/icons/Icon';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import {DEFAULT_IMAGE_MODAL, ERROR_MESSAGE} from '../constants';
-import commonFuc, {checkPermissionDownloadFile} from '../utils/commonFuc';
-import defaultCoverImage from '../assets/default-cover-image.jpg';
 import VideoPlayer from 'react-native-video-player';
-import Video from 'react-native-video';
-import {SCREEN_HEIGHT, WINDOW_WIDTH} from '../styles';
+import {DEFAULT_IMAGE_MODAL, ERROR_MESSAGE} from '../../constants';
+import {SCREEN_HEIGHT} from '../../styles';
+import commonFuc, {checkPermissionDownloadFile} from '../../utils/commonFuc';
 
 const ViewImageModal = props => {
   const {imageProps, setImageProps} = props;
@@ -27,7 +25,9 @@ const ViewImageModal = props => {
           onCancel={handleCloseModal}
           onSwipeDown={handleCloseModal}
           saveToLocalByLongPress={false}
-          failImageSource={{uri: require('../assets/default-cover-image.jpg')}}
+          failImageSource={{
+            uri: require('../../assets/default-cover-image.jpg'),
+          }}
           renderIndicator={currentIndex => (
             <View style={styles.indicator}>
               <TouchableOpacity onPress={handleCloseModal}>

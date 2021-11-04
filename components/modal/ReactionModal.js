@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Button} from 'react-native-elements';
-import {messageApi} from '../api';
+import {messageApi} from '../../api';
 import {
   DEFAULT_MESSAGE_MODAL_VISIBLE,
   DEFAULT_REACTION_MODAL_VISIBLE,
   REACTIONS,
-} from '../constants';
+} from '../../constants';
 
 const ICON_WIDTH = 30;
 const ICON_HEIGHT = 30;

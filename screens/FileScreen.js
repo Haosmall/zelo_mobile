@@ -1,9 +1,9 @@
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import React, { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import ListFileSent from '../components/ListFileSent';
-import { messageType } from '../constants';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import React, {useEffect} from 'react';
+import {StyleSheet, Text} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import ListFileSent from '../components/conversation/ListFileSent';
+import {messageType} from '../constants';
 
 export default function FileScreen({navigation}) {
   const dispatch = useDispatch();
@@ -26,7 +26,6 @@ export default function FileScreen({navigation}) {
         swipeEnabled: true,
         // tabBarLabel: navigation.isFocused() ? route.name : "",
         tabBarLabel: ({focused, color}) => {
-
           return <Text style={{color}}>{route.name}</Text>;
         },
       })}>

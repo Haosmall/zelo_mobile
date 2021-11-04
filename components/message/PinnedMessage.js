@@ -4,7 +4,7 @@ import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import {Button, Divider, Icon, ListItem} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
-import {GREY_COLOR, MAIN_COLOR, WINDOW_WIDTH} from '../styles';
+import {GREY_COLOR, MAIN_COLOR, WINDOW_WIDTH} from '../../styles';
 
 const PinnedMessage = props => {
   const {openPinMessage} = props;

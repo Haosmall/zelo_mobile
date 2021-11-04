@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
@@ -12,8 +13,8 @@ import {
 import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {io} from 'socket.io-client';
-import Conversation from '../components/Conversation';
-import MessageHeaderModal from '../components/MessageHeaderModal';
+import Conversation from '../components/conversation/Conversation';
+import MessageHeaderModal from '../components/modal/MessageHeaderModal';
 import {REACT_APP_SOCKET_URL} from '../constants';
 import {
   cancelMyFriendRequest,
@@ -40,7 +41,7 @@ import {
   usersNotTyping,
   usersTyping,
 } from '../redux/messageSlice';
-import globalStyles from '../styles';
+import globalStyles, {MAIN_COLOR} from '../styles';
 
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
@@ -50,7 +51,7 @@ export default function HomeScreen({navigation}) {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const {conversations} = useSelector(state => state.message);
+  const {conversations, isLoading} = useSelector(state => state.message);
   const {currentUserId} = useSelector(state => state.global);
   const {userProfile} = useSelector(state => state.me);
 
@@ -165,12 +166,12 @@ export default function HomeScreen({navigation}) {
     socket.on(
       'new-message-of-channel',
       (conversationId, channelId, message) => {
-        console.table('new-message-of-channel', {
+        console.log({
           conversationId,
           channelId,
           message,
         });
-        // dispatch(addMessage({conversationId, message}));
+        // dispatch(addChannelMessage({conversationId, channelId, message}));
         // dispatch(
         //   setNotification({conversationId, message, userId: currentUserId}),
         // );
@@ -306,8 +307,16 @@ export default function HomeScreen({navigation}) {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }>
           <View style={globalStyles.emty}>
-            <Icon name="warning" type="antdesign" />
-            <Text style={globalStyles.emptyText}>Không có tin nhắn nào</Text>
+            {isLoading ? (
+              <ActivityIndicator size={22} color={MAIN_COLOR} />
+            ) : (
+              <>
+                <Icon name="warning" type="antdesign" />
+                <Text style={globalStyles.emptyText}>
+                  Không có tin nhắn nào
+                </Text>
+              </>
+            )}
           </View>
         </ScrollView>
       )}

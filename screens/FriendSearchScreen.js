@@ -12,7 +12,7 @@ import {
   fetchListLastViewer,
   updateCurrentConversation,
 } from '../redux/messageSlice';
-import {GREY_COLOR, OVERLAY_AVATAR_COLOR} from '../styles';
+import {GREY_COLOR, OVERLAY_AVATAR_COLOR_GREY} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
 export default function FriendSearchScreen({navigation, route}) {
@@ -220,7 +220,7 @@ export default function FriendSearchScreen({navigation, route}) {
                         rounded
                         title={commonFuc.getAcronym(item.name)}
                         overlayContainerStyle={{
-                          backgroundColor: OVERLAY_AVATAR_COLOR,
+                          backgroundColor: OVERLAY_AVATAR_COLOR_GREY,
                         }}
                         source={
                           item?.avatar?.length > 0
@@ -269,7 +269,7 @@ export default function FriendSearchScreen({navigation, route}) {
             width: '100%',
             borderBottomWidth: 0,
             borderRadius: 5,
-            backgroundColor: OVERLAY_AVATAR_COLOR,
+            backgroundColor: OVERLAY_AVATAR_COLOR_GREY,
             paddingHorizontal: 10,
             paddingVertical: 0,
             marginHorizontal: 0,
@@ -352,6 +352,6 @@ const styles = StyleSheet.create({
     marginLeft: 14,
   },
   overlay: {
-    backgroundColor: OVERLAY_AVATAR_COLOR,
+    backgroundColor: OVERLAY_AVATAR_COLOR_GREY,
   },
 });

@@ -9,14 +9,10 @@ import {
   View,
 } from 'react-native';
 import {Icon, Image} from 'react-native-elements';
-import {DEFAULT_IMAGE_MODAL, messageType} from '../constants';
-import globalStyles, {
-  SCREEN_WIDTH,
-  WINDOW_HEIGHT,
-  WINDOW_WIDTH,
-} from '../styles';
-import commonFuc from '../utils/commonFuc';
-import ViewImageModal from './ViewImageModal';
+import {DEFAULT_IMAGE_MODAL, messageType} from '../../constants';
+import {WINDOW_HEIGHT, WINDOW_WIDTH} from '../../styles';
+import commonFuc from '../../utils/commonFuc';
+import ViewImageModal from '../modal/ViewImageModal';
 
 export default function ListFileSent(props) {
   const {listFiles, type} = props;

@@ -15,10 +15,10 @@ import {
 } from 'react-native';
 import {Button, Divider, Icon, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
-import pinMessagesApi from '../api/pinMessagesApi';
-import {DEFAULT_PIN_MESSAGE_MODAL} from '../constants';
-import {fetchPinMessages} from '../redux/pinSlice';
-import {GREY_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
+import pinMessagesApi from '../../api/pinMessagesApi';
+import {DEFAULT_PIN_MESSAGE_MODAL} from '../../constants';
+import {fetchPinMessages} from '../../redux/pinSlice';
+import {GREY_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../../styles';
 
 const PinMessageModal = props => {
   const {modalVisible, setModalVisible} = props;

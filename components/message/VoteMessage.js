@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Button} from 'react-native-elements';
-import {MAIN_COLOR} from '../styles';
-import commonFuc from '../utils/commonFuc';
-import VoteProgress from './VoteProgress';
+import {MAIN_COLOR} from '../../styles';
+import commonFuc from '../../utils/commonFuc';
+import VoteProgress from '../VoteProgress';
 import {useDispatch, useSelector} from 'react-redux';
-import {setCurrentVote} from '../redux/messageSlice';
+import {setCurrentVote} from '../../redux/messageSlice';
 
 const VoteMessage = props => {
   const {message, navigation} = props;

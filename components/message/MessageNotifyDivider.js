@@ -2,26 +2,28 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
 import HTMLView from 'react-native-htmlview';
-import {messageType} from '../constants';
+import {messageType} from '../../constants';
 import {Icon} from 'react-native-elements';
-import {MAIN_COLOR} from '../styles';
+import {MAIN_COLOR} from '../../styles';
+import commonFuc from '../../utils/commonFuc';
 
 const MessageNotifyDivider = props => {
   const {message, isReceiverMessage} = props;
   const {type, content, user} = message;
 
-  const contentLowercase =
-    content === messageType.PIN_MESSAGE
-      ? 'đã ghim một tin nhắn'
-      : content === messageType.NOT_PIN_MESSAGE
-      ? 'đã bỏ ghim một tin nhắn'
-      : content === messageType.CREATE_CHANNEL
-      ? 'đã tạo một kênh nhắn tin'
-      : content === messageType.DELETE_CHANNEL
-      ? 'đã xóa một kênh nhắn tin'
-      : content === messageType.UPDATE_CHANNEL
-      ? 'đã đổi tên một kênh nhắn tin'
-      : content.charAt(0).toLocaleLowerCase() + content.slice(1);
+  const contentLowercase = commonFuc.getNotifyContent(content, true);
+  // content === messageType.PIN_MESSAGE
+  //   ? 'đã ghim một tin nhắn'
+  //   : content === messageType.NOT_PIN_MESSAGE
+  //   ? 'đã bỏ ghim một tin nhắn'
+  //   : content === messageType.CREATE_CHANNEL
+  //   ? 'đã tạo một kênh nhắn tin'
+  //   : content === messageType.DELETE_CHANNEL
+  //   ? 'đã xóa một kênh nhắn tin'
+  //   : content === messageType.UPDATE_CHANNEL
+  //   ? 'đã đổi tên một kênh nhắn tin'
+  //   : content.charAt(0).toLocaleLowerCase() + content.slice(1);
+
   const contentWithSenderName = `<p> ${
     isReceiverMessage ? 'Bạn' : user.name
   } ${contentLowercase}</p`;

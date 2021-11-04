@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Text} from 'react-native';
-import {DEFAULT_COVER_IMAGE, messageType} from '../constants';
-import commonFuc from '../utils/commonFuc';
-import dateUtils from '../utils/dateUtils';
+import {DEFAULT_COVER_IMAGE, messageType} from '../../constants';
+import commonFuc from '../../utils/commonFuc';
+import dateUtils from '../../utils/dateUtils';
 import ReceiverMessage from './ReceiverMessage';
 import SenderMessage from './SenderMessage';
 import VoteMessage from './VoteMessage';

@@ -20,6 +20,9 @@ const initialState = {
   files: {},
   members: [],
   channels: [],
+  currentChannelId: '',
+  channelPages: {},
+  channelMessages: [],
 };
 
 export const fetchConversations = createAsyncThunk(
@@ -29,12 +32,22 @@ export const fetchConversations = createAsyncThunk(
     return conversations;
   },
 );
+
 export const fetchMessages = createAsyncThunk(
   `${KEY}/fetchMessages`,
   async (params, thunkApi) => {
     const {conversationId, apiParams, isSendMessage = false} = params;
     const messages = await messageApi.fetchMessage(conversationId, apiParams);
     return {messages, conversationId, isSendMessage};
+  },
+);
+
+export const fetchChannelMessages = createAsyncThunk(
+  `${KEY}/fetchChannelMessages`,
+  async (params, thunkApi) => {
+    const {channelId, apiParams, isSendMessage = false} = params;
+    const messages = await channelApi.fetchMessages(channelId, apiParams);
+    return {messages, channelId, isSendMessage};
   },
 );
 
@@ -154,6 +167,48 @@ const messageSlice = createSlice({
       }
 
       state.conversations = [seachConversation, ...conversationTempt];
+    },
+
+    // TODO:---------------------- addMessage ----------------------
+    addChannelMessage: (state, action) => {
+      const {conversationId, channelId, message} = action.payload;
+
+      // tìm conversation
+      const index = state.channels.findIndex(
+        channelEle => channelEle._id === channelId,
+      );
+      const seachChannel = state.conversations[index];
+
+      seachChannel.numberUnread = seachChannel.numberUnread + 1;
+      seachChannel.lastMessage = {
+        ...message,
+        createdAt: dateUtils.toTime(message.createdAt),
+      };
+      // xóa conversation đó ra
+      // const channelTempt = state.conversations.filter(
+      //   channelEle => channelEle._id !== channelId,
+      // );
+
+      if (
+        channelId === state.currentChannelId &&
+        state.currentChannelId !== state.currentConversationId
+      ) {
+        const length = state.channelMessages.length;
+
+        if (length) {
+          const messagesReverse = state.channelMessages.reverse();
+          const lastMessage = messagesReverse[length - 1];
+          if (lastMessage._id !== message._id) {
+            messagesReverse.push(message);
+            state.channelMessages = messagesReverse.reverse();
+          }
+        } else {
+          state.channelMessages.push(message);
+        }
+        seachChannel.numberUnread = 0;
+      }
+
+      // state.conversations = [seachConversation, ...channelTempt];
     },
 
     //  TODO:---------------------- deleteMessage ----------------------
@@ -299,12 +354,12 @@ const messageSlice = createSlice({
     // TODO:---------------------- setNotification ----------------------
     setNotification: (state, action) => {
       const {conversationId, message, userId} = action.payload;
-      const isNotification = state.conversations.find(ele => {
+      const conversation = state.conversations.find(ele => {
         // console.log('ele: ', ele);
         return ele._id === conversationId;
-      }).isNotify;
+      });
 
-      if (!isNotification) {
+      if (!conversation.isNotify) {
         return;
       }
       if (state.conversations.length <= 0) {
@@ -318,25 +373,31 @@ const messageSlice = createSlice({
         return;
       }
 
-      console.log('isNotification: ', isNotification);
       const messageContent = message.content;
-      const messageContentNotify =
-        messageContent === messageType.PIN_MESSAGE
-          ? 'Đã ghim một tin nhắn'
-          : messageContent === messageType.NOT_PIN_MESSAGE
-          ? 'Đã bỏ ghim một tin nhắn'
-          : messageContent === messageType.CREATE_CHANNEL
-          ? 'Đã tạo một kênh nhắn tin'
-          : messageContent === messageType.DELETE_CHANNEL
-          ? 'Đã xóa một kênh nhắn tin'
-          : messageContent === messageType.UPDATE_CHANNEL
-          ? 'Đã đổi tên một kênh nhắn tin'
-          : messageContent;
+      const messageContentNotify = commonFuc.getNotifyContent(
+        messageContent,
+        false,
+      );
+
+      // const messageContentNotify =
+      //   messageContent === messageType.PIN_MESSAGE
+      //     ? 'Đã ghim một tin nhắn'
+      //     : messageContent === messageType.NOT_PIN_MESSAGE
+      //     ? 'Đã bỏ ghim một tin nhắn'
+      //     : messageContent === messageType.CREATE_CHANNEL
+      //     ? 'Đã tạo một kênh nhắn tin'
+      //     : messageContent === messageType.DELETE_CHANNEL
+      //     ? 'Đã xóa một kênh nhắn tin'
+      //     : messageContent === messageType.UPDATE_CHANNEL
+      //     ? 'Đã đổi tên một kênh nhắn tin'
+      //     : messageContent;
       // PushNotification.cancelAllLocalNotifications();
       PushNotification.localNotification({
         channelId: 'new-message',
-        title: message.user.name,
-        message: messageContentNotify,
+        title: conversation.name,
+        message: conversation.type
+          ? `${message.user.name}: ${messageContentNotify}`
+          : messageContentNotify,
         id: state.messages.length,
         soundName: 'my_sound.mp3',
         playSound: true,
@@ -408,6 +469,11 @@ const messageSlice = createSlice({
       state.usersTyping = newUsersTyping;
     },
 
+    // TODO:---------------------- setCurrentChannelId ----------------------
+    setCurrentChannelId: (state, action) => {
+      state.currentChannelId = action.payload;
+    },
+
     // TODO:---------------------- resetMessageSlice ----------------------
     resetMessageSlice: (state, action) => {
       Object.assign(state, initialState);
@@ -463,6 +529,44 @@ const messageSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchMessages.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:---------------------- fetchChannelMessages ----------------------
+    // Đang xử lý
+    [fetchChannelMessages.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchChannelMessages.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      const {messages, channelId, isSendMessage} = action.payload;
+
+      // xét currentchannelId
+      const channelIndex = state.channels.findIndex(
+        channelEle => channelEle._id === channelId,
+      );
+
+      state.channels[channelIndex] = {
+        ...state.channels[channelIndex],
+        numberUnread: 0,
+      };
+
+      state.currentChannelId = channelId;
+      state.channelPages = messages;
+      if (isSendMessage) {
+        console.log('fext mess send');
+        state.channelMessages = messages.data.reverse();
+      } else {
+        console.log('fext mess heare');
+        const temp = [...messages.data, ...state.messages.reverse()];
+        state.channelMessages = commonFuc
+          .getUniqueListBy(temp, '_id')
+          .reverse();
+      }
+    },
+    // Xử lý khi bị lỗi
+    [fetchChannelMessages.rejected]: (state, action) => {
       state.isLoading = false;
     },
 
@@ -546,5 +650,7 @@ export const {
   usersTyping,
   usersNotTyping,
   resetMessageSlice,
+  setCurrentChannelId,
+  addChannelMessage,
 } = actions;
 export default reducer;

@@ -1,25 +1,22 @@
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
   Keyboard,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
+  TouchableOpacity, View
 } from 'react-native';
-import {Icon} from 'react-native-elements';
-import {useSelector} from 'react-redux';
-
-import {messageApi} from '../api';
-import globalStyles, {MAIN_COLOR} from '../styles';
-
 import DocumentPicker from 'react-native-document-picker';
-import {ERROR_MESSAGE, messageType} from '../constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon } from 'react-native-elements';
 import RNFetchBlob from 'react-native-fetch-blob';
-import commonFuc from '../utils/commonFuc';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { useSelector } from 'react-redux';
+import { messageApi } from '../../api';
+import { ERROR_MESSAGE, messageType } from '../../constants';
+import globalStyles, { MAIN_COLOR } from '../../styles';
+import commonFuc from '../../utils/commonFuc';
+
+
 
 const MessageBottomBar = props => {
   const {conversationId, showStickyBoard, showImageModal, stickyBoardVisible} =

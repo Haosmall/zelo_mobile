@@ -5,7 +5,7 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import {conversationApi} from '../api';
-import {ERROR_MESSAGE, REACTIONS} from '../constants';
+import {ERROR_MESSAGE, messageType, REACTIONS} from '../constants';
 import {
   clearMessagePages,
   fetchConversations,
@@ -136,6 +136,42 @@ const commonFuc = {
     }
 
     return dateUtils.getDate(dateString);
+  },
+
+  getNotifyContent: (messageContent, isNotifyDivider) => {
+    let content = messageContent;
+
+    switch (messageContent) {
+      case messageType.PIN_MESSAGE:
+        content = 'Đã ghim một tin nhắn';
+        break;
+
+      case messageType.NOT_PIN_MESSAGE:
+        content = 'Đã bỏ ghim một tin nhắn';
+        break;
+
+      case messageType.CREATE_CHANNEL:
+        content = 'Đã tạo một kênh nhắn tin';
+        break;
+
+      case messageType.DELETE_CHANNEL:
+        content = 'Đã xóa một kênh nhắn tin';
+        break;
+
+      case messageType.UPDATE_CHANNEL:
+        content = 'Đã đổi tên một kênh nhắn tin';
+        break;
+
+      default:
+        content = messageContent;
+        break;
+    }
+
+    if (isNotifyDivider) {
+      return content.charAt(0).toLocaleLowerCase() + content.slice(1);
+    }
+
+    return content.replace('<b>', '').replace('</b>', '');
   },
 };
 

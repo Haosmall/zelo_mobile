@@ -10,7 +10,7 @@ import {Button} from 'react-native-elements';
 import {Icon} from 'react-native-elements';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {useDispatch, useSelector} from 'react-redux';
-import {setModalVisible} from '../redux/globalSlice';
+import {setModalVisible} from '../../redux/globalSlice';
 
 const MessageHeaderModal = ({navigation}) => {
   const {modalVisible} = useSelector(state => state.global);

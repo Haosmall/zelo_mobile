@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import {Button, Divider, Icon, Input} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
-import {voteApi} from '../api';
-import {DEFAULT_ADD_VOTE_MODAL} from '../constants';
-import commonFuc from '../utils/commonFuc';
+import {voteApi} from '../../api';
+import {DEFAULT_ADD_VOTE_MODAL} from '../../constants';
+import commonFuc from '../../utils/commonFuc';
 
 const AddVoteModal = props => {
   const {modalVisible, setModalVisible} = props;
