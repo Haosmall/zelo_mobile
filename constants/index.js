@@ -75,3 +75,7 @@ export const DEFAULT_IMAGE_MODAL = {
   content: [],
   isImage: true,
 };
+export const DEFAULT_REPLY_MESSAGE = {
+  isReply: false,
+  replyMessage: {},
+};

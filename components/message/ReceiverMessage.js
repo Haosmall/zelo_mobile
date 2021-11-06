@@ -17,6 +17,7 @@ import globalStyles, {MAIN_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
+import MessageReply from './MessageReply';
 
 const ReceiverMessage = props => {
   const {
@@ -70,6 +71,13 @@ const ReceiverMessage = props => {
           delayLongPress={500}>
           <View style={styles.receiverContainer}>
             <View style={styles.receiver} key={_id}>
+              {message?.replyMessage &&
+                Object.keys(message?.replyMessage).length > 0 && (
+                  <MessageReply
+                    message={message.replyMessage}
+                    isNewMessage={false}
+                  />
+                )}
               {type === messageType.IMAGE ? (
                 <Image
                   source={{uri: content}}
@@ -112,7 +120,7 @@ const ReceiverMessage = props => {
                 />
               ) : (
                 <View>
-                  {message.tagUsers.length > 0 ? (
+                  {message?.tagUsers?.length > 0 ? (
                     <HTMLView
                       value={commonFuc.convertMessageToHtml(
                         content,

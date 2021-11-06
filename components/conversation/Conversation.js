@@ -48,6 +48,9 @@ const Conversation = props => {
         case messageType.STICKER:
           content = '[Nhãn dán]';
           break;
+        case messageType.HTML:
+          content = '[Văn bản]';
+          break;
         case messageType.VIDEO:
           const fileNameVideo = commonFuc.getFileName(lastMessageContent);
           content = `[Video] ${fileNameVideo}`;

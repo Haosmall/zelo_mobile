@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {Avatar, Button, Icon, Input, ListItem} from 'react-native-elements';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {conversationApi, friendApi} from '../api';
 import FriendItem from '../components/FriendItem';
 import {ERROR_MESSAGE, friendType} from '../constants';
@@ -19,8 +19,9 @@ import commonFuc from '../utils/commonFuc';
 export default function FriendSearchScreen({navigation, route}) {
   const {isAddToGroup, currentConversationId} = route.params;
   const dispatch = useDispatch();
+  const {listFriends} = useSelector(state => state.friend);
 
-  const [listFriends, setListFriends] = useState([]);
+  const [friendList, setFriendList] = useState(listFriends);
   const [listAddToGroup, setListAddToGroup] = useState([]);
   const [errorText, setErrorText] = useState('');
 
@@ -41,26 +42,42 @@ export default function FriendSearchScreen({navigation, route}) {
   const handleSearchFriendChange = userName => {
     inputRef.current = userName;
 
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
+    // if (typingTimeoutRef.current) {
+    //   clearTimeout(typingTimeoutRef.current);
+    // }
 
-    typingTimeoutRef.current = setTimeout(() => {
-      handleSearchFriendSubmit(userName);
-    }, 250);
+    // typingTimeoutRef.current = setTimeout(() => {
+    //   handleSearchFriendSubmit(userName);
+    // }, 250);
+
+    const friendSearchs = listFriends.filter(ele =>
+      ele.name.toLowerCase().includes(userName.toLowerCase()),
+    );
+    setFriendList(friendSearchs);
   };
 
   const handleSearchFriendSubmit = async userName => {
     try {
       // const response = await userApi.fetchUsers(userName);
       const response = await friendApi.fetchFriends({name: userName});
-      setListFriends(response);
+      setFriendList(response);
       console.log(response);
       response.length === 0 && commonFuc.notifyMessage('Không tìm thấy');
     } catch (error) {
       commonFuc.notifyMessage('Không tìm thấy');
     }
   };
+  // const handleSearchFriendSubmit = async userName => {
+  //   try {
+  //     // const response = await userApi.fetchUsers(userName);
+  //     const response = await friendApi.fetchFriends({name: userName});
+  //     setFriendList(response);
+  //     console.log(response);
+  //     response.length === 0 && commonFuc.notifyMessage('Không tìm thấy');
+  //   } catch (error) {
+  //     commonFuc.notifyMessage('Không tìm thấy');
+  //   }
+  // };
 
   const handleAddToGroup = item => {
     const listAddToGroupNew = [...listAddToGroup, item];
@@ -283,7 +300,7 @@ export default function FriendSearchScreen({navigation, route}) {
       </ListItem>
 
       <FlatList
-        data={listFriends}
+        data={friendList}
         keyExtractor={(item, index) => item._id}
         initialNumToRender={12}
         renderItem={({item}) => {

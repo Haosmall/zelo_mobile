@@ -16,6 +16,7 @@ import globalStyles, {MAIN_COLOR, OVERLAY_AVATAR_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
+import MessageReply from './MessageReply';
 import TextMention from './TextMention';
 
 const SenderMessage = props => {
@@ -88,6 +89,15 @@ const SenderMessage = props => {
             ]}>
             {user.name}
           </Text>
+
+          {message?.replyMessage &&
+            Object.keys(message?.replyMessage).length > 0 && (
+              <MessageReply
+                message={message.replyMessage}
+                isNewMessage={false}
+              />
+            )}
+
           {type === messageType.IMAGE ? (
             <Image
               source={{uri: content}}
@@ -126,7 +136,7 @@ const SenderMessage = props => {
             />
           ) : (
             <View>
-              {message.tagUsers.length > 0 ? (
+              {message?.tagUsers?.length > 0 ? (
                 <HTMLView
                   value={commonFuc.convertMessageToHtml(
                     content,

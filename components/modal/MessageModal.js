@@ -15,8 +15,13 @@ import MessageModalButton from '../MessageModalButton';
 const BUTTON_RADIUS = 10;
 
 const MessageModal = props => {
-  const {modalVisible, setModalVisible, setPinMessageVisible, navigation} =
-    props;
+  const {
+    modalVisible,
+    setModalVisible,
+    setPinMessageVisible,
+    navigation,
+    handleOnReplyMessagePress,
+  } = props;
   const {currentConversation, currentConversationId} = useSelector(
     state => state.message,
   );
@@ -72,6 +77,11 @@ const MessageModal = props => {
     handleCloseModal();
   };
 
+  const handleReplyMessage = () => {
+    handleOnReplyMessagePress(messageId);
+    handleCloseModal();
+  };
+
   return (
     <SafeAreaView style={styles.centeredView}>
       <Modal
@@ -108,6 +118,7 @@ const MessageModal = props => {
                   iconName="action-undo"
                   iconType="simple-line-icon"
                   iconColor="#ab8ef0"
+                  onPress={handleReplyMessage}
                 />
 
                 <MessageModalButton
@@ -178,12 +189,14 @@ MessageModal.propTypes = {
   modalVisible: PropTypes.object,
   setModalVisible: PropTypes.func,
   setPinMessageVisible: PropTypes.func,
+  handleOnReplyMessagePress: PropTypes.func,
 };
 
 MessageModal.defaultProps = {
   modalVisible: DEFAULT_MESSAGE_MODAL_VISIBLE,
   setModalVisible: null,
   setPinMessageVisible: null,
+  handleOnReplyMessagePress: null,
 };
 
 const styles = StyleSheet.create({

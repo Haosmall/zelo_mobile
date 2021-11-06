@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Keyboard,
   ScrollView,
@@ -15,13 +15,19 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useSelector} from 'react-redux';
 import {messageApi} from '../../api';
-import {ERROR_MESSAGE, messageType} from '../../constants';
+import {
+  DEFAULT_REPLY_MESSAGE,
+  ERROR_MESSAGE,
+  messageType,
+} from '../../constants';
 import globalStyles, {
+  GREY_COLOR,
   MAIN_COLOR,
   OVERLAY_AVATAR_COLOR,
   WINDOW_WIDTH,
 } from '../../styles';
 import commonFuc from '../../utils/commonFuc';
+import MessageReply from './MessageReply';
 
 const TAG_REGEX = /((\@)\[([^[]*)]\(([^(^)]*)\))/g;
 
@@ -33,6 +39,8 @@ const MessageBottomBar = props => {
     stickyBoardVisible,
     members,
     type,
+    replyMessage,
+    setReplyMessage,
   } = props;
   const [messageValue, setMessageValue] = useState('');
   const [singleFile, setSingleFile] = useState(null);
@@ -43,6 +51,15 @@ const MessageBottomBar = props => {
   const [loadingText, setLoadingText] = useState('upload... 0%');
 
   const tagRef = useRef([]);
+
+  useEffect(() => {
+    const replyUser = replyMessage.replyMessage.user;
+
+    if (type && replyMessage.isReply && userProfile._id !== replyUser._id) {
+      setMessageValue(`@[${replyUser.name}](undefined) `);
+      tagRef.current = [replyUser];
+    }
+  }, [replyMessage]);
 
   const onUploadProgress = percentCompleted => {
     if (percentCompleted < 99) {
@@ -81,13 +98,17 @@ const MessageBottomBar = props => {
         }
       }
 
-      console.table({content, tags, conversationId});
+      const replyMessageId =
+        type && replyMessage.isReply ? replyMessage.replyMessage._id : null;
+
+      console.table({content, tags, conversationId, replyMessageId});
 
       const newMessage = {
         content,
         type: 'TEXT',
         conversationId,
         tags,
+        replyMessageId,
       };
       console.log({newMessage});
       messageApi
@@ -96,6 +117,7 @@ const MessageBottomBar = props => {
           console.log('Send Message Success');
           socket.emit('not-typing', conversationId, userProfile);
           tagRef.current = [];
+          replyMessage.isReply && setReplyMessage(DEFAULT_REPLY_MESSAGE);
         })
         .catch(err => console.error('Send Message Fail', err));
     } else {
@@ -278,6 +300,22 @@ const MessageBottomBar = props => {
 
   return (
     <>
+      {replyMessage.isReply && (
+        <View
+          style={{
+            width: '100%',
+            backgroundColor: '#fff',
+            paddingHorizontal: 15,
+            paddingVertical: 8,
+          }}>
+          <MessageReply
+            message={replyMessage.replyMessage}
+            onClose={() => setReplyMessage(DEFAULT_REPLY_MESSAGE)}
+            isNewMessage={true}
+          />
+        </View>
+      )}
+
       <View style={styles.footer}>
         <Spinner
           visible={isLoading}
@@ -379,6 +417,8 @@ MessageBottomBar.propTypes = {
   showImageModal: PropTypes.func,
   stickyBoardVisible: PropTypes.bool,
   members: PropTypes.array,
+  replyMessage: PropTypes.object,
+  setReplyMessage: PropTypes.func,
 };
 
 MessageBottomBar.defaultProps = {
@@ -387,6 +427,8 @@ MessageBottomBar.defaultProps = {
   showImageModal: null,
   stickyBoardVisible: false,
   members: [],
+  replyMessage: DEFAULT_REPLY_MESSAGE,
+  setReplyMessage: null,
 };
 
 const styles = StyleSheet.create({

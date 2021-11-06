@@ -17,16 +17,16 @@ import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import AnimatedEllipsis from '../components/AnimatedEllipsis';
 import ChatMessage from '../components/message/ChatMessage';
-import ImagePickerModal from '../components/modal/ImagePickerModal';
 import MessageBottomBar from '../components/message/MessageBottomBar';
 import MessageDivider from '../components/message/MessageDivider';
 import MessageHeaderLeft from '../components/message/MessageHeaderLeft';
+import PinnedMessage from '../components/message/PinnedMessage';
+import ImagePickerModal from '../components/modal/ImagePickerModal';
 import MessageModal from '../components/modal/MessageModal';
 import PinMessageModal from '../components/modal/PinMessageModal';
-import PinnedMessage from '../components/message/PinnedMessage';
 import ReactionModal from '../components/modal/ReactionModal';
-import StickyBoard from '../components/StickyBoard';
 import ViewImageModal from '../components/modal/ViewImageModal';
+import StickyBoard from '../components/StickyBoard';
 import {
   DEFAULT_IMAGE_MODAL,
   DEFAULT_MESSAGE_MODAL_VISIBLE,
@@ -34,6 +34,7 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PIN_MESSAGE_MODAL,
   DEFAULT_REACTION_MODAL_VISIBLE,
+  DEFAULT_REPLY_MESSAGE,
 } from '../constants';
 import {
   clearMessagePages,
@@ -70,6 +71,7 @@ export default function MessageScreen({navigation, route}) {
     DEFAULT_PIN_MESSAGE_MODAL,
   );
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
+  const [replyMessage, setReplyMessage] = useState(DEFAULT_REPLY_MESSAGE);
   const [stickyBoardVisible, setStickyBoardVisible] = useState(false);
   const [apiParams, setApiParams] = useState({page, size});
 
@@ -89,6 +91,16 @@ export default function MessageScreen({navigation, route}) {
     dispatch(fetchChannels({conversationId: currentConversation._id}));
     navigation.navigate('Tùy chọn', {
       conversationId,
+    });
+  };
+
+  const handleOnReplyMessagePress = messageId => {
+    const replyMessage = messages.find(
+      messageEle => messageEle._id === messageId,
+    );
+    setReplyMessage({
+      isReply: true,
+      replyMessage,
     });
   };
 
@@ -249,6 +261,8 @@ export default function MessageScreen({navigation, route}) {
               stickyBoardVisible={stickyBoardVisible}
               members={members}
               type={currentConversation.type}
+              replyMessage={replyMessage}
+              setReplyMessage={setReplyMessage}
             />
 
             <StickyBoard
@@ -270,6 +284,7 @@ export default function MessageScreen({navigation, route}) {
             setModalVisible={setModalVisible}
             setPinMessageVisible={setPinMessageVisible}
             navigation={navigation}
+            handleOnReplyMessagePress={handleOnReplyMessagePress}
           />
           {pinMessageVisible.isVisible && (
             <PinMessageModal
