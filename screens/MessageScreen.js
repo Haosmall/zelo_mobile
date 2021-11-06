@@ -49,8 +49,14 @@ export default function MessageScreen({navigation, route}) {
   // Props
   const {conversationId} = route.params;
   const dispatch = useDispatch();
-  const {messages, messagePages, currentConversation, usersTyping, isLoading} =
-    useSelector(state => state.message);
+  const {
+    messages,
+    messagePages,
+    currentConversation,
+    usersTyping,
+    isLoading,
+    members,
+  } = useSelector(state => state.message);
   const {currentUserId, keyboardHeight} = useSelector(state => state.global);
   // const {totalPages} = messagePages;
 
@@ -241,6 +247,8 @@ export default function MessageScreen({navigation, route}) {
               showStickyBoard={setStickyBoardVisible}
               showImageModal={setImageModalVisible}
               stickyBoardVisible={stickyBoardVisible}
+              members={members}
+              type={currentConversation.type}
             />
 
             <StickyBoard

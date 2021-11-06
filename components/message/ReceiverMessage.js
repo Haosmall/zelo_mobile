@@ -13,7 +13,7 @@ import HTMLView from 'react-native-htmlview';
 import RNUrlPreview from 'react-native-url-preview';
 import {useSelector} from 'react-redux';
 import {messageType} from '../../constants';
-import globalStyles from '../../styles';
+import globalStyles, {MAIN_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
@@ -31,7 +31,7 @@ const ReceiverMessage = props => {
     isLastMessage,
   } = props;
 
-  const {_id, isDeleted, type} = message;
+  const {_id, isDeleted, type, tagUsers, replyMessage} = message;
 
   const {listLastViewer} = useSelector(state => state.message);
   const {currentUserId} = useSelector(state => state.global);
@@ -112,7 +112,26 @@ const ReceiverMessage = props => {
                 />
               ) : (
                 <View>
-                  <Text style={contentStyle}>{content}</Text>
+                  {message.tagUsers.length > 0 ? (
+                    <HTMLView
+                      value={commonFuc.convertMessageToHtml(
+                        content,
+                        [...tagUsers]
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .reverse(),
+                      )}
+                      stylesheet={{
+                        p: {fontSize: 13, flexWrap: 'wrap'},
+                        span: {
+                          fontSize: 13,
+                          flexWrap: 'wrap',
+                          color: MAIN_COLOR,
+                        },
+                      }}
+                    />
+                  ) : (
+                    <Text style={contentStyle}>{content}</Text>
+                  )}
                   <RNUrlPreview text={content} />
                 </View>
               )}

@@ -1,8 +1,8 @@
 import {CardStyleInterpolators} from '@react-navigation/stack';
-import LinearGradient from 'react-native-linear-gradient';
-import {Dimensions, StyleSheet} from 'react-native';
 // import {LinearGradient} from 'expo-linear-gradient';
 import React from 'react';
+import {Dimensions, StyleSheet} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 export const WINDOW_WIDTH = Dimensions.get('window').width;
 export const WINDOW_HEIGHT = Dimensions.get('window').height;

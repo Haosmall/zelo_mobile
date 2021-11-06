@@ -49,7 +49,7 @@ const MessageModal = props => {
     handleCloseModal();
   };
   const handlePinMessage = async () => {
-    if (pinMessages.length > 3) {
+    if (pinMessages.length === 3) {
       setPinMessageVisible({
         isVisible: true,
         isError: true,

@@ -25,7 +25,7 @@ export default function ForwardMessageScreen({navigation, route}) {
 
   const handleOnchangeText = text => {
     const conversationSearchs = conversations.filter(ele =>
-      ele.name.includes(text),
+      ele.name.toLowerCase().includes(text.toLowerCase()),
     );
     setListConversations(conversationSearchs);
   };

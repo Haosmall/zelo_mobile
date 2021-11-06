@@ -34,6 +34,7 @@ import {
   fetchChannels,
   fetchConversations,
   fetchListLastViewer,
+  fetchMembers,
   renameConversation,
   setNotification,
   updateCurrentConversation,
@@ -264,6 +265,7 @@ export default function HomeScreen({navigation}) {
     // dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
     dispatch(fetchListLastViewer({conversationId}));
+    dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,

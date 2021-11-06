@@ -10,6 +10,7 @@ import {
   clearMessagePages,
   fetchConversations,
   fetchListLastViewer,
+  fetchMembers,
   updateCurrentConversation,
 } from '../redux/messageSlice';
 import dateUtils from './dateUtils';
@@ -173,6 +174,18 @@ const commonFuc = {
 
     return content.replace('<b>', '').replace('</b>', '');
   },
+
+  convertMessageToHtml: (content, tagUsers) => {
+    let contentHtml = content;
+
+    for (let tagUser of tagUsers) {
+      contentHtml = contentHtml.replaceAll(
+        `@${tagUser.name}`,
+        `<span>@${tagUser.name}</span>`,
+      );
+    }
+    return `<p>${contentHtml}</p>`;
+  },
 };
 
 export const handleCreateChat = async (
@@ -204,6 +217,7 @@ const handleEnterChat = (
     dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
     dispatch(fetchListLastViewer({conversationId}));
+    dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);
   }
   navigation.navigate('Nhắn tin', {

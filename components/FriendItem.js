@@ -16,6 +16,7 @@ import {
   clearMessagePages,
   fetchConversations,
   fetchListLastViewer,
+  fetchMembers,
   updateCurrentConversation,
 } from '../redux/messageSlice';
 import {OVERLAY_AVATAR_COLOR} from '../styles';
@@ -167,6 +168,7 @@ export default function FriendItem(props) {
     dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
     dispatch(fetchListLastViewer({conversationId}));
+    dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,

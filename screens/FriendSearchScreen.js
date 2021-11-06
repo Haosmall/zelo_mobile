@@ -10,6 +10,7 @@ import {
   clearMessagePages,
   fetchConversations,
   fetchListLastViewer,
+  fetchMembers,
   updateCurrentConversation,
 } from '../redux/messageSlice';
 import {GREY_COLOR, OVERLAY_AVATAR_COLOR_GREY} from '../styles';
@@ -123,6 +124,7 @@ export default function FriendSearchScreen({navigation, route}) {
     dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
     dispatch(fetchListLastViewer({conversationId}));
+    dispatch(fetchMembers({conversationId}));
     console.log('group: : ', conversationId);
     navigation.replace('Nhắn tin', {
       conversationId,

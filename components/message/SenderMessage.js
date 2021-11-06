@@ -12,10 +12,11 @@ import HTMLView from 'react-native-htmlview';
 import RNUrlPreview from 'react-native-url-preview';
 import {useSelector} from 'react-redux';
 import {messageType} from '../../constants';
-import globalStyles, {OVERLAY_AVATAR_COLOR} from '../../styles';
+import globalStyles, {MAIN_COLOR, OVERLAY_AVATAR_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
+import TextMention from './TextMention';
 
 const SenderMessage = props => {
   const {
@@ -31,7 +32,7 @@ const SenderMessage = props => {
 
   const {currentConversation} = useSelector(state => state.message);
 
-  const {_id, user, isDeleted, type} = message;
+  const {_id, user, isDeleted, type, tagUsers, replyMessage} = message;
 
   const contentStyle = isDeleted
     ? styles.messageRecall
@@ -125,7 +126,22 @@ const SenderMessage = props => {
             />
           ) : (
             <View>
-              <Text style={contentStyle}>{content}</Text>
+              {message.tagUsers.length > 0 ? (
+                <HTMLView
+                  value={commonFuc.convertMessageToHtml(
+                    content,
+                    [...tagUsers]
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .reverse(),
+                  )}
+                  stylesheet={{
+                    p: {fontSize: 13, flexWrap: 'wrap'},
+                    span: {fontSize: 13, flexWrap: 'wrap', color: MAIN_COLOR},
+                  }}
+                />
+              ) : (
+                <Text style={contentStyle}>{content}</Text>
+              )}
               <RNUrlPreview text={content} />
             </View>
           )}
