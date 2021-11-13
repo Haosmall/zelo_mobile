@@ -30,13 +30,19 @@ export const useKeyboardHeight = () => {
   }
 
   useEffect(() => {
-    const didShow = Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
-    const didHide = Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+    const keyboardDidShow = Keyboard.addListener(
+      'keyboardDidShow',
+      onKeyboardDidShow,
+    );
+    const keyboardDidHide = Keyboard.addListener(
+      'keyboardDidHide',
+      onKeyboardDidHide,
+    );
     return () => {
       // Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow);
       // Keyboard.removeListener('keyboardDidHide', onKeyboardDidHide);
-      didShow.remove();
-      didHide.remove();
+      keyboardDidShow.remove();
+      keyboardDidHide.remove();
     };
   }, []);
 

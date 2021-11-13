@@ -70,9 +70,9 @@ const PhonebookScreen = ({navigation}) => {
     if (!contacts) return [];
     const phonesTemp = contacts.map(contactEle => {
       const phone = contactEle.phoneNumbers[0].number
-        .replaceAll(/\s/g, '')
-        .replaceAll(/-/g, '')
-        .replaceAll('+84', '0');
+        .replace(/\s/g, '')
+        .replace(/-/g, '')
+        .replace('+84', '0');
       const name = contactEle.displayName;
       return {name, phone};
     });

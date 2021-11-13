@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Linking, Platform, StyleSheet, View} from 'react-native';
 import {Avatar, Button, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {conversationApi, friendApi} from '../api';
@@ -17,6 +17,7 @@ import {
   fetchConversations,
   fetchListLastViewer,
   fetchMembers,
+  setCurrentChannel,
   updateCurrentConversation,
 } from '../redux/messageSlice';
 import {OVERLAY_AVATAR_COLOR} from '../styles';
@@ -98,7 +99,15 @@ export default function FriendItem(props) {
         break;
       case friendType.DONT_HAVE_ACCOUNT:
         console.log('Moi tao tk');
-        handleAddFriendRequest();
+
+        const messageBody =
+          'Moi ban cai dat Zelo de nhan tin va goi dien thoai mien phi: https://zelochat.xyz';
+
+        const url = `sms:${userId}${
+          Platform.OS === 'ios' ? '&' : '?'
+        }body=${messageBody}`;
+
+        Linking.openURL(url);
         break;
       case 'DETAILS':
         break;
@@ -167,6 +176,12 @@ export default function FriendItem(props) {
   const handleEnterChat = conversationId => {
     dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
+    dispatch(
+      setCurrentChannel({
+        currentChannelId: conversationId,
+        currentChannelName: conversationId,
+      }),
+    );
     dispatch(fetchListLastViewer({conversationId}));
     dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);

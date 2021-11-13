@@ -25,7 +25,9 @@ const StickyBoard = props => {
   const bottom = useAnimatedBottom(visible, height);
 
   const {stickers} = useSelector(state => state.global);
-  const {currentConversationId} = useSelector(state => state.message);
+  const {currentConversationId, currentChannelId} = useSelector(
+    state => state.message,
+  );
 
   const [currentStickerCollection, setCurrentStickerCollection] = useState(
     stickers?.[0],
@@ -41,10 +43,13 @@ const StickyBoard = props => {
   };
 
   const handleSendSticker = async stickerUrl => {
+    const channelId =
+      currentChannelId !== currentConversationId ? currentChannelId : null;
     const newMessage = {
       content: stickerUrl,
       type: 'STICKER',
       conversationId: currentConversationId,
+      channelId,
     };
 
     try {

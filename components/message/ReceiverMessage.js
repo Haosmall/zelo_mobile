@@ -67,7 +67,7 @@ const ReceiverMessage = props => {
         <MessageNotifyDivider message={message} />
       ) : (
         <TouchableWithoutFeedback
-          onLongPress={handleOpenOptionModal}
+          onLongPress={isDeleted ? null : handleOpenOptionModal}
           delayLongPress={500}>
           <View style={styles.receiverContainer}>
             <View style={styles.receiver} key={_id}>

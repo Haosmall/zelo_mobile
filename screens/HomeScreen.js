@@ -15,7 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {io} from 'socket.io-client';
 import Conversation from '../components/conversation/Conversation';
 import MessageHeaderModal from '../components/modal/MessageHeaderModal';
-import {REACT_APP_SOCKET_URL} from '../constants';
+import {DEFAULT_MESSAGE_PARAMS, REACT_APP_SOCKET_URL} from '../constants';
 import {
   cancelMyFriendRequest,
   deleteFriend,
@@ -28,15 +28,20 @@ import {
 } from '../redux/friendSlice';
 import {fetchStickers, initSocket} from '../redux/globalSlice';
 import {
+  addChannelMessage,
   addMessage,
   addReaction,
+  deleteChannel,
   deleteMessage,
   fetchChannels,
   fetchConversations,
   fetchListLastViewer,
   fetchMembers,
+  fetchMessages,
   renameConversation,
+  setCurrentChannel,
   setNotification,
+  updateChannel,
   updateCurrentConversation,
   updateVoteMessage,
   usersNotTyping,
@@ -158,21 +163,27 @@ export default function HomeScreen({navigation}) {
 
     socket.on('update-channel', ({_id, name, conversationId}) => {
       dispatch(fetchChannels({conversationId}));
+      dispatch(
+        updateChannel({channelId: _id, conversationId, newChannelName: name}),
+      );
     });
 
     socket.on('delete-channel', ({conversationId, channelId}) => {
-      dispatch(fetchChannels({conversationId}));
+      dispatch(deleteChannel({conversationId, channelId}));
+      // dispatch(
+      //   fetchMessages({conversationId, apiParams: DEFAULT_MESSAGE_PARAMS}),
+      // );
     });
 
     socket.on(
       'new-message-of-channel',
       (conversationId, channelId, message) => {
-        console.log({
+        console.log('new-message-of-channel', {
           conversationId,
           channelId,
           message,
         });
-        // dispatch(addChannelMessage({conversationId, channelId, message}));
+        dispatch(addChannelMessage({conversationId, channelId, message}));
         // dispatch(
         //   setNotification({conversationId, message, userId: currentUserId}),
         // );
@@ -264,6 +275,12 @@ export default function HomeScreen({navigation}) {
   ) => {
     // dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
+    dispatch(
+      setCurrentChannel({
+        currentChannelId: conversationId,
+        currentChannelName: conversationId,
+      }),
+    );
     dispatch(fetchListLastViewer({conversationId}));
     dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);

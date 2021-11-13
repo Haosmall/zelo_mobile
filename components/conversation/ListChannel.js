@@ -3,21 +3,65 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Button, Icon, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
+import {DEFAULT_MESSAGE_PARAMS} from '../../constants';
+import {
+  clearChannelMessages,
+  clearMessages,
+  fetchChannelMessages,
+  fetchMessages,
+  setCurrentChannel,
+} from '../../redux/messageSlice';
+import {fetchPinMessages} from '../../redux/pinSlice';
 import OptionButton from './OptionButton';
 
 const ListChannel = props => {
-  const {channels, currentConversation} = useSelector(state => state.message);
+  const {navigation, onAddChannelPress} = props;
+  const {channels, currentConversation, currentConversationId} = useSelector(
+    state => state.message,
+  );
   const dispatch = useDispatch();
 
   const [isShowMore, setIsShowMore] = useState(false);
 
   const getNumberUnreadGeneralChannel = () => {};
 
+  const handleOnChannelPress = (currentChannelId, currentChannelName) => {
+    dispatch(
+      setCurrentChannel({
+        currentChannelId,
+        currentChannelName,
+      }),
+    );
+
+    dispatch(clearChannelMessages());
+
+    if (currentChannelId === currentConversationId) {
+      dispatch(clearMessages());
+      dispatch(
+        fetchMessages({
+          conversationId: currentChannelId,
+          apiParams: DEFAULT_MESSAGE_PARAMS,
+        }),
+      );
+      dispatch(fetchPinMessages({conversationId: currentChannelId}));
+    } else {
+      dispatch(
+        fetchChannelMessages({
+          channelId: currentChannelId,
+          apiParams: DEFAULT_MESSAGE_PARAMS,
+        }),
+      );
+    }
+
+    navigation.goBack();
+  };
+
   return (
     <View>
       <TouchableOpacity
-      //  onPress={onPress}
-      >
+        onPress={() =>
+          handleOnChannelPress(currentConversationId, currentConversationId)
+        }>
         <ListItem>
           <Icon type="material-icon" name="tag" />
           <ListItem.Content>
@@ -42,9 +86,9 @@ const ListChannel = props => {
             index < 2 && (
               <View key={channel._id}>
                 <TouchableOpacity
-
-                //  onPress={onPress}
-                >
+                  onPress={() =>
+                    handleOnChannelPress(channel._id, channel.name)
+                  }>
                   <ListItem>
                     <Icon type="material-icon" name="tag" />
                     <ListItem.Content>
@@ -71,9 +115,9 @@ const ListChannel = props => {
             index >= 2 && (
               <View key={channel._id}>
                 <TouchableOpacity
-
-                //  onPress={onPress}
-                >
+                  onPress={() =>
+                    handleOnChannelPress(channel._id, channel.name)
+                  }>
                   <ListItem>
                     <Icon type="material-icon" name="tag" />
                     <ListItem.Content>
@@ -106,7 +150,7 @@ const ListChannel = props => {
       )}
       <Button
         title="Thêm channel"
-        // onPress={() => setIsShowMore(!isShowMore)}
+        onPress={onAddChannelPress}
         type="outline"
         containerStyle={{marginHorizontal: 10, marginVertical: 5}}
         buttonStyle={{marginHorizontal: 10}}
@@ -116,10 +160,10 @@ const ListChannel = props => {
 };
 
 ListChannel.propTypes = {
-  aa: PropTypes.string,
+  onAddChannelPress: PropTypes.func,
 };
 
-ListChannel.defaultProps = {};
+ListChannel.defaultProps = {onAddChannelPress: null};
 export default ListChannel;
 
 const styles = StyleSheet.create({

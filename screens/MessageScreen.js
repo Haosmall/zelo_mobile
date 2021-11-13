@@ -30,6 +30,7 @@ import StickyBoard from '../components/StickyBoard';
 import {
   DEFAULT_IMAGE_MODAL,
   DEFAULT_MESSAGE_MODAL_VISIBLE,
+  DEFAULT_MESSAGE_PARAMS,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   DEFAULT_PIN_MESSAGE_MODAL,
@@ -38,6 +39,7 @@ import {
 } from '../constants';
 import {
   clearMessagePages,
+  fetchChannelMessages,
   fetchChannels,
   fetchMessages,
 } from '../redux/messageSlice';
@@ -54,14 +56,18 @@ export default function MessageScreen({navigation, route}) {
     messages,
     messagePages,
     currentConversation,
+    currentChannelId,
     usersTyping,
     isLoading,
     members,
+    channelPages,
+    channelMessages,
   } = useSelector(state => state.message);
   const {currentUserId, keyboardHeight} = useSelector(state => state.global);
   // const {totalPages} = messagePages;
 
   // State
+  const [isGeneralChannel, setIsGeneralChannel] = useState(true);
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_MESSAGE_MODAL_VISIBLE,
   );
@@ -73,7 +79,7 @@ export default function MessageScreen({navigation, route}) {
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
   const [replyMessage, setReplyMessage] = useState(DEFAULT_REPLY_MESSAGE);
   const [stickyBoardVisible, setStickyBoardVisible] = useState(false);
-  const [apiParams, setApiParams] = useState({page, size});
+  const [apiParams, setApiParams] = useState(DEFAULT_MESSAGE_PARAMS);
 
   // Ref
   const scrollViewRef = useRef(null);
@@ -95,7 +101,9 @@ export default function MessageScreen({navigation, route}) {
   };
 
   const handleOnReplyMessagePress = messageId => {
-    const replyMessage = messages.find(
+    const messageList = isGeneralChannel ? messages : channelMessages;
+
+    const replyMessage = messageList.find(
       messageEle => messageEle._id === messageId,
     );
     setReplyMessage({
@@ -130,21 +138,26 @@ export default function MessageScreen({navigation, route}) {
       goBack={handleGoBack}
       totalMembers={currentConversation?.totalMembers}
       name={currentConversation?.name}
+      currentConversationId={conversationId}
     />
   );
 
   useEffect(() => {
     console.log('Message: ', currentUserId);
+
     dispatch(fetchMessages({conversationId, apiParams}));
     dispatch(fetchPinMessages({conversationId}));
   }, []);
+
   useEffect(() => {
     navigation.setOptions({
       title: '',
       headerLeft,
       headerRight,
     });
-  }, [currentConversation]);
+    setIsGeneralChannel(conversationId === currentChannelId);
+    setApiParams(DEFAULT_MESSAGE_PARAMS);
+  }, [currentConversation, currentChannelId]);
 
   // useLayoutEffect(() => {
   //   navigation.setOptions({
@@ -156,7 +169,8 @@ export default function MessageScreen({navigation, route}) {
 
   const renderMessage = (currentMessage, index) => {
     const isMyMessage = currentUserId === currentMessage.user._id;
-    const nextMessage = messages?.[index + 1];
+    const messageList = isGeneralChannel ? messages : channelMessages;
+    const nextMessage = messageList?.[index + 1];
 
     const nextMessageTime = new Date(nextMessage?.createdAt);
     const messageTime = new Date(currentMessage.createdAt);
@@ -191,11 +205,23 @@ export default function MessageScreen({navigation, route}) {
   const goToNextPage = async () => {
     console.log('Scroll Top');
     const currentPage = apiParams.page;
-    if (currentPage < messagePages?.totalPages) {
-      const item = messages[0];
+
+    const totalPages = isGeneralChannel
+      ? messagePages?.totalPages
+      : channelPages?.totalPages;
+
+    if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
       const newParam = {...apiParams, page: nextPage};
-      await dispatch(fetchMessages({conversationId, apiParams: newParam}));
+
+      isGeneralChannel
+        ? await dispatch(fetchMessages({conversationId, apiParams: newParam}))
+        : await dispatch(
+            fetchChannelMessages({
+              channelId: currentChannelId,
+              apiParams: newParam,
+            }),
+          );
 
       setApiParams(newParam);
       console.log('currentPage: ', currentPage);
@@ -215,35 +241,38 @@ export default function MessageScreen({navigation, route}) {
           style={styles.container}
           keyboardVerticalOffset={90}>
           <>
-            {messages.length > 0 ? (
-              <>
-                <PinnedMessage openPinMessage={setPinMessageVisible} />
-                <FlatList
-                  onScroll={event =>
-                    onContentOffsetChanged(event.nativeEvent.contentOffset.y)
-                  }
-                  onEndReached={() => {
-                    goToNextPage();
-                  }}
-                  data={messages}
-                  keyExtractor={item => item._id}
-                  // keyExtractor={(item, index) => `${item._id}-${index}`}
-                  renderItem={({item, index}) => renderMessage(item, index)}
-                  initialNumToRender={20}
-                  ListFooterComponent={() =>
-                    isLoading ? <MessageDivider isLoading={true} /> : null
-                  }
-                  inverted
-                  contentContainerStyle={{paddingBottom: 15}}
-                  // ListHeaderComponent={() => <Text>sss</Text>}
-                  // stickyHeaderIndices={[0]}
-                />
-              </>
+            {/* {messages.length > 0 ? (
+              <></>
             ) : (
               <ScrollView>
-                {/* <EmptyData content="Không có tin nhắn" /> */}
+                <EmptyData content="Không có tin nhắn" />
               </ScrollView>
+            )} */}
+
+            {isGeneralChannel && (
+              <PinnedMessage openPinMessage={setPinMessageVisible} />
             )}
+            <FlatList
+              // onScroll={event =>
+              //   onContentOffsetChanged(event.nativeEvent.contentOffset.y)
+              // }
+              onEndReached={() => {
+                goToNextPage();
+              }}
+              data={isGeneralChannel ? messages : channelMessages}
+              keyExtractor={item => item._id}
+              // keyExtractor={(item, index) => `${item._id}-${index}`}
+              renderItem={({item, index}) => renderMessage(item, index)}
+              initialNumToRender={20}
+              ListFooterComponent={() =>
+                isLoading ? <MessageDivider isLoading={true} /> : null
+              }
+              inverted
+              contentContainerStyle={{paddingBottom: 15}}
+              // ListHeaderComponent={() => <Text>sss</Text>}
+              // stickyHeaderIndices={[0]}
+            />
+
             {usersTyping.length > 0 && (
               <View style={styles.typingContainer}>
                 <View style={styles.typingWrap}>
@@ -259,7 +288,9 @@ export default function MessageScreen({navigation, route}) {
               showStickyBoard={setStickyBoardVisible}
               showImageModal={setImageModalVisible}
               stickyBoardVisible={stickyBoardVisible}
-              members={members}
+              members={members.map(member => {
+                return {...member, id: member._id};
+              })}
               type={currentConversation.type}
               replyMessage={replyMessage}
               setReplyMessage={setReplyMessage}

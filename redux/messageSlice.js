@@ -23,6 +23,7 @@ const initialState = {
   currentChannelId: '',
   channelPages: {},
   channelMessages: [],
+  currentChannelName: '',
 };
 
 export const fetchConversations = createAsyncThunk(
@@ -150,7 +151,10 @@ const messageSlice = createSlice({
         conversationEle => conversationEle._id !== conversationId,
       );
 
-      if (conversationId === state.currentConversationId) {
+      if (
+        conversationId === state.currentConversationId &&
+        state.currentChannelId === state.currentConversationId
+      ) {
         const length = state.messages.length;
 
         if (length) {
@@ -169,7 +173,7 @@ const messageSlice = createSlice({
       state.conversations = [seachConversation, ...conversationTempt];
     },
 
-    // TODO:---------------------- addMessage ----------------------
+    // TODO:---------------------- addChannelMessage ----------------------
     addChannelMessage: (state, action) => {
       const {conversationId, channelId, message} = action.payload;
 
@@ -239,7 +243,12 @@ const messageSlice = createSlice({
           const seachMessage = messages[index];
           const newMessage = [...messages];
 
-          newMessage[index] = {...seachMessage, isDeleted: true};
+          newMessage[index] = {
+            _id: seachMessage._id,
+            isDeleted: true,
+            user: seachMessage.user,
+            createdAt: seachMessage.createdAt,
+          };
           state.messages = newMessage.reverse();
         }
       }
@@ -469,9 +478,57 @@ const messageSlice = createSlice({
       state.usersTyping = newUsersTyping;
     },
 
-    // TODO:---------------------- setCurrentChannelId ----------------------
-    setCurrentChannelId: (state, action) => {
-      state.currentChannelId = action.payload;
+    // TODO:---------------------- setCurrentChannel ----------------------
+    setCurrentChannel: (state, action) => {
+      const {currentChannelId, currentChannelName} = action.payload;
+      state.currentChannelId = currentChannelId;
+      state.currentChannelName = currentChannelName;
+    },
+
+    // TODO:---------------------- clearChannelMessages ----------------------
+    clearChannelMessages: (state, action) => {
+      state.channelMessages = [];
+    },
+
+    // TODO:---------------------- updateChannel ----------------------
+    updateChannel: (state, action) => {
+      const {channelId, conversationId, newChannelName} = action.payload;
+      const currentChannelId = state.currentChannelId;
+
+      if (currentChannelId === channelId) {
+        state.currentChannelName = newChannelName;
+      }
+
+      const channels = state.channels;
+
+      const channelIndex = channels.findIndex(
+        channelEle => channelEle._id === channelId,
+      );
+
+      const oldChannel = channels[channelIndex];
+
+      state.channels[channelIndex] = {...oldChannel, name: newChannelName};
+    },
+
+    // TODO:---------------------- deleteChannel ----------------------
+    deleteChannel: (state, action) => {
+      const {channelId, conversationId} = action.payload;
+
+      const oldChannels = state.channels;
+      const newChannels = oldChannels.filter(
+        channelEle => channelEle._id !== channelId,
+      );
+
+      state.channels = newChannels;
+      state.messages = [];
+      state.channelMessages = [];
+      state.currentChannelId = conversationId;
+      state.currentChannelName = conversationId;
+    },
+
+    // TODO:---------------------- clearMessages ----------------------
+    clearMessages: (state, action) => {
+      state.messages = [];
     },
 
     // TODO:---------------------- resetMessageSlice ----------------------
@@ -517,6 +574,7 @@ const messageSlice = createSlice({
       };
 
       state.currentConversationId = conversationId;
+      state.currentChannelId = conversationId;
       state.messagePages = messages;
       if (isSendMessage) {
         console.log('fext mess send');
@@ -559,7 +617,7 @@ const messageSlice = createSlice({
         state.channelMessages = messages.data.reverse();
       } else {
         console.log('fext mess heare');
-        const temp = [...messages.data, ...state.messages.reverse()];
+        const temp = [...messages.data, ...state.channelMessages.reverse()];
         state.channelMessages = commonFuc
           .getUniqueListBy(temp, '_id')
           .reverse();
@@ -650,7 +708,11 @@ export const {
   usersTyping,
   usersNotTyping,
   resetMessageSlice,
-  setCurrentChannelId,
   addChannelMessage,
+  setCurrentChannel,
+  clearChannelMessages,
+  clearMessages,
+  updateChannel,
+  deleteChannel,
 } = actions;
 export default reducer;

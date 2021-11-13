@@ -2,9 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-elements';
+import {useSelector} from 'react-redux';
 
 function MessageHeaderLeft(props) {
-  const {goBack, totalMembers, name} = props;
+  const {goBack, totalMembers, name, currentConversationId} = props;
+  const {currentChannelId, currentChannelName} = useSelector(
+    state => state.message,
+  );
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={goBack}>
@@ -15,10 +19,15 @@ function MessageHeaderLeft(props) {
           marginLeft: 20,
         }}>
         <Text style={styles.headerTitle}>{name}</Text>
-        {totalMembers > 2 && (
-          <Text
-            style={styles.headerSubTitle}>{`${totalMembers} thành viên`}</Text>
-        )}
+        {totalMembers > 2 &&
+          (currentChannelId === currentConversationId ? (
+            <Text
+              style={
+                styles.headerSubTitle
+              }>{`${totalMembers} thành viên`}</Text>
+          ) : (
+            <Text style={styles.headerSubTitle}>{currentChannelName}</Text>
+          ))}
       </View>
     </View>
   );
@@ -28,12 +37,14 @@ MessageHeaderLeft.propTypes = {
   totalMembers: PropTypes.number,
   goBack: PropTypes.func,
   name: PropTypes.string,
+  currentConversationId: PropTypes.string,
 };
 
 MessageHeaderLeft.defaultProps = {
   totalMembers: 2,
   goBack: null,
   name: '',
+  currentConversationId: '',
 };
 
 export default MessageHeaderLeft;

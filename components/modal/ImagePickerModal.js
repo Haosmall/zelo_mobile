@@ -22,7 +22,9 @@ import commonFuc from '../../utils/commonFuc';
 const ImagePickerModal = props => {
   const {modalVisible, setModalVisible} = props;
 
-  const {currentConversationId} = useSelector(state => state.message);
+  const {currentConversationId, currentChannelId} = useSelector(
+    state => state.message,
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('upload... 0%');
@@ -107,9 +109,13 @@ const ImagePickerModal = props => {
   const handleSendImage = async (file, isVideo) => {
     console.log('filePath: ', file);
 
+    const channelId =
+      currentChannelId !== currentConversationId ? currentChannelId : null;
+
     const params = {
       type: isVideo ? messageType.VIDEO : messageType.IMAGE,
       conversationId: currentConversationId,
+      channelId,
     };
 
     if (isVideo) {

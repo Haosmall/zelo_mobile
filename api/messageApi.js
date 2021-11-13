@@ -30,13 +30,14 @@ const messageApi = {
   },
 
   sendFileBase64Message: (file, params, uploadProgress) => {
-    const {type, conversationId} = params;
+    const {type, conversationId, channelId} = params;
     console.log('file type: ', typeof file);
 
     const config = {
       params: {
         type,
         conversationId,
+        channelId,
       },
 
       onUploadProgress: progressEvent => {
@@ -44,7 +45,6 @@ const messageApi = {
           let percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total,
           );
-          console.log('percentCompleted: ', percentCompleted);
           uploadProgress(percentCompleted);
         }
       },

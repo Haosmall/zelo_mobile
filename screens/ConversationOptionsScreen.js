@@ -17,6 +17,7 @@ import ListChannel from '../components/conversation/ListChannel';
 import OptionButton from '../components/conversation/OptionButton';
 import RenameConversationModal from '../components/modal/RenameConversationModal';
 import {
+  DEFAULT_ADD_CHANNEL_MODAL,
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
   DELETE_GROUP_MESSAGE,
@@ -28,6 +29,7 @@ import {useGoback} from '../hooks';
 import {fetchFiles, fetchMembers} from '../redux/messageSlice';
 import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
+import AddChannelModal from '../components/modal/AddChannelModal';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId} = route.params;
@@ -44,6 +46,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_RENAME_CONVERSATION_MODAL,
   );
+  const [addChannel, setAddChannel] = useState(DEFAULT_ADD_CHANNEL_MODAL);
   const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
 
   useGoback(navigation);
@@ -133,6 +136,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
     navigation.navigate('Thành viên');
   };
 
+  const handleAddNewChannel = () => {
+    setAddChannel({...DEFAULT_ADD_CHANNEL_MODAL, isVisible: true});
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -180,7 +187,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
 
         {type && (
           <Pressable style={globalStyles.viewEle}>
-            <ListChannel />
+            <ListChannel
+              navigation={navigation}
+              onAddChannelPress={handleAddNewChannel}
+            />
           </Pressable>
         )}
 
@@ -236,6 +246,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
       />
+
+      {addChannel.isVisible && (
+        <AddChannelModal modalProps={addChannel} onShowModal={setAddChannel} />
+      )}
     </SafeAreaView>
   );
 }

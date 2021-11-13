@@ -43,8 +43,8 @@ const MessageBottomBar = props => {
     setReplyMessage,
   } = props;
   const [messageValue, setMessageValue] = useState('');
-  const [singleFile, setSingleFile] = useState(null);
   const {userProfile} = useSelector(state => state.me);
+  const {currentChannelId} = useSelector(state => state.message);
   const {socket} = useSelector(state => state.global);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +56,7 @@ const MessageBottomBar = props => {
     const replyUser = replyMessage.replyMessage.user;
 
     if (type && replyMessage.isReply && userProfile._id !== replyUser._id) {
-      setMessageValue(`@[${replyUser.name}](undefined) `);
+      setMessageValue(`@[${replyUser.name}](${replyUser._id}) `);
       tagRef.current = [replyUser];
     }
   }, [replyMessage]);
@@ -82,20 +82,33 @@ const MessageBottomBar = props => {
 
       let content = messageValue;
       let tags = [];
-      if (tagRef.current.length > 0) {
-        tags = tagRef.current.map(tag => tag._id);
 
-        const tagList = content.match(TAG_REGEX);
-        if (tagList.length > 0) {
-          tagList.map(tagEle => {
-            const tagReplace = tagEle
-              .replace('@[', '@')
-              .replace('](undefined)', '');
+      const tagRefCurrent = tagRef.current;
+      if (tagRefCurrent.length > 0) {
+        tagRefCurrent.map(tagEle => {
+          tags.push(tagEle._id);
+          if (content.includes(`@[${tagEle.name}](${tagEle._id})`))
+            content = content.replace(
+              `@[${tagEle.name}](${tagEle._id})`,
+              `@${tagEle.name}`,
+            );
 
-            if (content.includes(tagEle))
-              content = content.replace(tagEle, tagReplace);
-          });
-        }
+          console.log('Content: ', content);
+        });
+
+        // tags = tagRefCurrent.map(tag => tag._id);
+        // const tagList = content.match(TAG_REGEX);
+        // if (tagList.length > 0) {
+        //   tagList.map(tagEle => {
+        //     const tagReplace = tagEle.replace(
+        //       `@[${tagEle.name}](${tagEle._id})`,
+        //       `@${tagEle.name}`,
+        //     );
+
+        //     if (content.includes(tagEle))
+        //       content = content.replace(tagEle, tagReplace);
+        //   });
+        // }
       }
 
       const replyMessageId =
@@ -103,12 +116,18 @@ const MessageBottomBar = props => {
 
       console.table({content, tags, conversationId, replyMessageId});
 
+      console.log('currentChannelId: ', currentChannelId);
+
+      const channelId =
+        currentChannelId !== conversationId ? currentChannelId : null;
+
       const newMessage = {
         content,
         type: 'TEXT',
         conversationId,
         tags,
         replyMessageId,
+        channelId,
       };
       console.log({newMessage});
       messageApi
@@ -141,9 +160,7 @@ const MessageBottomBar = props => {
 
     if (oldTag.length > 0) {
       const newTag = oldTag.filter(ele =>
-        value
-          .toLocaleLowerCase()
-          .includes(`@[${ele.name.toLocaleLowerCase()}](undefined)`),
+        value.includes(`@[${ele.name}](${ele._id})`),
       );
       tagRef.current = newTag;
       console.log('newTag', newTag);
@@ -164,7 +181,6 @@ const MessageBottomBar = props => {
       console.log('res stringify : ' + JSON.stringify(res));
       handleUploadFile(res);
     } catch (err) {
-      setSingleFile(null);
       if (DocumentPicker.isCancel(err)) {
         commonFuc.notifyMessage('Đã hủy');
       } else {
@@ -185,9 +201,13 @@ const MessageBottomBar = props => {
         ? messageType.IMAGE
         : messageType.FILE;
 
+      const channelId =
+        currentChannelId !== conversationId ? currentChannelId : null;
+
       const params = {
         type,
         conversationId: conversationId,
+        channelId,
       };
 
       if (fileToUpload.fileSize > 20971520) {

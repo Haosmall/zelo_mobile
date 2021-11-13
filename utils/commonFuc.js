@@ -11,6 +11,7 @@ import {
   fetchConversations,
   fetchListLastViewer,
   fetchMembers,
+  setCurrentChannel,
   updateCurrentConversation,
 } from '../redux/messageSlice';
 import dateUtils from './dateUtils';
@@ -179,7 +180,7 @@ const commonFuc = {
     let contentHtml = content;
 
     for (let tagUser of tagUsers) {
-      contentHtml = contentHtml.replaceAll(
+      contentHtml = contentHtml.replace(
         `@${tagUser.name}`,
         `<span>@${tagUser.name}</span>`,
       );
@@ -216,8 +217,16 @@ const handleEnterChat = (
   if (currentConversationId !== conversationId) {
     dispatch(clearMessagePages());
     dispatch(updateCurrentConversation({conversationId}));
+    dispatch(
+      setCurrentChannel({
+        currentChannelId: conversationId,
+        currentChannelName: conversationId,
+      }),
+    );
     dispatch(fetchListLastViewer({conversationId}));
     dispatch(fetchMembers({conversationId}));
+    dispatch(setCurrentChannel({conversationId}));
+
     console.log('conver: ', conversationId);
   }
   navigation.navigate('Nhắn tin', {

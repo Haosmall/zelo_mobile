@@ -1,9 +1,12 @@
-// export const REACT_APP_API_URL = 'https://zelochat.xyz/api';
-// export const REACT_APP_SOCKET_URL = 'https://zelochat.xyz';
-export const REACT_APP_API_URL = 'http://192.168.1.8:3001';
-export const REACT_APP_SOCKET_URL = 'http://192.168.1.8:3001';
-export const DEFAULT_PAGE = 0;
-export const DEFAULT_PAGE_SIZE = 20;
+export const REACT_APP_API_URL = 'https://zelochat.xyz/api';
+export const REACT_APP_SOCKET_URL = 'https://zelochat.xyz';
+// export const REACT_APP_API_URL = 'http://192.168.1.8:3001';
+// export const REACT_APP_SOCKET_URL = 'http://192.168.1.8:3001';
+
+export const DEFAULT_MESSAGE_PARAMS = {
+  page: 0,
+  size: 20,
+};
 export const REACTIONS = ['👍', '♥️', '😄', '😲', '😭', '😡'];
 
 export const DEFAULT_COVER_IMAGE =
@@ -75,7 +78,14 @@ export const DEFAULT_IMAGE_MODAL = {
   content: [],
   isImage: true,
 };
+
 export const DEFAULT_REPLY_MESSAGE = {
   isReply: false,
   replyMessage: {},
+};
+
+export const DEFAULT_ADD_CHANNEL_MODAL = {
+  isVisible: false,
+  name: '',
+  channelId: '',
 };
