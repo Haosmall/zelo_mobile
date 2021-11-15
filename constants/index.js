@@ -84,7 +84,7 @@ export const DEFAULT_REPLY_MESSAGE = {
   replyMessage: {},
 };
 
-export const DEFAULT_ADD_CHANNEL_MODAL = {
+export const DEFAULT_CHANNEL_MODAL = {
   isVisible: false,
   name: '',
   channelId: '',

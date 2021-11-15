@@ -175,15 +175,15 @@ export default function FriendItem(props) {
 
   const handleEnterChat = conversationId => {
     dispatch(clearMessagePages());
-    dispatch(updateCurrentConversation({conversationId}));
-    dispatch(
-      setCurrentChannel({
-        currentChannelId: conversationId,
-        currentChannelName: conversationId,
-      }),
-    );
-    dispatch(fetchListLastViewer({conversationId}));
-    dispatch(fetchMembers({conversationId}));
+    // dispatch(updateCurrentConversation({conversationId}));
+    // dispatch(
+    //   setCurrentChannel({
+    //     currentChannelId: conversationId,
+    //     currentChannelName: conversationId,
+    //   }),
+    // );
+    // dispatch(fetchListLastViewer({conversationId}));
+    // dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,

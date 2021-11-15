@@ -216,15 +216,15 @@ const handleEnterChat = (
 ) => {
   if (currentConversationId !== conversationId) {
     dispatch(clearMessagePages());
-    dispatch(updateCurrentConversation({conversationId}));
-    dispatch(
-      setCurrentChannel({
-        currentChannelId: conversationId,
-        currentChannelName: conversationId,
-      }),
-    );
-    dispatch(fetchListLastViewer({conversationId}));
-    dispatch(fetchMembers({conversationId}));
+    // dispatch(updateCurrentConversation({conversationId}));
+    // dispatch(
+    //   setCurrentChannel({
+    //     currentChannelId: conversationId,
+    //     currentChannelName: conversationId,
+    //   }),
+    // );
+    // dispatch(fetchListLastViewer({conversationId}));
+    // dispatch(fetchMembers({conversationId}));
     dispatch(setCurrentChannel({conversationId}));
 
     console.log('conver: ', conversationId);

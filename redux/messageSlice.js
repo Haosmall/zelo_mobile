@@ -104,16 +104,6 @@ const messageSlice = createSlice({
 
     // TODO:---------------------- clearMessagePages ----------------------
     clearMessagePages: (state, action) => {
-      // state.messagePages = {};
-      // state.messages = [];
-      // state.currentConversationId = '';
-      // state.currentConversation = {};
-      // state.currentVote = {};
-      // state.listLastViewer = [];
-      // state.usersTyping = [];
-      // state.files = {};
-      // state.members = [];
-
       Object.assign(state, {
         ...initialState,
         isLoading: false,
@@ -181,7 +171,7 @@ const messageSlice = createSlice({
       const index = state.channels.findIndex(
         channelEle => channelEle._id === channelId,
       );
-      const seachChannel = state.conversations[index];
+      const seachChannel = state.channels[index];
 
       seachChannel.numberUnread = seachChannel.numberUnread + 1;
       seachChannel.lastMessage = {
@@ -520,7 +510,9 @@ const messageSlice = createSlice({
       );
 
       state.channels = newChannels;
-      state.messages = [];
+      if (state.currentChannelId === channelId) {
+        state.messages = [];
+      }
       state.channelMessages = [];
       state.currentChannelId = conversationId;
       state.currentChannelName = conversationId;

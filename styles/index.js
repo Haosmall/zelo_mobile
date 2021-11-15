@@ -1,4 +1,8 @@
-import {CardStyleInterpolators} from '@react-navigation/stack';
+import {
+  CardStyleInterpolators,
+  TransitionPresets,
+  TransitionSpecs,
+} from '@react-navigation/stack';
 // import {LinearGradient} from 'expo-linear-gradient';
 import React from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
@@ -16,6 +20,18 @@ export const GREY_COLOR = '#889197';
 export const OVERLAY_AVATAR_COLOR = '#019dd7';
 export const OVERLAY_AVATAR_COLOR_GREY = '#d9dfeb';
 
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
+
 export const globalScreenOptions = {
   headerStyle: {backgroundColor: MAIN_COLOR},
   headerBackground: () => (
@@ -30,7 +46,13 @@ export const globalScreenOptions = {
   headerTitleStyle: {color: 'white'},
   headerTintColor: 'white',
   gestureEnabled: true,
-  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+  // transitionSpec: {
+  //   open: config,
+  //   close: config,
+  //   // open: TransitionSpecs.TransitionIOSSpec,
+  //   // close: TransitionSpecs.TransitionIOSSpec,
+  // },
+  ...TransitionPresets.SlideFromRightIOS,
 };
 
 const globalStyles = StyleSheet.create({

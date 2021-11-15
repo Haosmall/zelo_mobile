@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -31,6 +31,7 @@ import {
   addChannelMessage,
   addMessage,
   addReaction,
+  clearMessages,
   deleteChannel,
   deleteMessage,
   fetchChannels,
@@ -52,12 +53,19 @@ import globalStyles, {MAIN_COLOR} from '../styles';
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
 let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
+
+let flag = true;
+
 export default function HomeScreen({navigation}) {
   const dispatch = useDispatch();
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const {conversations, isLoading} = useSelector(state => state.message);
+  const channelIdRef = useRef('');
+
+  const {conversations, isLoading, currentChannelId} = useSelector(
+    state => state.message,
+  );
   const {currentUserId} = useSelector(state => state.global);
   const {userProfile} = useSelector(state => state.me);
 
@@ -144,7 +152,11 @@ export default function HomeScreen({navigation}) {
     // TODO:<====================== message socket ======================>
     socket.on('new-message', (conversationId, message) => {
       console.log('new-message', conversationId);
-      dispatch(addMessage({conversationId, message}));
+      if (flag) {
+        dispatch(addMessage({conversationId, message}));
+      } else {
+        flag = true;
+      }
       dispatch(
         setNotification({conversationId, message, userId: currentUserId}),
       );
@@ -170,9 +182,17 @@ export default function HomeScreen({navigation}) {
 
     socket.on('delete-channel', ({conversationId, channelId}) => {
       dispatch(deleteChannel({conversationId, channelId}));
-      // dispatch(
-      //   fetchMessages({conversationId, apiParams: DEFAULT_MESSAGE_PARAMS}),
-      // );
+
+      console.error('channelId: ', channelId);
+      console.error('channelIdRef.current: ', channelIdRef.current);
+
+      if (channelId === channelIdRef.current) {
+        dispatch(clearMessages());
+        dispatch(
+          fetchMessages({conversationId, apiParams: DEFAULT_MESSAGE_PARAMS}),
+        );
+        flag = false;
+      }
     });
 
     socket.on(
@@ -274,18 +294,20 @@ export default function HomeScreen({navigation}) {
     avatar,
   ) => {
     // dispatch(clearMessagePages());
-    dispatch(updateCurrentConversation({conversationId}));
-    dispatch(
-      setCurrentChannel({
-        currentChannelId: conversationId,
-        currentChannelName: conversationId,
-      }),
-    );
-    dispatch(fetchListLastViewer({conversationId}));
-    dispatch(fetchMembers({conversationId}));
+    channelIdRef.current = conversationId;
+    // dispatch(updateCurrentConversation({conversationId}));
+    // dispatch(
+    //   setCurrentChannel({
+    //     currentChannelId: conversationId,
+    //     currentChannelName: conversationId,
+    //   }),
+    // );
+    // dispatch(fetchListLastViewer({conversationId}));
+    // dispatch(fetchMembers({conversationId}));
     console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
+      channelIdRef,
     });
   };
 

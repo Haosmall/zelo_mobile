@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
 export const loginValid = {
   initial: {
+    // username: '',
+    // password: '',
     username: '0798662438',
     password: '12345678',
   },
@@ -12,6 +14,9 @@ export const loginValid = {
 
 export const registerValid = {
   initial: {
+    // name: '',
+    // username: '',
+    // password: '',
     name: 'Nhật Hào',
     username: '0398765421',
     password: '12345678',
@@ -25,9 +30,12 @@ export const registerValid = {
 
 export const passwordValid = {
   initial: {
+    // username: '',
+    // password: '',
+    // passwordConfirmation: '',
     username: '0398765421',
-    password: '123456789',
-    passwordConfirmation: '123456789',
+    password: '12345678',
+    passwordConfirmation: '12345678',
   },
   validationSchema: Yup.object().shape({
     username: Yup.string().required('Tài khoản không được để trống'),

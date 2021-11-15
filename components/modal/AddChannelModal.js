@@ -12,7 +12,7 @@ import {
 import {Button, Input} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {channelApi} from '../../api';
-import {DEFAULT_ADD_CHANNEL_MODAL, ERROR_MESSAGE} from '../../constants';
+import {DEFAULT_CHANNEL_MODAL, ERROR_MESSAGE} from '../../constants';
 import commonFuc from '../../utils/commonFuc';
 
 const AddChannelModal = props => {
@@ -26,7 +26,7 @@ const AddChannelModal = props => {
   const [error, setError] = useState('');
 
   const handleCloseModal = () => {
-    onShowModal(DEFAULT_ADD_CHANNEL_MODAL);
+    onShowModal(DEFAULT_CHANNEL_MODAL);
   };
 
   const handleConfirm = async () => {
@@ -119,7 +119,7 @@ AddChannelModal.propTypes = {
 };
 
 AddChannelModal.defaultProps = {
-  modalProps: DEFAULT_ADD_CHANNEL_MODAL,
+  modalProps: DEFAULT_CHANNEL_MODAL,
   onShowModal: null,
 };
 

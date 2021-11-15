@@ -17,7 +17,7 @@ import ListChannel from '../components/conversation/ListChannel';
 import OptionButton from '../components/conversation/OptionButton';
 import RenameConversationModal from '../components/modal/RenameConversationModal';
 import {
-  DEFAULT_ADD_CHANNEL_MODAL,
+  DEFAULT_CHANNEL_MODAL,
   DEFAULT_ADD_VOTE_MODAL,
   DEFAULT_RENAME_CONVERSATION_MODAL,
   DELETE_GROUP_MESSAGE,
@@ -32,7 +32,7 @@ import commonFuc from '../utils/commonFuc';
 import AddChannelModal from '../components/modal/AddChannelModal';
 
 export default function ConversationOptionsScreen({navigation, route}) {
-  const {conversationId} = route.params;
+  const {conversationId, channelIdRef} = route.params;
 
   const {currentConversation, currentConversationId} = useSelector(
     state => state.message,
@@ -46,7 +46,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
   const [modalVisible, setModalVisible] = useState(
     DEFAULT_RENAME_CONVERSATION_MODAL,
   );
-  const [addChannel, setAddChannel] = useState(DEFAULT_ADD_CHANNEL_MODAL);
+  const [addChannel, setAddChannel] = useState(DEFAULT_CHANNEL_MODAL);
   const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
 
   useGoback(navigation);
@@ -137,7 +137,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
   };
 
   const handleAddNewChannel = () => {
-    setAddChannel({...DEFAULT_ADD_CHANNEL_MODAL, isVisible: true});
+    setAddChannel({...DEFAULT_CHANNEL_MODAL, isVisible: true});
   };
 
   return (
@@ -190,6 +190,8 @@ export default function ConversationOptionsScreen({navigation, route}) {
             <ListChannel
               navigation={navigation}
               onAddChannelPress={handleAddNewChannel}
+              onShowRenameModal={setAddChannel}
+              channelIdRef={channelIdRef}
             />
           </Pressable>
         )}

@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Button, Icon, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
-import {DEFAULT_MESSAGE_PARAMS} from '../../constants';
+import {DEFAULT_CHANNEL_MODAL, DEFAULT_MESSAGE_PARAMS} from '../../constants';
 import {
   clearChannelMessages,
   clearMessages,
@@ -12,16 +12,22 @@ import {
   setCurrentChannel,
 } from '../../redux/messageSlice';
 import {fetchPinMessages} from '../../redux/pinSlice';
+import ChannelModal from '../modal/ChannelModal';
 import OptionButton from './OptionButton';
 
 const ListChannel = props => {
-  const {navigation, onAddChannelPress} = props;
+  const {navigation, onAddChannelPress, onShowRenameModal, channelIdRef} =
+    props;
   const {channels, currentConversation, currentConversationId} = useSelector(
     state => state.message,
   );
   const dispatch = useDispatch();
 
   const [isShowMore, setIsShowMore] = useState(false);
+
+  const [channelModalProps, setChannelModalProps] = useState(
+    DEFAULT_CHANNEL_MODAL,
+  );
 
   const getNumberUnreadGeneralChannel = () => {};
 
@@ -35,6 +41,9 @@ const ListChannel = props => {
 
     dispatch(clearChannelMessages());
 
+    if (channelIdRef) {
+      channelIdRef.current = currentChannelId;
+    }
     if (currentChannelId === currentConversationId) {
       dispatch(clearMessages());
       dispatch(
@@ -54,6 +63,10 @@ const ListChannel = props => {
     }
 
     navigation.goBack();
+  };
+
+  const handleOnLongPress = (channelId, name) => {
+    setChannelModalProps({isVisible: true, name, channelId});
   };
 
   return (
@@ -88,7 +101,11 @@ const ListChannel = props => {
                 <TouchableOpacity
                   onPress={() =>
                     handleOnChannelPress(channel._id, channel.name)
-                  }>
+                  }
+                  onLongPress={() =>
+                    handleOnLongPress(channel._id, channel.name)
+                  }
+                  delayLongPress={500}>
                   <ListItem>
                     <Icon type="material-icon" name="tag" />
                     <ListItem.Content>
@@ -117,7 +134,11 @@ const ListChannel = props => {
                 <TouchableOpacity
                   onPress={() =>
                     handleOnChannelPress(channel._id, channel.name)
-                  }>
+                  }
+                  onLongPress={() =>
+                    handleOnLongPress(channel._id, channel.name)
+                  }
+                  delayLongPress={500}>
                   <ListItem>
                     <Icon type="material-icon" name="tag" />
                     <ListItem.Content>
@@ -155,15 +176,28 @@ const ListChannel = props => {
         containerStyle={{marginHorizontal: 10, marginVertical: 5}}
         buttonStyle={{marginHorizontal: 10}}
       />
+
+      {channelModalProps.isVisible && (
+        <ChannelModal
+          modalVisible={channelModalProps}
+          setModalVisible={setChannelModalProps}
+          onShowRenameModal={onShowRenameModal}
+          channelIdRef={channelIdRef}
+        />
+      )}
     </View>
   );
 };
 
 ListChannel.propTypes = {
   onAddChannelPress: PropTypes.func,
+  onShowRenameModal: PropTypes.func,
 };
 
-ListChannel.defaultProps = {onAddChannelPress: null};
+ListChannel.defaultProps = {
+  onAddChannelPress: null,
+  onShowRenameModal: null,
+};
 export default ListChannel;
 
 const styles = StyleSheet.create({

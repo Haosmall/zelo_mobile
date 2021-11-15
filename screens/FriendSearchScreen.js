@@ -140,15 +140,15 @@ export default function FriendSearchScreen({navigation, route}) {
 
   const handleEnterChat = conversationId => {
     dispatch(clearMessagePages());
-    dispatch(updateCurrentConversation({conversationId}));
-    dispatch(
-      setCurrentChannel({
-        currentChannelId: conversationId,
-        currentChannelName: conversationId,
-      }),
-    );
-    dispatch(fetchListLastViewer({conversationId}));
-    dispatch(fetchMembers({conversationId}));
+    // dispatch(updateCurrentConversation({conversationId}));
+    // dispatch(
+    //   setCurrentChannel({
+    //     currentChannelId: conversationId,
+    //     currentChannelName: conversationId,
+    //   }),
+    // );
+    // dispatch(fetchListLastViewer({conversationId}));
+    // dispatch(fetchMembers({conversationId}));
     console.log('group: : ', conversationId);
     navigation.replace('Nhắn tin', {
       conversationId,

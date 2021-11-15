@@ -169,10 +169,10 @@ export default function MeScreen() {
           </ListItem>
           <ListItem containerStyle={{paddingTop: 0}}>
             <Text style={styles.title}></Text>
-            <Text style={styles.content}>
+            {/* <Text style={styles.content}>
               Số điện thoại chỉ hiển thị khi bạn có lưu số người này trong danh
               bạ
-            </Text>
+            </Text> */}
           </ListItem>
         </View>
 

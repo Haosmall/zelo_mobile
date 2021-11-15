@@ -41,7 +41,11 @@ import {
   clearMessagePages,
   fetchChannelMessages,
   fetchChannels,
+  fetchListLastViewer,
+  fetchMembers,
   fetchMessages,
+  setCurrentChannel,
+  updateCurrentConversation,
 } from '../redux/messageSlice';
 import {fetchPinMessages, resetPinSlice} from '../redux/pinSlice';
 
@@ -50,7 +54,7 @@ const size = DEFAULT_PAGE_SIZE;
 
 export default function MessageScreen({navigation, route}) {
   // Props
-  const {conversationId} = route.params;
+  const {conversationId, channelIdRef} = route.params;
   const dispatch = useDispatch();
   const {
     messages,
@@ -97,6 +101,7 @@ export default function MessageScreen({navigation, route}) {
     dispatch(fetchChannels({conversationId: currentConversation._id}));
     navigation.navigate('Tùy chọn', {
       conversationId,
+      channelIdRef,
     });
   };
 
@@ -144,7 +149,17 @@ export default function MessageScreen({navigation, route}) {
 
   useEffect(() => {
     console.log('Message: ', currentUserId);
-
+    //
+    dispatch(updateCurrentConversation({conversationId}));
+    dispatch(
+      setCurrentChannel({
+        currentChannelId: conversationId,
+        currentChannelName: conversationId,
+      }),
+    );
+    dispatch(fetchListLastViewer({conversationId}));
+    dispatch(fetchMembers({conversationId}));
+    //
     dispatch(fetchMessages({conversationId, apiParams}));
     dispatch(fetchPinMessages({conversationId}));
   }, []);
@@ -241,27 +256,15 @@ export default function MessageScreen({navigation, route}) {
           style={styles.container}
           keyboardVerticalOffset={90}>
           <>
-            {/* {messages.length > 0 ? (
-              <></>
-            ) : (
-              <ScrollView>
-                <EmptyData content="Không có tin nhắn" />
-              </ScrollView>
-            )} */}
-
             {isGeneralChannel && (
               <PinnedMessage openPinMessage={setPinMessageVisible} />
             )}
             <FlatList
-              // onScroll={event =>
-              //   onContentOffsetChanged(event.nativeEvent.contentOffset.y)
-              // }
               onEndReached={() => {
                 goToNextPage();
               }}
               data={isGeneralChannel ? messages : channelMessages}
               keyExtractor={item => item._id}
-              // keyExtractor={(item, index) => `${item._id}-${index}`}
               renderItem={({item, index}) => renderMessage(item, index)}
               initialNumToRender={20}
               ListFooterComponent={() =>
@@ -269,8 +272,6 @@ export default function MessageScreen({navigation, route}) {
               }
               inverted
               contentContainerStyle={{paddingBottom: 15}}
-              // ListHeaderComponent={() => <Text>sss</Text>}
-              // stickyHeaderIndices={[0]}
             />
 
             {usersTyping.length > 0 && (
