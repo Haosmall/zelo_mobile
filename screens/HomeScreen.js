@@ -37,10 +37,8 @@ import {
   fetchChannels,
   fetchConversations,
   fetchListLastViewer,
-  fetchMembers,
   fetchMessages,
   renameConversation,
-  setCurrentChannel,
   setNotification,
   updateChannel,
   updateCurrentConversation,
@@ -49,6 +47,7 @@ import {
   usersTyping,
 } from '../redux/messageSlice';
 import globalStyles, {MAIN_COLOR} from '../styles';
+import {currentKey, logout} from '../utils/commonFuc';
 
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
@@ -284,6 +283,16 @@ export default function HomeScreen({navigation}) {
       dispatch(inviteFriendRequest(details));
       dispatch(fetchFriendById({userId: details._id}));
     });
+
+    // TODO:<====================== revoke-token socket ======================>
+
+    socket.on('revoke-token', ({key}) => {
+      console.log('currentKey: ', currentKey);
+      console.log('revoke-token key: ', key);
+      if (currentKey !== key) {
+        logout(dispatch);
+      }
+    });
   }, []);
 
   const handleEnterChat = (
@@ -338,6 +347,7 @@ export default function HomeScreen({navigation}) {
                 type={item?.type}
                 conversationId={item?._id}
                 totalMembers={item?.totalMembers}
+                avatarColor={item?.avatarColor}
               />
             </Pressable>
           )}

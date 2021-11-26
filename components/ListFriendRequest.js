@@ -20,7 +20,7 @@ export default function ListFriendRequest(props) {
       <ScrollView>
         {listFriends.length > 0 &&
           listFriends.map(friend => {
-            const {_id, avatar, name} = friend;
+            const {_id, avatar, name, avatarColor} = friend;
             return (
               <Pressable key={_id}>
                 <View style={{backgroundColor: '#fff'}}>
@@ -29,6 +29,7 @@ export default function ListFriendRequest(props) {
                     name={name}
                     type={type}
                     userId={_id}
+                    avatarColor={avatarColor}
                   />
                   <View style={styles.bottomDivider}></View>
                 </View>

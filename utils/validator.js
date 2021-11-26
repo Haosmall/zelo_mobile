@@ -97,3 +97,21 @@ export const groupValid = {
       .max(30, 'Tối đa 30 kí tự'),
   }),
 };
+
+export const changePasswordValid = {
+  initial: {
+    // oldPassword: '',
+    // newPassword: '',
+    // passwordConfirmation: '',
+    oldPassword: '12345678',
+    newPassword: '12345678',
+    passwordConfirmation: '12345678',
+  },
+  validationSchema: Yup.object().shape({
+    oldPassword: Yup.string().required('Mật khẩu cũ không được để trống'),
+    newPassword: Yup.string().required('Mật khẩu mới không được để trống'),
+    passwordConfirmation: Yup.string()
+      .required('Không được để trống')
+      .oneOf([Yup.ref('newPassword'), null], 'Mật khẩu không khớp'),
+  }),
+};

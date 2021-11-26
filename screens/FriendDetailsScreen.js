@@ -237,7 +237,10 @@ export default function FriendDetailsScreen({navigation}) {
             source={searchFriend.avatar ? {uri: searchFriend.avatar} : null}
             size={120}
             rounded
-            overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
+            overlayContainerStyle={{
+              backgroundColor:
+                searchFriend?.avatarColor || OVERLAY_AVATAR_COLOR,
+            }}
             containerStyle={styles.avatar}
             onPress={() =>
               searchFriend.avatar && handleViewImage(searchFriend.avatar)

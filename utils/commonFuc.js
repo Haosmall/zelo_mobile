@@ -1,21 +1,26 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  Platform,
-  ToastAndroid,
+  Alert,
   AlertIOS,
   PermissionsAndroid,
+  Platform,
+  ToastAndroid,
 } from 'react-native';
+import RNFetchBlob from 'react-native-fetch-blob';
+import RNRestart from 'react-native-restart';
 import {conversationApi} from '../api';
 import {ERROR_MESSAGE, messageType, REACTIONS} from '../constants';
+import {resetFriendSlice} from '../redux/friendSlice';
+import {resetGlobalSlice} from '../redux/globalSlice';
+import {resetMeSlice} from '../redux/meSlice';
 import {
   clearMessagePages,
   fetchConversations,
-  fetchListLastViewer,
-  fetchMembers,
+  resetMessageSlice,
   setCurrentChannel,
-  updateCurrentConversation,
 } from '../redux/messageSlice';
+import {resetPinSlice} from '../redux/pinSlice';
 import dateUtils from './dateUtils';
-import RNFetchBlob from 'react-native-fetch-blob';
 
 const commonFuc = {
   getBase64: file => {
@@ -189,6 +194,19 @@ const commonFuc = {
   },
 };
 
+export const logout = async dispatch => {
+  await AsyncStorage.removeItem('token');
+  await AsyncStorage.removeItem('refreshToken');
+  await AsyncStorage.removeItem('userId');
+  dispatch(resetFriendSlice());
+  dispatch(resetGlobalSlice());
+  dispatch(resetMeSlice());
+  dispatch(resetMessageSlice());
+  dispatch(resetPinSlice());
+  // dispatch(setLogin(false));
+  RNRestart.Restart();
+};
+
 export const handleCreateChat = async (
   userId,
   navigation,
@@ -306,6 +324,21 @@ const downloadFile = fileUrl => {
 const getFileExtention = fileUrl => {
   // To get the file extension
   return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+};
+
+export let currentKey = '';
+
+export const makeId = () => {
+  currentKey = '';
+  const randomChars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < 20; i++)
+    currentKey += randomChars.charAt(
+      Math.floor(Math.random() * randomChars.length),
+    );
+
+  return currentKey;
 };
 
 export default commonFuc;

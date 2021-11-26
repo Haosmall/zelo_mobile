@@ -143,12 +143,18 @@ export default function ConversationOptionsScreen({navigation, route}) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Pressable style={styles.subContainer}>
+        <Pressable
+          style={styles.subContainer}
+          onPress={() => commonFuc.notifyMessage('Xem ava')}>
           <Avatar
             rounded
             size="large"
             source={avatarSource}
-            overlayContainerStyle={styles.overlay}
+            overlayContainerStyle={
+              currentConversation?.avatarColor
+                ? {backgroundColor: currentConversation?.avatarColor}
+                : styles.overlay
+            }
             title={type ? null : commonFuc.getAcronym(currentConversation.name)}
             icon={{
               name: 'groups',
@@ -164,6 +170,8 @@ export default function ConversationOptionsScreen({navigation, route}) {
                 color="transparent"
                 iconStyle={{color: 'black'}}
                 containerStyle={styles.avatarAccessory}
+                onPress={() => commonFuc.notifyMessage('Nhóm')}
+                style={styles.avatarAccessory}
               />
             )}
           </Avatar>

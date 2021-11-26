@@ -81,7 +81,8 @@ const MemberScreen = ({navigation}) => {
                     rounded
                     title={commonFuc.getAcronym(item.name)}
                     overlayContainerStyle={{
-                      backgroundColor: OVERLAY_AVATAR_COLOR,
+                      backgroundColor:
+                        item?.avatarColor || OVERLAY_AVATAR_COLOR,
                     }}
                     source={
                       item?.avatar?.length > 0

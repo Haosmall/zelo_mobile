@@ -66,7 +66,9 @@ const SenderMessage = props => {
                   }
                 : null
             }
-            overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
+            overlayContainerStyle={{
+              backgroundColor: user?.avatarColor || OVERLAY_AVATAR_COLOR,
+            }}
             containerStyle={styles.avatar}>
             {currentConversation?.leaderId &&
               currentConversation?.leaderId === user._id && (

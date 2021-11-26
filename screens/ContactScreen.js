@@ -169,6 +169,7 @@ export default function ContactScreen({navigation}) {
                     type={friendType.FRIEND}
                     userId={item._id}
                     navigation={navigation}
+                    avatarColor={item?.avatarColor}
                   />
                   <View style={styles.bottomDivider}></View>
                 </View>

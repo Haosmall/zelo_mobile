@@ -24,8 +24,16 @@ import {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc, {handleCreateChat} from '../utils/commonFuc';
 
 export default function FriendItem(props) {
-  const {type, name, avatar, topDivider, userId, navigation, handleGroup} =
-    props;
+  const {
+    type,
+    name,
+    avatar,
+    topDivider,
+    userId,
+    navigation,
+    handleGroup,
+    avatarColor,
+  } = props;
 
   const {currentConversationId} = useSelector(state => state.message);
 
@@ -202,7 +210,7 @@ export default function FriendItem(props) {
       <Avatar
         rounded
         title={commonFuc.getAcronym(name)}
-        overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
+        overlayContainerStyle={{backgroundColor: avatarColor}}
         source={
           avatar.length > 0
             ? {
@@ -256,6 +264,7 @@ FriendItem.propTypes = {
   type: PropTypes.string,
   name: PropTypes.string,
   avatar: PropTypes.string,
+  avatarColor: PropTypes.string,
   userId: PropTypes.string,
   topDivider: PropTypes.bool,
   handleGroup: PropTypes.func,
@@ -268,6 +277,7 @@ FriendItem.defaultProps = {
   userId: '',
   topDivider: false,
   handleGroup: null,
+  avatarColor: OVERLAY_AVATAR_COLOR,
 };
 
 const styles = StyleSheet.create({

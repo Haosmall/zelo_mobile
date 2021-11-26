@@ -125,6 +125,7 @@ const PhonebookScreen = ({navigation}) => {
                   type={item?.status ? 'DETAILS' : friendType.DONT_HAVE_ACCOUNT}
                   userId={item?._id || item.username}
                   navigation={navigation}
+                  avatarColor={item?.avatarColor}
                 />
                 <View
                   style={{

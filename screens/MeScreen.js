@@ -1,27 +1,28 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import {Avatar, Button, Image, ListItem} from 'react-native-elements';
-import RNRestart from 'react-native-restart';
+import {Avatar, Image, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import test from '../assets/favicon1.png';
+import OptionButton from '../components/conversation/OptionButton';
+import ChangePasswordModal from '../components/modal/ChangePasswordModal';
 import UpdateUserProfileModal from '../components/modal/UpdateUserProfileModal';
 import ViewImageModal from '../components/modal/ViewImageModal';
 import {DEFAULT_COVER_IMAGE, DEFAULT_IMAGE_MODAL} from '../constants';
-import {resetFriendSlice} from '../redux/friendSlice';
-import {resetGlobalSlice} from '../redux/globalSlice';
-import {fetchProfile, resetMeSlice} from '../redux/meSlice';
-import {resetMessageSlice} from '../redux/messageSlice';
-import {resetPinSlice} from '../redux/pinSlice';
-import {OVERLAY_AVATAR_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
-import commonFuc from '../utils/commonFuc';
+import {fetchProfile} from '../redux/meSlice';
+import globalStyles, {
+  OVERLAY_AVATAR_COLOR,
+  WINDOW_HEIGHT,
+  WINDOW_WIDTH,
+} from '../styles';
+import commonFuc, {currentKey, logout, makeId} from '../utils/commonFuc';
 
 export default function MeScreen() {
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ export default function MeScreen() {
   const {userProfile} = useSelector(state => state.me);
 
   const [isUpdateProfile, setIsUpdateProfile] = useState(false);
+  const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false);
   const [imageIndex, setiImageIndex] = useState(0);
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
 
@@ -49,6 +51,12 @@ export default function MeScreen() {
     },
   ];
 
+  const handleLogoutAll = () => {
+    console.log('before all ', currentKey);
+    makeId();
+    console.log('after all ', currentKey);
+  };
+
   const handleLogOut = () => {
     Alert.alert('Cảnh báo', 'Bạn có muốn đăng xuất không?', [
       {
@@ -57,16 +65,7 @@ export default function MeScreen() {
       {
         text: 'Có',
         onPress: async () => {
-          await AsyncStorage.removeItem('token');
-          await AsyncStorage.removeItem('refreshToken');
-          await AsyncStorage.removeItem('userId');
-          dispatch(resetFriendSlice());
-          dispatch(resetGlobalSlice());
-          dispatch(resetMeSlice());
-          dispatch(resetMessageSlice());
-          dispatch(resetPinSlice());
-          // dispatch(setLogin(false));
-          RNRestart.Restart();
+          await logout(dispatch);
         },
       },
     ]);
@@ -118,35 +117,33 @@ export default function MeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={styles.header}>
-          <Image
-            source={{uri: userProfile?.coverImage || DEFAULT_COVER_IMAGE}}
-            style={styles.coverImage}
-            onPress={() => handleViewImage(userProfile?.coverImage)}
-          />
-          {/* <View style={{width: '100%', justifyContent: 'center'}}>
-          </View> */}
-          <Avatar
-            title={commonFuc.getAcronym(userProfile.name)}
-            source={userProfile.avatar ? {uri: userProfile.avatar} : null}
-            size={120}
-            rounded
-            overlayContainerStyle={{backgroundColor: OVERLAY_AVATAR_COLOR}}
-            containerStyle={styles.avatar}
-            onPress={() =>
-              userProfile.avatar && handleViewImage(userProfile.avatar)
-            }
-          />
-        </View>
-        <View style={styles.action}>
-          <Text style={styles.name}>{userProfile.name}</Text>
-          <Button
-            title="Đổi thông tin"
-            type="clear"
-            containerStyle={styles.buttonContainer}
-            buttonStyle={styles.button}
-            onPress={() => setIsUpdateProfile(true)}
-          />
+        <View style={{backgroundColor: '#fff'}}>
+          <View style={styles.header}>
+            <Image
+              source={{uri: userProfile?.coverImage || DEFAULT_COVER_IMAGE}}
+              style={styles.coverImage}
+              onPress={() => handleViewImage(userProfile?.coverImage)}
+            />
+            {/* <View style={{width: '100%', justifyContent: 'center'}}>
+            </View> */}
+            <Avatar
+              title={commonFuc.getAcronym(userProfile.name)}
+              source={userProfile.avatar ? {uri: userProfile.avatar} : null}
+              size={120}
+              rounded
+              overlayContainerStyle={{
+                backgroundColor:
+                  userProfile?.avatarColor || OVERLAY_AVATAR_COLOR,
+              }}
+              containerStyle={styles.avatar}
+              onPress={() =>
+                userProfile.avatar && handleViewImage(userProfile.avatar)
+              }
+            />
+          </View>
+          <View style={styles.action}>
+            <Text style={styles.name}>{userProfile.name}</Text>
+          </View>
         </View>
         <View style={styles.detailsContainer}>
           <ListItem topDivider>
@@ -159,31 +156,59 @@ export default function MeScreen() {
             <Text style={styles.title}>Ngày sinh</Text>
             <Text style={styles.content}>{handleDoB()}</Text>
           </ListItem>
-          <ListItem topDivider>
-            <Text style={styles.title}>Email</Text>
-            <Text style={styles.content}>{handleEmail()}</Text>
-          </ListItem>
-          <ListItem topDivider>
-            <Text style={styles.title}>Điện thoại</Text>
-            <Text style={styles.content}>{handlePhoneNumber()}</Text>
-          </ListItem>
-          <ListItem containerStyle={{paddingTop: 0}}>
-            <Text style={styles.title}></Text>
-            {/* <Text style={styles.content}>
-              Số điện thoại chỉ hiển thị khi bạn có lưu số người này trong danh
-              bạ
-            </Text> */}
-          </ListItem>
+          {handleEmail().length > 0 && (
+            <ListItem topDivider>
+              <Text style={styles.title}>Email</Text>
+              <Text style={styles.content}>{handleEmail()}</Text>
+            </ListItem>
+          )}
+          {handlePhoneNumber().length > 0 && (
+            <>
+              <ListItem topDivider>
+                <Text style={styles.title}>Điện thoại</Text>
+                <Text style={styles.content}>{handlePhoneNumber()}</Text>
+              </ListItem>
+              <ListItem containerStyle={{paddingTop: 0}}>
+                <Text style={styles.title}></Text>
+                <Text style={styles.content}>
+                  Số điện thoại của bạn chỉ hiển thị với bạn bè có lưu số của
+                  bạn trong danh bạ
+                </Text>
+              </ListItem>
+            </>
+          )}
         </View>
 
         <ViewImageModal imageProps={imageProps} setImageProps={setImageProps} />
 
-        <Button
-          title="Đăng xuất"
-          onPress={handleLogOut}
-          containerStyle={[styles.buttonContainer, {marginHorizontal: 15}]}
-          buttonStyle={styles.button}
-        />
+        <Pressable style={globalStyles.viewEle}>
+          <OptionButton
+            onPress={() => setIsUpdateProfile(true)}
+            iconType="antdesign"
+            iconName="edit"
+            title="Đổi thông tin"
+          />
+          <OptionButton
+            onPress={() => setIsChangePasswordVisible(true)}
+            iconType="antdesign"
+            iconName="lock"
+            title="Đổi mật khẩu"
+          />
+          <OptionButton
+            onPress={handleLogoutAll}
+            iconType="material"
+            iconName="logout"
+            title="Đăng xuất ra khỏi các thiết bị khác"
+          />
+          <OptionButton
+            onPress={handleLogOut}
+            iconType="material"
+            iconName="logout"
+            title="Đăng xuất"
+            iconColor="red"
+            titleStyle={{color: 'red'}}
+          />
+        </Pressable>
       </ScrollView>
 
       {isUpdateProfile && (
@@ -193,13 +218,20 @@ export default function MeScreen() {
           userProfile={userProfile}
         />
       )}
+
+      {isChangePasswordVisible && (
+        <ChangePasswordModal
+          modalVisible={isChangePasswordVisible}
+          setModalVisible={setIsChangePasswordVisible}
+        />
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#E2E9F1',
   },
   header: {
     // alignItems: 'center',

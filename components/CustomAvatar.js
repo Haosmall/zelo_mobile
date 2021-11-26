@@ -6,7 +6,7 @@ import {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
 const CustomAvatar = props => {
-  const {avatars, name, totalMembers} = props;
+  const {avatars, name, totalMembers, avatarColor} = props;
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
 
@@ -16,7 +16,9 @@ const CustomAvatar = props => {
     <Avatar
       rounded
       title={commonFuc.getAcronym(name)}
-      overlayContainerStyle={styles.overlay}
+      overlayContainerStyle={{
+        backgroundColor: avatarColor,
+      }}
       source={
         avatars.length > 0
           ? {
@@ -34,7 +36,9 @@ const CustomAvatar = props => {
             <Avatar
               rounded
               // title={commonFuc.getAcronym(name)}
-              overlayContainerStyle={styles.overlay}
+              overlayContainerStyle={{
+                backgroundColor: avatars[value - 1].avatarColor,
+              }}
               icon={{name: 'person'}}
               source={
                 avatars[value - 1]?.length > 0
@@ -67,6 +71,7 @@ const CustomAvatar = props => {
 CustomAvatar.propTypes = {
   avatars: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   name: PropTypes.string,
+  avatarColor: PropTypes.string,
   totalMembers: PropTypes.number,
 };
 
@@ -74,6 +79,7 @@ CustomAvatar.defaultProps = {
   avatars: '',
   name: '',
   totalMembers: 2,
+  avatarColor: OVERLAY_AVATAR_COLOR,
 };
 
 export default CustomAvatar;

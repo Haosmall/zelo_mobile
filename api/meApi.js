@@ -28,8 +28,17 @@ const meApi = {
 
   syncContacts: phones => {
     const url = `${BASE_URL}/phone-books`;
-    console.log('api: ', {phones});
     return axiosClient.post(url, {phones});
+  },
+
+  changePassword: (oldPassword, newPassword) => {
+    const url = `${BASE_URL}/password`;
+    return axiosClient.patch(url, {oldPassword, newPassword});
+  },
+
+  logoutAllDevice: (password, key) => {
+    const url = `${BASE_URL}/revoke-token`;
+    return axiosClient.delete(url, {data: {password, key}});
   },
 };
 

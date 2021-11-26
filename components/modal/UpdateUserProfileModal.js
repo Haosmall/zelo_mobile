@@ -108,7 +108,7 @@ const UpdateUserProfileModal = props => {
         onRequestClose={handleCloseModal}>
         <TouchableOpacity
           activeOpacity={1}
-          onPressOut={handleCloseModal}
+          // onPressOut={handleCloseModal}
           style={styles.container}>
           <SafeAreaView style={styles.modalView}>
             <View style={styles.header}>

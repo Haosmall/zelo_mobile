@@ -4,6 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import {CheckBox, Icon, ListItem} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import {messageType} from '../../constants';
+import {OVERLAY_AVATAR_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 import CustomAvatar from '../CustomAvatar';
 import MessageInfo from './MessageInfo';
@@ -20,6 +21,7 @@ const Conversation = props => {
     conversationId,
     isForward,
     checked,
+    avatarColor,
   } = props;
 
   const {userProfile} = useSelector(state => state.me);
@@ -108,6 +110,7 @@ const Conversation = props => {
           name={name}
           avatars={avatars}
           totalMembers={totalMembers}
+          avatarColor={avatarColor}
         />
         <ListItem.Content>
           <ListItem.Title
@@ -181,6 +184,7 @@ Conversation.propTypes = {
   lastMessage: PropTypes.object,
   name: PropTypes.string,
   conversationId: PropTypes.string,
+  avatarColor: PropTypes.string,
   type: PropTypes.bool,
   isForward: PropTypes.bool,
   checked: PropTypes.bool,
@@ -197,6 +201,7 @@ Conversation.defaultProps = {
   type: false,
   isForward: false,
   checked: false,
+  avatarColor: OVERLAY_AVATAR_COLOR,
 };
 
 export default Conversation;

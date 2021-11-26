@@ -92,6 +92,7 @@ export default function ForwardMessageScreen({navigation, route}) {
                     name={item.name}
                     avatars={item.avatar}
                     totalMembers={item.totalMembers}
+                    avatarColor={item?.avatarColor}
                   />
                 </TouchableOpacity>
               ))}
@@ -160,6 +161,7 @@ export default function ForwardMessageScreen({navigation, route}) {
                 totalMembers={item?.totalMembers}
                 isForward={true}
                 checked={isChecked}
+                avatarColor={item?.avatarColor}
               />
             </TouchableOpacity>
           );

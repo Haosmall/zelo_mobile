@@ -332,6 +332,7 @@ export default function FriendSearchScreen({navigation, route}) {
                   type={type}
                   userId={item?._id}
                   navigation={navigation}
+                  avatarColor={item?.avatarColor}
                   handleGroup={
                     !isAddToGroup
                       ? null

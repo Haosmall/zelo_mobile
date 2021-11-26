@@ -30,7 +30,6 @@ axiosClient.interceptors.response.use(
       if (code === 401) {
         if (auto === 'yes') {
           return refreshToken().then(async response => {
-            console.log('get token refreshToken>>', response.data);
             const {token} = response.data;
             await AsyncStorage.setItem('token', token);
             axiosClient.setToken(token);
@@ -50,6 +49,7 @@ axiosClient.interceptors.response.use(
 
   error => {
     // return error.response;
+    console.error(error.response);
     throw error;
   },
 );
