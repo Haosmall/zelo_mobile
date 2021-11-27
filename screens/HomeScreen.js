@@ -287,9 +287,9 @@ export default function HomeScreen({navigation}) {
     // TODO:<====================== revoke-token socket ======================>
 
     socket.on('revoke-token', ({key}) => {
-      console.log('currentKey: ', currentKey);
-      console.log('revoke-token key: ', key);
       if (currentKey !== key) {
+        console.log('currentKey: ', currentKey);
+        console.log('revoke-token key: ', key);
         logout(dispatch);
       }
     });

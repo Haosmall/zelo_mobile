@@ -13,31 +13,30 @@ import {
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import {meApi} from '../../api';
-import commonFuc, {currentKey, makeId} from '../../utils/commonFuc';
-import {changePasswordValid} from '../../utils/validator';
+import commonFuc, {makeId} from '../../utils/commonFuc';
+import {logoutAllValid} from '../../utils/validator';
 import InputField from '../InputField';
 import CustomModal from './CustomModal';
 
-const ChangePasswordModal = props => {
+const LogoutAllModal = props => {
   const {modalVisible, setModalVisible} = props;
 
   const handleCloseModal = () => {
     setModalVisible(false);
   };
 
-  const handleChangePassword = async values => {
-    const {oldPassword, newPassword} = values;
+  const handleOnSubmit = async values => {
+    const {password} = values;
+    console.log('password: ', password);
 
     try {
-      await meApi.changePassword(oldPassword, newPassword);
-
       const key = makeId();
-      const response = await meApi.logoutAllDevice(newPassword, key);
+      const response = await meApi.logoutAllDevice(password, key);
       await AsyncStorage.setItem('token', response.token);
       await AsyncStorage.setItem('refreshToken', response.refreshToken);
-      commonFuc.notifyMessage('Đổi mật khẩu thành công');
+      commonFuc.notifyMessage('Đăng xuất thành công');
     } catch (error) {
-      commonFuc.notifyMessage('Đổi mật khẩu thất bại');
+      commonFuc.notifyMessage('Đăng xuất thất bại');
     }
 
     handleCloseModal();
@@ -47,11 +46,11 @@ const ChangePasswordModal = props => {
     <CustomModal
       visible={modalVisible}
       onCloseModal={handleCloseModal}
-      title="Đổi mật khẩu">
+      title="Đăng xuất ra khỏi các thiết bị khác">
       <Formik
-        initialValues={changePasswordValid.initial}
-        validationSchema={changePasswordValid.validationSchema}
-        onSubmit={values => handleChangePassword(values)}>
+        initialValues={logoutAllValid.initial}
+        validationSchema={logoutAllValid.validationSchema}
+        onSubmit={values => handleOnSubmit(values)}>
         {formikProps => {
           const {values, errors, handleChange, handleSubmit} = formikProps;
           return (
@@ -60,26 +59,10 @@ const ChangePasswordModal = props => {
                 <InputField
                   placeholder="Nhập mật khẩu hiện tại"
                   autoFocus
-                  onChangeText={handleChange('oldPassword')}
+                  onChangeText={handleChange('password')}
                   secureTextEntry={true}
-                  value={values.oldPassword}
-                  error={errors.oldPassword}
-                />
-                <InputField
-                  placeholder="Nhập mật khẩu mới"
-                  onChangeText={handleChange('newPassword')}
-                  secureTextEntry={true}
-                  value={values.newPassword}
-                  error={errors.newPassword}
-                />
-
-                <InputField
-                  style={styles.input}
-                  placeholder="Nhập lại mật khẩu"
-                  secureTextEntry={true}
-                  onChangeText={handleChange('passwordConfirmation')}
-                  value={values.passwordConfirmation}
-                  error={errors.passwordConfirmation}
+                  value={values.password}
+                  error={errors.password}
                 />
               </View>
               <View style={styles.footer}>
@@ -90,7 +73,7 @@ const ChangePasswordModal = props => {
                   titleStyle={{color: 'black'}}
                   containerStyle={{marginRight: 20}}
                 />
-                <Button title="Thay đổi" onPress={handleSubmit} type="clear" />
+                <Button title="Đăng xuất" onPress={handleSubmit} type="clear" />
               </View>
             </>
           );
@@ -100,12 +83,12 @@ const ChangePasswordModal = props => {
   );
 };
 
-ChangePasswordModal.propTypes = {
+LogoutAllModal.propTypes = {
   modalVisible: PropTypes.bool,
   setModalVisible: PropTypes.func,
 };
 
-ChangePasswordModal.defaultProps = {
+LogoutAllModal.defaultProps = {
   modalVisible: false,
   setModalVisible: null,
 };
@@ -157,4 +140,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChangePasswordModal;
+export default LogoutAllModal;

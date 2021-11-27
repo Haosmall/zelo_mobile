@@ -13,6 +13,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import test from '../assets/favicon1.png';
 import OptionButton from '../components/conversation/OptionButton';
 import ChangePasswordModal from '../components/modal/ChangePasswordModal';
+import LogoutAllModal from '../components/modal/LogoutAllModal';
 import UpdateUserProfileModal from '../components/modal/UpdateUserProfileModal';
 import ViewImageModal from '../components/modal/ViewImageModal';
 import {DEFAULT_COVER_IMAGE, DEFAULT_IMAGE_MODAL} from '../constants';
@@ -31,7 +32,7 @@ export default function MeScreen() {
 
   const [isUpdateProfile, setIsUpdateProfile] = useState(false);
   const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false);
-  const [imageIndex, setiImageIndex] = useState(0);
+  const [isLogoutAll, setIsLogoutAll] = useState(false);
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
 
   const handleFetchProfile = async () => {
@@ -51,12 +52,6 @@ export default function MeScreen() {
     },
   ];
 
-  const handleLogoutAll = () => {
-    console.log('before all ', currentKey);
-    makeId();
-    console.log('after all ', currentKey);
-  };
-
   const handleLogOut = () => {
     Alert.alert('Cảnh báo', 'Bạn có muốn đăng xuất không?', [
       {
@@ -69,6 +64,28 @@ export default function MeScreen() {
         },
       },
     ]);
+  };
+
+  const handleLogoutAll = () => {
+    Alert.prompt(
+      'Đăng xuất ra khỏi các thiết bị khác',
+      'Nhập mật khẩu hiện tại của bạn đề đăng xuất ra khỏi các thiết bị khác',
+      [
+        {
+          text: 'Không',
+        },
+        {
+          text: 'Có',
+          onPress: async password => {
+            console.log('before all ', currentKey);
+            makeId();
+            console.log('after all ', currentKey);
+            console.log('OK Pressed, password: ' + password);
+          },
+        },
+      ],
+      'secure-text',
+    );
   };
 
   const handleViewImage = url => {
@@ -195,7 +212,7 @@ export default function MeScreen() {
             title="Đổi mật khẩu"
           />
           <OptionButton
-            onPress={handleLogoutAll}
+            onPress={() => setIsLogoutAll(true)}
             iconType="material"
             iconName="logout"
             title="Đăng xuất ra khỏi các thiết bị khác"
@@ -223,6 +240,12 @@ export default function MeScreen() {
         <ChangePasswordModal
           modalVisible={isChangePasswordVisible}
           setModalVisible={setIsChangePasswordVisible}
+        />
+      )}
+      {isLogoutAll && (
+        <LogoutAllModal
+          modalVisible={isLogoutAll}
+          setModalVisible={setIsLogoutAll}
         />
       )}
     </SafeAreaView>

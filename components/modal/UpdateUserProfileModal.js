@@ -20,6 +20,7 @@ import {ERROR_MESSAGE} from '../../constants';
 import {fetchProfile} from '../../redux/meSlice';
 import commonFuc from '../../utils/commonFuc';
 import {userProfileValid} from '../../utils/validator';
+import CustomModal from './CustomModal';
 
 const UpdateUserProfileModal = props => {
   const {modalVisible, setModalVisible} = props;
@@ -100,90 +101,79 @@ const UpdateUserProfileModal = props => {
   };
 
   return (
-    <SafeAreaView style={styles.centeredView}>
-      <Modal
-        animationType="fade"
-        transparent={true}
+    <>
+      <CustomModal
         visible={modalVisible}
-        onRequestClose={handleCloseModal}>
-        <TouchableOpacity
-          activeOpacity={1}
-          // onPressOut={handleCloseModal}
-          style={styles.container}>
-          <SafeAreaView style={styles.modalView}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Cập nhật thông tin</Text>
-            </View>
-            <Formik
-              initialValues={initialValues}
-              validationSchema={userProfileValid.validationSchema}
-              onSubmit={values => handleUpdateUserProfile(values)}>
-              {formikProps => {
-                const {values, errors, handleChange, handleSubmit} =
-                  formikProps;
-                return (
-                  <>
-                    <View style={styles.body}>
-                      <InputField
-                        placeholder={'Họ và tên'}
-                        autoFocus
-                        onChangeText={handleChange('name')}
-                        value={values.name}
-                        error={errors.name}
-                        style={{fontSize: 15, paddingBottom: 0}}
-                        inputContainerStyle={{
-                          borderBottomWidth: 0,
-                          width: '100%',
-                        }}
-                        maxLength={30}
-                      />
+        onCloseModal={handleCloseModal}
+        title="Cập nhật thông tin">
+        <Formik
+          initialValues={initialValues}
+          validationSchema={userProfileValid.validationSchema}
+          onSubmit={values => handleUpdateUserProfile(values)}>
+          {formikProps => {
+            const {values, errors, handleChange, handleSubmit} = formikProps;
+            return (
+              <>
+                <View style={styles.body}>
+                  <InputField
+                    placeholder={'Họ và tên'}
+                    autoFocus
+                    onChangeText={handleChange('name')}
+                    value={values.name}
+                    error={errors.name}
+                    style={{fontSize: 15, paddingBottom: 0}}
+                    inputContainerStyle={{
+                      borderBottomWidth: 0,
+                      width: '100%',
+                    }}
+                    maxLength={30}
+                  />
 
-                      <CheckBox
-                        center
-                        title="Nam"
-                        checkedIcon="dot-circle-o"
-                        uncheckedIcon="circle-o"
-                        checked={!genderValue}
-                        onPress={() => setGenderValue(false)}
-                        value={false}
-                      />
-                      <CheckBox
-                        center
-                        title="Nữ"
-                        checkedIcon="dot-circle-o"
-                        uncheckedIcon="circle-o"
-                        checked={genderValue}
-                        onPress={() => setGenderValue(true)}
-                        value={true}
-                      />
+                  <CheckBox
+                    center
+                    title="Nam"
+                    checkedIcon="dot-circle-o"
+                    uncheckedIcon="circle-o"
+                    checked={!genderValue}
+                    onPress={() => setGenderValue(false)}
+                    value={false}
+                  />
+                  <CheckBox
+                    center
+                    title="Nữ"
+                    checkedIcon="dot-circle-o"
+                    uncheckedIcon="circle-o"
+                    checked={genderValue}
+                    onPress={() => setGenderValue(true)}
+                    value={true}
+                  />
 
-                      <Button
-                        type="clear"
-                        title={dobTitle}
-                        onPress={handleOpenDatePicker}
-                      />
-                    </View>
-                    <View style={styles.footer}>
-                      <Button
-                        title="Hủy"
-                        onPress={handleCloseModal}
-                        type="clear"
-                        titleStyle={{color: 'black'}}
-                        containerStyle={{marginRight: 20}}
-                      />
-                      <Button
-                        title="Cập nhật"
-                        onPress={handleSubmit}
-                        type="clear"
-                      />
-                    </View>
-                  </>
-                );
-              }}
-            </Formik>
-          </SafeAreaView>
-        </TouchableOpacity>
-      </Modal>
+                  <Button
+                    type="clear"
+                    title={dobTitle}
+                    onPress={handleOpenDatePicker}
+                  />
+                </View>
+                <View style={styles.footer}>
+                  <Button
+                    title="Hủy"
+                    onPress={handleCloseModal}
+                    type="clear"
+                    titleStyle={{color: 'black'}}
+                    containerStyle={{marginRight: 20}}
+                  />
+                  <Button
+                    title="Cập nhật"
+                    onPress={handleSubmit}
+                    type="clear"
+                  />
+                </View>
+              </>
+            );
+          }}
+        </Formik>
+      </CustomModal>
+
       {show && (
         <DateTimePickerModal
           isVisible={show}
@@ -193,7 +183,7 @@ const UpdateUserProfileModal = props => {
           onCancel={hideDatePicker}
         />
       )}
-    </SafeAreaView>
+    </>
   );
 };
 
