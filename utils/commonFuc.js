@@ -219,6 +219,9 @@ export const handleCreateChat = async (
     await dispatch(fetchConversations());
     // if (response?.isExists) {
     console.log('Nhan Tin: ', response._id);
+
+    console.log('currentConversationId: ', currentConversationId);
+
     handleEnterChat(response._id, navigation, dispatch, currentConversationId);
     // }
   } catch (error) {
@@ -245,10 +248,11 @@ const handleEnterChat = (
     // dispatch(fetchListLastViewer({conversationId}));
     // dispatch(fetchMembers({conversationId}));
     dispatch(setCurrentChannel({conversationId}));
+    dispatch(resetPinSlice());
 
     console.log('conver: ', conversationId);
   }
-  navigation.navigate('Nhắn tin', {
+  navigation.replace('Nhắn tin', {
     conversationId,
   });
 };

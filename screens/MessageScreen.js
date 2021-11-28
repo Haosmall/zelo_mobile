@@ -92,7 +92,8 @@ export default function MessageScreen({navigation, route}) {
   const handleGoBack = () => {
     dispatch(clearMessagePages());
     dispatch(resetPinSlice());
-    navigation.goBack();
+    navigation.popToTop();
+    // navigation.goBack();
     return true;
   };
 

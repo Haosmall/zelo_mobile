@@ -109,7 +109,12 @@ export const changePasswordValid = {
   },
   validationSchema: Yup.object().shape({
     oldPassword: Yup.string().required('Mật khẩu cũ không được để trống'),
-    newPassword: Yup.string().required('Mật khẩu mới không được để trống'),
+    newPassword: Yup.string()
+      .required('Mật khẩu mới không được để trống')
+      .notOneOf(
+        [Yup.ref('oldPassword'), null],
+        'Mật khẩu mới không trùng với mật khẩu cũ',
+      ),
     passwordConfirmation: Yup.string()
       .required('Không được để trống')
       .oneOf([Yup.ref('newPassword'), null], 'Mật khẩu không khớp'),
