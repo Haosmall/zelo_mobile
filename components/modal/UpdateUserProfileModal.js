@@ -115,44 +115,67 @@ const UpdateUserProfileModal = props => {
             return (
               <>
                 <View style={styles.body}>
-                  <InputField
-                    placeholder={'Họ và tên'}
-                    autoFocus
-                    onChangeText={handleChange('name')}
-                    value={values.name}
-                    error={errors.name}
-                    style={{fontSize: 15, paddingBottom: 0}}
-                    inputContainerStyle={{
-                      borderBottomWidth: 0,
-                      width: '100%',
-                    }}
-                    maxLength={30}
-                  />
+                  <View style={styles.row}>
+                    <Text style={styles.titleBody}>Họ và tên</Text>
+                    <InputField
+                      placeholder={'Họ và tên'}
+                      autoFocus
+                      onChangeText={handleChange('name')}
+                      value={values.name}
+                      error={errors.name}
+                      style={{fontSize: 15, paddingBottom: 0}}
+                      inputContainerStyle={{
+                        borderBottomWidth: 0,
+                        width: '100%',
+                      }}
+                      maxLength={30}
+                    />
+                  </View>
 
-                  <CheckBox
-                    center
-                    title="Nam"
-                    checkedIcon="dot-circle-o"
-                    uncheckedIcon="circle-o"
-                    checked={!genderValue}
-                    onPress={() => setGenderValue(false)}
-                    value={false}
-                  />
-                  <CheckBox
-                    center
-                    title="Nữ"
-                    checkedIcon="dot-circle-o"
-                    uncheckedIcon="circle-o"
-                    checked={genderValue}
-                    onPress={() => setGenderValue(true)}
-                    value={true}
-                  />
+                  <View style={styles.row}>
+                    <Text style={styles.titleBody}>Giới tính</Text>
+                    <CheckBox
+                      center
+                      title="Nam"
+                      checkedIcon="dot-circle-o"
+                      uncheckedIcon="circle-o"
+                      checked={!genderValue}
+                      onPress={() => setGenderValue(false)}
+                      value={false}
+                      containerStyle={{
+                        // width: 100,
+                        backgroundColor: '#fff',
+                        borderColor: '#fff',
+                        borderWidth: 0,
+                      }}
+                    />
+                    <CheckBox
+                      center
+                      title="Nữ"
+                      checkedIcon="dot-circle-o"
+                      uncheckedIcon="circle-o"
+                      checked={genderValue}
+                      onPress={() => setGenderValue(true)}
+                      value={true}
+                      containerStyle={{
+                        // width: 100,
+                        backgroundColor: '#fff',
+                        borderColor: '#fff',
+                        borderWidth: 0,
+                      }}
+                    />
+                  </View>
 
-                  <Button
-                    type="clear"
-                    title={dobTitle}
-                    onPress={handleOpenDatePicker}
-                  />
+                  <View style={styles.row}>
+                    <Text style={styles.titleBody}>Ngày sinh</Text>
+                    <Button
+                      type="clear"
+                      title={dobTitle}
+                      onPress={handleOpenDatePicker}
+                      titleStyle={{color: '#000'}}
+                      containerStyle={{marginLeft: 10}}
+                    />
+                  </View>
                 </View>
                 <View style={styles.footer}>
                   <Button
@@ -238,6 +261,16 @@ const styles = StyleSheet.create({
     borderBottomColor: 'black',
   },
   body: {},
+  titleBody: {
+    width: '20%',
+    alignSelf: 'center',
+    // backgroundColor: 'pink',
+    fontSize: 15,
+  },
+  row: {
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+  },
   footer: {
     paddingHorizontal: 15,
     paddingBottom: 5,
