@@ -527,6 +527,59 @@ const messageSlice = createSlice({
     resetMessageSlice: (state, action) => {
       Object.assign(state, initialState);
     },
+
+    // TODO:---------------------- updateAvatarConversation ----------------------
+    updateAvatarConversation: (state, action) => {
+      const {conversationId, conversationAvatar, message} = action.payload;
+
+      if (conversationId === state.currentConversationId) {
+        const oldConversation = state.currentConversation;
+
+        state.currentConversation = {
+          ...oldConversation,
+          avatar: conversationAvatar,
+        };
+      }
+
+      const index = state.conversations.findIndex(
+        ele => ele._id === conversationId,
+      );
+
+      const conversationSearch = state.conversations[index];
+
+      state.conversations[index] = {
+        ...conversationSearch,
+        avatar: conversationAvatar,
+      };
+    },
+
+    // TODO:---------------------- updateMangerIds ----------------------
+    updateMangerIds: (state, action) => {
+      const {conversationId, memberId, isAddManager} = action.payload;
+
+      const index = state.conversations.findIndex(
+        ele => ele._id === conversationId,
+      );
+
+      const conversationSearch = state.conversations[index];
+      const oldMangerIds = conversationSearch.managerIds;
+      let newManagerIds;
+      if (isAddManager) {
+        newManagerIds = [...oldMangerIds, memberId];
+      } else {
+        newManagerIds = oldMangerIds.filter(ele => ele !== memberId);
+      }
+
+      const newConversation = {
+        ...conversationSearch,
+        managerIds: newManagerIds,
+      };
+
+      state.conversations[index] = newConversation;
+      if (state.currentConversationId === conversationId) {
+        state.currentConversation = newConversation;
+      }
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {
@@ -706,5 +759,7 @@ export const {
   clearMessages,
   updateChannel,
   deleteChannel,
+  updateAvatarConversation,
+  updateMangerIds,
 } = actions;
 export default reducer;

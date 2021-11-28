@@ -7,6 +7,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 import RNFetchBlob from 'react-native-fetch-blob';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import RNRestart from 'react-native-restart';
 import {conversationApi} from '../api';
 import {ERROR_MESSAGE, messageType, REACTIONS} from '../constants';
@@ -276,7 +277,7 @@ export const checkPermissionDownloadFile = async fileUrl => {
       }
     } catch (err) {
       // To handle permission related exception
-      console.log('++++' + err);
+      console.error(err);
     }
   }
 };
@@ -339,6 +340,84 @@ export const makeId = () => {
     );
 
   return currentKey;
+};
+
+export const showImagePicker = async (uploadFile, isCoverImage) => {
+  const options = {
+    mediaType: 'photo',
+    includeBase64: true,
+  };
+
+  await launchImageLibrary(options, async res => {
+    console.log('res = ', res);
+
+    if (res.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (res.error) {
+      console.log('ImagePicker Error: ', res.error);
+    } else if (res.customButton) {
+      console.log('User tapped custom button: ', res.customButton);
+      alert(res.customButton);
+    } else {
+      let source = res.assets[0];
+      console.log('source = ', source.uri);
+      await handleSendImage(source, uploadFile, isCoverImage);
+    }
+  });
+};
+
+export const openCamera = async (uploadFile, isCoverImage) => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: 'App Camera Permission',
+        message: 'Ứng dụng cần quyền truy cập vào máy ảnh của bạn',
+        buttonNeutral: 'Hỏi lại tôi sau',
+        buttonNegative: 'Hủy',
+        buttonPositive: 'Đồng ý',
+      },
+    );
+    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('Camera permission denied');
+      return;
+    } else {
+      console.log('Camera permission given');
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+
+  const options = {
+    mediaType: 'photo',
+    includeBase64: true,
+  };
+  launchCamera(options, async res => {
+    console.log('res = ', res);
+
+    if (res.didCancel) {
+      console.log('User cancelled camera');
+    } else if (res.error) {
+      console.error('ImagePicker Error: ', res.error);
+    } else if (res.customButton) {
+      console.log('User tapped custom button: ', res.customButton);
+      alert(res.customButton);
+    } else {
+      let source = res.assets[0];
+      await handleSendImage(source, uploadFile, isCoverImage);
+    }
+  });
+};
+
+const handleSendImage = async (file, uploadFile, isCoverImage) => {
+  const fileNameSplit = file.fileName.split('.');
+  const fileName = fileNameSplit[0];
+  const fileBase64 = file.base64;
+  const fileExtension = `.${fileNameSplit[1]}`;
+
+  const body = {fileName, fileExtension, fileBase64};
+
+  await uploadFile(body, isCoverImage);
 };
 
 export default commonFuc;

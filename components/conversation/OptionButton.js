@@ -14,14 +14,15 @@ export default function OptionButton(props) {
     iconName,
     iconColor,
     subtitle,
+    containerStyle,
   } = props;
   return (
     <>
       <TouchableOpacity onPress={onPress}>
         <ListItem
-        // topDivider={false}
-        // bottomDivider={false}
-        >
+          // topDivider={false}
+          // bottomDivider={false}
+          containerStyle={containerStyle}>
           <Icon type={iconType} name={iconName} color={iconColor} />
           <ListItem.Content>
             <ListItem.Title style={titleStyle}>{title}</ListItem.Title>
@@ -43,6 +44,7 @@ OptionButton.propTypes = {
   title: PropTypes.string,
   dividerStyle: PropTypes.object,
   titleStyle: PropTypes.object,
+  containerStyle: PropTypes.object,
   iconType: PropTypes.string,
   iconName: PropTypes.string,
   iconColor: PropTypes.string,
@@ -54,6 +56,7 @@ OptionButton.defaultProps = {
   title: '',
   dividerStyle: {},
   titleStyle: {},
+  containerStyle: null,
   iconType: '',
   iconName: '',
   subtitle: '',

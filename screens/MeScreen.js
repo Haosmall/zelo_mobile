@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
   Pressable,
@@ -9,15 +9,22 @@ import {
   View,
 } from 'react-native';
 import {Avatar, Image, ListItem} from 'react-native-elements';
+import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
+import {meApi} from '../api';
 import test from '../assets/favicon1.png';
 import OptionButton from '../components/conversation/OptionButton';
+import AvatarModal from '../components/modal/AvatarModal';
 import ChangePasswordModal from '../components/modal/ChangePasswordModal';
 import LogoutAllModal from '../components/modal/LogoutAllModal';
 import UpdateUserProfileModal from '../components/modal/UpdateUserProfileModal';
 import ViewImageModal from '../components/modal/ViewImageModal';
-import {DEFAULT_COVER_IMAGE, DEFAULT_IMAGE_MODAL} from '../constants';
-import {fetchProfile} from '../redux/meSlice';
+import {
+  DEFAULT_COVER_IMAGE,
+  DEFAULT_IMAGE_MODAL,
+  ERROR_MESSAGE,
+} from '../constants';
+import {fetchProfile, updateImage} from '../redux/meSlice';
 import globalStyles, {
   OVERLAY_AVATAR_COLOR,
   WINDOW_HEIGHT,
@@ -33,6 +40,8 @@ export default function MeScreen() {
   const [isUpdateProfile, setIsUpdateProfile] = useState(false);
   const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false);
   const [isLogoutAll, setIsLogoutAll] = useState(false);
+  const [isImageVisible, setIsImageVisible] = useState(false);
+  const isCoverImageRef = useRef(false);
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
 
   const handleFetchProfile = async () => {
@@ -88,7 +97,19 @@ export default function MeScreen() {
     );
   };
 
-  const handleViewImage = url => {
+  const handleViewImage = isCoverImage => {
+    let url = null;
+    if (isCoverImage) {
+      url = userProfile?.coverImage;
+    } else {
+      url = userProfile.avatar;
+    }
+
+    if (!isCoverImage && !url) {
+      commonFuc.notifyMessage('Bạn chưa có ảnh đại diện');
+      return;
+    }
+
     setImageProps({
       isVisible: true,
       userName: userProfile.name,
@@ -131,15 +152,60 @@ export default function MeScreen() {
     return phoneNumber;
   };
 
+  const onImagePress = isCoverImage => {
+    isCoverImageRef.current = isCoverImage;
+    setIsImageVisible(true);
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('upload... 0%');
+
+  const onUploadProgress = percentCompleted => {
+    if (percentCompleted < 99) {
+      setLoadingText(`upload... ${percentCompleted}%`);
+    } else {
+      setIsLoading(false);
+      setLoadingText('upload... 0%');
+    }
+  };
+
+  const handleUploadFile = async (body, isCoverImage) => {
+    setIsImageVisible(false);
+    console.log('Body upload: ', body);
+    try {
+      if (isCoverImage) {
+        const response = await meApi.updateCoverImageBase64(
+          body,
+          onUploadProgress,
+        );
+        console.log('coverImage: ', response.coverImage);
+        dispatch(updateImage({isCoverImage, uri: response.coverImage}));
+      } else {
+        const response = await meApi.updateAvatarBase64(body, onUploadProgress);
+        console.log('avatar: ', response.avatar);
+        dispatch(updateImage({isCoverImage, uri: response.avatar}));
+      }
+    } catch (error) {
+      console.error('Upload image: ', error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <Spinner
+        visible={isLoading}
+        textContent={loadingText}
+        textStyle={globalStyles.spinnerTextStyle}
+      />
       <ScrollView>
         <View style={{backgroundColor: '#fff'}}>
           <View style={styles.header}>
             <Image
               source={{uri: userProfile?.coverImage || DEFAULT_COVER_IMAGE}}
               style={styles.coverImage}
-              onPress={() => handleViewImage(userProfile?.coverImage)}
+              onPress={() => onImagePress(true)}
+              // onPress={() => handleViewImage(userProfile?.coverImage)}
             />
             {/* <View style={{width: '100%', justifyContent: 'center'}}>
             </View> */}
@@ -153,9 +219,10 @@ export default function MeScreen() {
                   userProfile?.avatarColor || OVERLAY_AVATAR_COLOR,
               }}
               containerStyle={styles.avatar}
-              onPress={() =>
-                userProfile.avatar && handleViewImage(userProfile.avatar)
-              }
+              onPress={() => onImagePress(false)}
+              // onPress={() =>
+              //   userProfile.avatar && handleViewImage(userProfile.avatar)
+              // }
             />
           </View>
           <View style={styles.action}>
@@ -163,25 +230,39 @@ export default function MeScreen() {
           </View>
         </View>
         <View style={styles.detailsContainer}>
-          <ListItem topDivider>
+          <View style={styles.dividerContainer}>
+            <View style={styles.divider}></View>
+          </View>
+          <ListItem>
             <Text style={styles.title}>Giới tính</Text>
             <Text style={styles.content}>
               {userProfile.gender ? 'Nữ' : 'Nam'}
             </Text>
           </ListItem>
-          <ListItem topDivider>
+          <View style={styles.dividerContainer}>
+            <View style={styles.divider}></View>
+          </View>
+          <ListItem>
             <Text style={styles.title}>Ngày sinh</Text>
             <Text style={styles.content}>{handleDoB()}</Text>
           </ListItem>
           {handleEmail().length > 0 && (
-            <ListItem topDivider>
-              <Text style={styles.title}>Email</Text>
-              <Text style={styles.content}>{handleEmail()}</Text>
-            </ListItem>
+            <>
+              <View style={styles.dividerContainer}>
+                <View style={styles.divider}></View>
+              </View>
+              <ListItem>
+                <Text style={styles.title}>Email</Text>
+                <Text style={styles.content}>{handleEmail()}</Text>
+              </ListItem>
+            </>
           )}
           {handlePhoneNumber().length > 0 && (
             <>
-              <ListItem topDivider>
+              <View style={styles.dividerContainer}>
+                <View style={styles.divider}></View>
+              </View>
+              <ListItem>
                 <Text style={styles.title}>Điện thoại</Text>
                 <Text style={styles.content}>{handlePhoneNumber()}</Text>
               </ListItem>
@@ -248,6 +329,15 @@ export default function MeScreen() {
           setModalVisible={setIsLogoutAll}
         />
       )}
+      {isImageVisible && (
+        <AvatarModal
+          modalVisible={isImageVisible}
+          setModalVisible={setIsImageVisible}
+          isCoverImage={isCoverImageRef.current}
+          onViewImage={handleViewImage}
+          onUploadFile={handleUploadFile}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -312,5 +402,15 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 50,
+  },
+  dividerContainer: {
+    backgroundColor: '#fff',
+    height: 2,
+  },
+  divider: {
+    borderBottomWidth: 1,
+    // borderBottomColor: 'red',
+    borderBottomColor: '#E5E6E8',
+    marginHorizontal: 15,
   },
 });

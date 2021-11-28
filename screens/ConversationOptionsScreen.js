@@ -24,12 +24,16 @@ import {
   ERROR_MESSAGE,
   LEAVE_GROUP_MESSAGE,
   messageType,
+  DEFAULT_IMAGE_MODAL,
 } from '../constants';
 import {useGoback} from '../hooks';
 import {fetchFiles, fetchMembers} from '../redux/messageSlice';
 import globalStyles, {OVERLAY_AVATAR_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 import AddChannelModal from '../components/modal/AddChannelModal';
+import ViewImageModal from '../components/modal/ViewImageModal';
+import AvatarModal from '../components/modal/AvatarModal';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId, channelIdRef} = route.params;
@@ -48,6 +52,10 @@ export default function ConversationOptionsScreen({navigation, route}) {
   );
   const [addChannel, setAddChannel] = useState(DEFAULT_CHANNEL_MODAL);
   const [addVoteVisible, setAddVoteVisible] = useState(DEFAULT_ADD_VOTE_MODAL);
+  const [isImageVisible, setIsImageVisible] = useState(false);
+  const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('upload... 0%');
 
   useGoback(navigation);
 
@@ -140,12 +148,53 @@ export default function ConversationOptionsScreen({navigation, route}) {
     setAddChannel({...DEFAULT_CHANNEL_MODAL, isVisible: true});
   };
 
+  const handleViewImage = () => {
+    if (!avatar || typeof avatar !== 'string') {
+      commonFuc.notifyMessage('Không có ảnh đại diện');
+      return;
+    }
+
+    setImageProps({
+      isVisible: true,
+      userName: currentConversation.name,
+      content: [{url: avatar}],
+      isImage: true,
+    });
+  };
+
+  const onUploadProgress = percentCompleted => {
+    if (percentCompleted < 99) {
+      setLoadingText(`upload... ${percentCompleted}%`);
+    } else {
+      setIsLoading(false);
+      setLoadingText('upload... 0%');
+    }
+  };
+
+  const handleUploadFile = async body => {
+    setIsImageVisible(false);
+    console.log('Body upload: ', body);
+    try {
+      await conversationApi.updateAvatarBase64(
+        currentConversationId,
+        body,
+        onUploadProgress,
+      );
+    } catch (error) {
+      console.error('Upload image: ', error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <Spinner
+        visible={isLoading}
+        textContent={loadingText}
+        textStyle={globalStyles.spinnerTextStyle}
+      />
       <ScrollView>
-        <Pressable
-          style={styles.subContainer}
-          onPress={() => commonFuc.notifyMessage('Xem ava')}>
+        <Pressable style={styles.subContainer} onPress={handleViewImage}>
           <Avatar
             rounded
             size="large"
@@ -170,7 +219,7 @@ export default function ConversationOptionsScreen({navigation, route}) {
                 color="transparent"
                 iconStyle={{color: 'black'}}
                 containerStyle={styles.avatarAccessory}
-                onPress={() => commonFuc.notifyMessage('Nhóm')}
+                onPress={() => setIsImageVisible(true)}
                 style={styles.avatarAccessory}
               />
             )}
@@ -259,6 +308,16 @@ export default function ConversationOptionsScreen({navigation, route}) {
 
       {addChannel.isVisible && (
         <AddChannelModal modalProps={addChannel} onShowModal={setAddChannel} />
+      )}
+      <ViewImageModal imageProps={imageProps} setImageProps={setImageProps} />
+      {isImageVisible && (
+        <AvatarModal
+          modalVisible={isImageVisible}
+          setModalVisible={setIsImageVisible}
+          isCoverImage={false}
+          onViewImage={handleViewImage}
+          onUploadFile={handleUploadFile}
+        />
       )}
     </SafeAreaView>
   );

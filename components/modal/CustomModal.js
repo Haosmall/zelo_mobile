@@ -26,6 +26,10 @@ const CustomModal = props => {
     onCloseModal,
     children,
     isShowTitle,
+    submitTitle,
+    onSubmit,
+    cancelTitle,
+    containerStyle,
   } = props;
 
   return (
@@ -39,7 +43,7 @@ const CustomModal = props => {
           activeOpacity={1}
           onPressOut={isPressOut ? onCloseModal : null}
           style={styles.container}>
-          <SafeAreaView style={styles.modalView}>
+          <SafeAreaView style={[styles.modalView, containerStyle]}>
             {isShowTitle && (
               <>
                 <View style={styles.header}>
@@ -54,13 +58,13 @@ const CustomModal = props => {
             {showFooter && (
               <View style={styles.footer}>
                 <Button
-                  title="Hủy"
+                  title={cancelTitle}
                   onPress={onCloseModal}
                   type="clear"
                   titleStyle={{color: 'black'}}
                   containerStyle={{marginRight: 20}}
                 />
-                <Button title="Đăng xuất" onPress={handleSubmit} type="clear" />
+                <Button title={submitTitle} onPress={onSubmit} type="clear" />
               </View>
             )}
           </SafeAreaView>
@@ -77,6 +81,10 @@ CustomModal.propTypes = {
   isPressOut: PropTypes.bool,
   isShowTitle: PropTypes.bool,
   onCloseModal: PropTypes.func,
+  submitTitle: PropTypes.string,
+  onSubmit: PropTypes.func,
+  cancelTitle: PropTypes.string,
+  containerStyle: PropTypes.object,
 };
 
 CustomModal.defaultProps = {
@@ -86,6 +94,10 @@ CustomModal.defaultProps = {
   isPressOut: false,
   isShowTitle: true,
   onCloseModal: null,
+  submitTitle: 'Ok',
+  onSubmit: null,
+  cancelTitle: 'Cancel',
+  containerStyle: null,
 };
 
 const BUTTON_RADIUS = 10;

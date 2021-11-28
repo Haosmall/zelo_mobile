@@ -95,7 +95,7 @@ const ImagePickerModal = props => {
       if (res.didCancel) {
         console.log('User cancelled camera');
       } else if (res.error) {
-        console.log('ImagePicker Error: ', res.error);
+        console.error('ImagePicker Error: ', res.error);
       } else if (res.customButton) {
         console.log('User tapped custom button: ', res.customButton);
         alert(res.customButton);

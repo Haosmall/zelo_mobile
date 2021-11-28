@@ -48,6 +48,13 @@ export const friendType = {
   ADD_TO_GROUP: 'ADD_TO_GROUP',
   REMOVE_FROM_GROUP: 'REMOVE_FROM_GROUP',
 };
+
+export const memberType = {
+  LEADER: 'LEADER',
+  DEPUTY_LEADER: 'DEPUTY_LEADER',
+  MEMBER: 'MEMBER',
+};
+
 export const DEFAULT_MESSAGE_MODAL_VISIBLE = {
   isVisible: false,
   isRecall: false,
@@ -88,4 +95,12 @@ export const DEFAULT_CHANNEL_MODAL = {
   isVisible: false,
   name: '',
   channelId: '',
+};
+
+export const DEFAULT_MEMBER_MODAL = {
+  isVisible: false,
+  memberRole: memberType.MEMBER,
+  userRole: memberType.LEADER,
+  memberId: '',
+  memberName: '',
 };

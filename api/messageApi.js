@@ -31,7 +31,6 @@ const messageApi = {
 
   sendFileBase64Message: (file, params, uploadProgress) => {
     const {type, conversationId, channelId} = params;
-    console.log('file type: ', typeof file);
 
     const config = {
       params: {

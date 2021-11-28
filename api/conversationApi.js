@@ -81,6 +81,33 @@ const conversationApi = {
   fetchListLastViewer: conversationId => {
     return axiosClient.get(`${BASE_URL}/${conversationId}/last-view`);
   },
+
+  updateAvatarBase64: (groupId, image, uploadProgress) => {
+    const url = `${BASE_URL}/${groupId}/avatar/base64`;
+    const config = {
+      onUploadProgress: progressEvent => {
+        if (typeof uploadProgress === 'function') {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
+          uploadProgress(percentCompleted);
+        }
+      },
+    };
+    return axiosClient.patch(url, image, config);
+  },
+
+  addManager: (conversationId, managerIds) => {
+    return axiosClient.post(`${BASE_URL}/${conversationId}/managers`, {
+      managerIds,
+    });
+  },
+
+  deleteManager: (conversationId, managerIds) => {
+    return axiosClient.delete(`${BASE_URL}/${conversationId}/managers`, {
+      data: {managerIds},
+    });
+  },
 };
 
 export default conversationApi;

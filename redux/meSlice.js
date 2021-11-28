@@ -45,6 +45,17 @@ const meSlice = createSlice({
     resetMeSlice: (state, action) => {
       Object.assign(state, initialState);
     },
+    updateImage: (state, action) => {
+      const {isCoverImage, uri} = action.payload;
+      const oldProfile = state.userProfile;
+      let newProfile;
+      if (isCoverImage) {
+        newProfile = {...oldProfile, coverImage: uri};
+      } else {
+        newProfile = {...oldProfile, avatar: uri};
+      }
+      state.userProfile = newProfile;
+    },
   },
   // xu ly api roi thay doi state
   extraReducers: {
@@ -91,5 +102,5 @@ const meSlice = createSlice({
 });
 
 const {reducer, actions} = meSlice;
-export const {setLoading, resetMeSlice} = actions;
+export const {setLoading, resetMeSlice, updateImage} = actions;
 export default reducer;

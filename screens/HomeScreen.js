@@ -40,6 +40,7 @@ import {
   fetchMessages,
   renameConversation,
   setNotification,
+  updateAvatarConversation,
   updateChannel,
   updateCurrentConversation,
   updateVoteMessage,
@@ -147,6 +148,20 @@ export default function HomeScreen({navigation}) {
       console.log('delete-conversation');
       dispatch(fetchConversations());
     });
+
+    socket.on(
+      'update-avatar-conversation',
+      (conversationId, conversationAvatar, message) => {
+        console.log('update-avatar-conversation');
+        dispatch(
+          updateAvatarConversation({
+            conversationId,
+            conversationAvatar,
+            message,
+          }),
+        );
+      },
+    );
 
     // TODO:<====================== message socket ======================>
     socket.on('new-message', (conversationId, message) => {
