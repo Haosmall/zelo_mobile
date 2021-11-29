@@ -32,7 +32,7 @@ import globalStyles, {
 } from '../styles';
 import commonFuc, {currentKey, logout, makeId} from '../utils/commonFuc';
 
-export default function MeScreen() {
+export default function MeScreen({navigation}) {
   const dispatch = useDispatch();
 
   const {userProfile} = useSelector(state => state.me);

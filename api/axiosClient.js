@@ -49,7 +49,7 @@ axiosClient.interceptors.response.use(
 
   error => {
     // return error.response;
-    console.error(error.response);
+    console.log(error.response);
     throw error;
   },
 );

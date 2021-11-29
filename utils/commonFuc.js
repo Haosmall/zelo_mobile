@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  Alert,
   AlertIOS,
   PermissionsAndroid,
   Platform,
@@ -8,7 +7,6 @@ import {
 } from 'react-native';
 import RNFetchBlob from 'react-native-fetch-blob';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import RNRestart from 'react-native-restart';
 import {conversationApi} from '../api';
 import {ERROR_MESSAGE, messageType, REACTIONS} from '../constants';
 import {resetFriendSlice} from '../redux/friendSlice';
@@ -22,6 +20,7 @@ import {
 } from '../redux/messageSlice';
 import {resetPinSlice} from '../redux/pinSlice';
 import dateUtils from './dateUtils';
+import {disconnect} from './socketClient';
 
 const commonFuc = {
   getBase64: file => {
@@ -195,17 +194,18 @@ const commonFuc = {
   },
 };
 
-export const logout = async dispatch => {
-  await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('refreshToken');
-  await AsyncStorage.removeItem('userId');
+export const logout = dispatch => {
+  AsyncStorage.removeItem('token');
+  AsyncStorage.removeItem('refreshToken');
+  AsyncStorage.removeItem('userId');
   dispatch(resetFriendSlice());
   dispatch(resetGlobalSlice());
   dispatch(resetMeSlice());
   dispatch(resetMessageSlice());
   dispatch(resetPinSlice());
+  disconnect();
   // dispatch(setLogin(false));
-  RNRestart.Restart();
+  // RNRestart.Restart();
 };
 
 export const handleCreateChat = async (

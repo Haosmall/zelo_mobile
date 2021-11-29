@@ -2,7 +2,6 @@ import React, {useEffect, useRef} from 'react';
 import {
   FlatList,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,7 +20,7 @@ export default function ContactScreen({navigation}) {
   const dispatch = useDispatch();
 
   const {listFriends} = useSelector(state => state.friend);
-  const {socket, isLoading} = useSelector(state => state.global);
+  const {isLoading} = useSelector(state => state.global);
 
   const inputRef = useRef('');
   const typingTimeoutRef = useRef(null);

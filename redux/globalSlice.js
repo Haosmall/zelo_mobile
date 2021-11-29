@@ -9,7 +9,6 @@ const initialState = {
   modalVisible: false,
   currentUserId: '',
   keyboardHeight: 280,
-  socket: {},
   stickers: [],
 };
 
@@ -47,9 +46,6 @@ const globalSlice = createSlice({
       }
       state.keyboardHeight = keyboardHeight;
     },
-    initSocket: (state, action) => {
-      state.socket = action.payload;
-    },
     resetGlobalSlice: (state, action) => {
       Object.assign(state, initialState);
     },
@@ -80,7 +76,6 @@ export const {
   setModalVisible,
   setCurrentUserId,
   setKeyboardHeight,
-  initSocket,
   resetGlobalSlice,
 } = actions;
 export default reducer;

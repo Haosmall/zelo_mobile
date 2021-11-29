@@ -21,12 +21,12 @@ import {
   messageType,
 } from '../../constants';
 import globalStyles, {
-  GREY_COLOR,
   MAIN_COLOR,
   OVERLAY_AVATAR_COLOR,
   WINDOW_WIDTH,
 } from '../../styles';
 import commonFuc from '../../utils/commonFuc';
+import {socket} from '../../utils/socketClient';
 import MessageReply from './MessageReply';
 
 const TAG_REGEX = /((\@)\[([^[]*)]\(([^(^)]*)\))/g;
@@ -45,7 +45,6 @@ const MessageBottomBar = props => {
   const [messageValue, setMessageValue] = useState('');
   const {userProfile} = useSelector(state => state.me);
   const {currentChannelId} = useSelector(state => state.message);
-  const {socket} = useSelector(state => state.global);
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('upload... 0%');
@@ -358,6 +357,9 @@ const MessageBottomBar = props => {
             value={messageValue}
             onChange={value => handleOnChageTextInput(value)}
             onFocus={() => showStickyBoard(false)}
+            onBlur={() =>
+              socket.emit('not-typing', conversationId, userProfile)
+            }
             style={styles.mentionInput}
             containerStyle={[
               styles.textInput,
@@ -383,6 +385,9 @@ const MessageBottomBar = props => {
             value={messageValue}
             onChangeText={value => handleOnChageTextInput(value)}
             onFocus={() => showStickyBoard(false)}
+            onBlur={() =>
+              socket.emit('not-typing', conversationId, userProfile)
+            }
             style={[
               styles.textInput,
               {maxHeight: 110, padding: 10, paddingVertical: 5},

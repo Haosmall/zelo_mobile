@@ -1,7 +1,6 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import PushNotification from 'react-native-push-notification';
 import {channelApi, conversationApi, messageApi} from '../api';
-import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
 
@@ -150,7 +149,13 @@ const messageSlice = createSlice({
         if (length) {
           const messagesReverse = state.messages.reverse();
           const lastMessage = messagesReverse[length - 1];
-          if (lastMessage._id !== message._id) {
+
+          const messageIndex = messagesReverse.findIndex(
+            ele => ele._id === message._id,
+          );
+
+          // if (lastMessage._id !== message._id) {
+          if (messageIndex < 0) {
             messagesReverse.push(message);
             state.messages = messagesReverse.reverse();
           }
@@ -438,8 +443,9 @@ const messageSlice = createSlice({
 
     // TODO:---------------------- usersTyping ----------------------
     usersTyping: (state, action) => {
-      const {conversationId, user} = action.payload;
+      const {conversationId, user, currentUserId} = action.payload;
 
+      if (currentUserId === user._id) return;
       if (conversationId !== state.currentConversationId) return;
 
       const oldUsersTyping = state.usersTyping;

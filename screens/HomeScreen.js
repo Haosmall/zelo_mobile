@@ -12,10 +12,9 @@ import {
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
-import {io} from 'socket.io-client';
 import Conversation from '../components/conversation/Conversation';
 import MessageHeaderModal from '../components/modal/MessageHeaderModal';
-import {DEFAULT_MESSAGE_PARAMS, REACT_APP_SOCKET_URL} from '../constants';
+import {DEFAULT_MESSAGE_PARAMS} from '../constants';
 import {
   cancelMyFriendRequest,
   deleteFriend,
@@ -26,7 +25,7 @@ import {
   fetchMyFriendRequests,
   inviteFriendRequest,
 } from '../redux/friendSlice';
-import {fetchStickers, initSocket} from '../redux/globalSlice';
+import {fetchStickers} from '../redux/globalSlice';
 import {
   addChannelMessage,
   addMessage,
@@ -47,16 +46,19 @@ import {
   usersNotTyping,
   usersTyping,
 } from '../redux/messageSlice';
+import store from '../redux/store';
 import globalStyles, {MAIN_COLOR} from '../styles';
 import {currentKey, logout} from '../utils/commonFuc';
+import {init, socket} from '../utils/socketClient';
 
 const generateArray = length =>
   Array.from(Array(length), (_, index) => index + 1);
-let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
+// let socket = io(REACT_APP_SOCKET_URL, {transports: ['websocket']});
 
 let flag = true;
 
 export default function HomeScreen({navigation}) {
+  init();
   const dispatch = useDispatch();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -75,7 +77,6 @@ export default function HomeScreen({navigation}) {
     console.log('fect');
     dispatch(fetchFriendRequests());
     dispatch(fetchMyFriendRequests());
-    dispatch(initSocket(socket));
   };
 
   useEffect(() => {
@@ -243,7 +244,8 @@ export default function HomeScreen({navigation}) {
 
     // TODO:<====================== typing socket ======================>
     socket.on('typing', (conversationId, user) => {
-      dispatch(usersTyping({conversationId, user}));
+      const currentUserId = store.getState()?.global?.currentUserId;
+      dispatch(usersTyping({conversationId, user, currentUserId}));
     });
 
     socket.on('not-typing', (conversationId, user) => {

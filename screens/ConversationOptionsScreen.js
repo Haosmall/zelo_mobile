@@ -34,6 +34,7 @@ import AddChannelModal from '../components/modal/AddChannelModal';
 import ViewImageModal from '../components/modal/ViewImageModal';
 import AvatarModal from '../components/modal/AvatarModal';
 import Spinner from 'react-native-loading-spinner-overlay';
+import {socket} from '../utils/socketClient';
 
 export default function ConversationOptionsScreen({navigation, route}) {
   const {conversationId, channelIdRef} = route.params;
@@ -43,7 +44,6 @@ export default function ConversationOptionsScreen({navigation, route}) {
   );
 
   const {userProfile} = useSelector(state => state.me);
-  const {socket} = useSelector(state => state.global);
   const dispatch = useDispatch();
   const {type, avatar, isNotify} = currentConversation;
 
