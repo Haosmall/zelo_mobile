@@ -18,7 +18,7 @@ export const registerValid = {
     // username: '',
     // password: '',
     name: 'Nhật Hào',
-    username: '0398765421',
+    username: '0987654321',
     password: '12345678',
   },
   validationSchema: Yup.object().shape({
@@ -33,7 +33,7 @@ export const passwordValid = {
     // username: '',
     // password: '',
     // passwordConfirmation: '',
-    username: '0398765421',
+    username: '0987654321',
     password: '12345678',
     passwordConfirmation: '12345678',
   },

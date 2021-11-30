@@ -1,14 +1,23 @@
 // import {StatusBar} from 'expo-status-bar';
 import {Formik} from 'formik';
 import React from 'react';
-import {KeyboardAvoidingView, StyleSheet, Text, View} from 'react-native';
-import {Button} from 'react-native-elements';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {Button, Icon} from 'react-native-elements';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import LinearGradient from 'react-native-linear-gradient';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import loginApi from '../api/loginApi';
 import InputField from '../components/InputField';
 import {setLoading} from '../redux/globalSlice';
-import globalStyles from '../styles';
+import globalStyles, {MAIN_COLOR} from '../styles';
 import {registerValid} from '../utils/validator';
 
 const RegisterScreen = ({navigation}) => {
@@ -24,27 +33,27 @@ const RegisterScreen = ({navigation}) => {
     const {username} = account;
     dispatch(setLoading(true));
 
-    const response = await loginApi.register(account);
-
-    if (response.data?.status) {
-      const account = await loginApi.fetchUser(username);
+    try {
+      await loginApi.register(account);
 
       navigation.navigate('Xác nhận tài khoản', {
         account,
         // handleConfirmAccount: null,
       });
-    } else {
+    } catch (error) {
+      console.error(error.response);
+      const account = await loginApi.fetchUser(username);
       navigation.navigate('Xác nhận tài khoản', {
         // handleConfirmAccount,
         account,
       });
     }
+
     dispatch(setLoading(false));
   };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
-      {/* <StatusBar style="light" /> */}
       <Text style={styles.zelo}>Zelo</Text>
       <View style={styles.inputContainer}>
         <Spinner
@@ -61,17 +70,35 @@ const RegisterScreen = ({navigation}) => {
             return (
               <>
                 <InputField
-                  placeholder="Tên dầy đủ"
+                  placeholder="Tên đầy đủ"
                   autoFocus
                   onChangeText={handleChange('name')}
                   value={values.name}
                   error={errors.name}
+                  containerStyle={styles.input}
+                  leftIcon={
+                    <Icon
+                      name="user"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
                 <InputField
                   placeholder="Email/số điện thoại"
                   onChangeText={handleChange('username')}
                   value={values.username}
                   error={errors.username}
+                  containerStyle={styles.input}
+                  leftIcon={
+                    <Icon
+                      name="mail"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
 
                 <InputField
@@ -81,17 +108,37 @@ const RegisterScreen = ({navigation}) => {
                   onChangeText={handleChange('password')}
                   value={values.password}
                   error={errors.password}
+                  containerStyle={styles.input}
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
 
                 <Button
                   title="Đăng ký"
                   style={styles.button}
                   onPress={handleSubmit}
+                  buttonStyle={{
+                    backgroundColor: MAIN_COLOR,
+                  }}
                 />
               </>
             );
           }}
         </Formik>
+        <View style={styles.registerContainer}>
+          <Text style={{fontSize: 15}}>Đã có tài khoản? </Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={[styles.forgotPasswordText, {color: MAIN_COLOR}]}>
+              Đăng nhập
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -103,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     // flex: 1,
     // backgroundColor: "#0068FF",
-    paddingTop: 30,
+    paddingTop: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -121,7 +168,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    // color: "white",
+    paddingHorizontal: 0,
   },
 
   button: {
@@ -129,9 +176,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 
-  forgotPassword: {
-    marginTop: 20,
-    marginHorizontal: 10,
-    borderWidth: 0,
+  forgotPasswordText: {
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
   },
 });

@@ -318,7 +318,7 @@ const downloadFile = fileUrl => {
     .then(res => {
       // Alert after successful downloading
       console.log('res -> ', JSON.stringify(res));
-      commonFuc.notifyMessage('Tải ảnh thành công');
+      commonFuc.notifyMessage('Tải thành công');
     })
     .catch(err => {
       commonFuc.notifyMessage(ERROR_MESSAGE);

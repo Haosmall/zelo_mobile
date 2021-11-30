@@ -8,7 +8,7 @@ import {messageType} from '../constants';
 export default function FileScreen({navigation}) {
   const dispatch = useDispatch();
 
-  const {files} = useSelector(state => state.message);
+  const {files, members} = useSelector(state => state.message);
 
   const Tab = createMaterialTopTabNavigator();
 
@@ -32,19 +32,31 @@ export default function FileScreen({navigation}) {
       <Tab.Screen
         name="Ảnh"
         children={() => (
-          <ListFileSent listFiles={files?.images} type={messageType.IMAGE} />
+          <ListFileSent
+            listFiles={files?.images}
+            type={messageType.IMAGE}
+            membersList={members}
+          />
         )}
       />
       <Tab.Screen
         name="Video"
         children={() => (
-          <ListFileSent listFiles={files?.videos} type={messageType.VIDEO} />
+          <ListFileSent
+            listFiles={files?.videos}
+            type={messageType.VIDEO}
+            membersList={members}
+          />
         )}
       />
       <Tab.Screen
         name="File"
         children={() => (
-          <ListFileSent listFiles={files?.files} type={messageType.FILE} />
+          <ListFileSent
+            listFiles={files?.files}
+            type={messageType.FILE}
+            membersList={members}
+          />
         )}
       />
     </Tab.Navigator>

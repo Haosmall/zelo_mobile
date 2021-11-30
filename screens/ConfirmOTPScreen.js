@@ -21,7 +21,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {loginApi} from '../api';
 import {ERROR_MESSAGE} from '../constants';
 import {setLoading} from '../redux/globalSlice';
-import globalStyles from '../styles';
+import globalStyles, {MAIN_COLOR} from '../styles';
 import commonFuc from '../utils/commonFuc';
 
 const CELL_COUNT = 6;
@@ -176,7 +176,13 @@ const ConfirmOTPScreen = ({navigation, route}) => {
           </TouchableOpacity>
         )}
         <View style={styles.button}>
-          <Button title="Xác nhận" onPress={handleConfirm} />
+          <Button
+            title="Xác nhận"
+            onPress={handleConfirm}
+            buttonStyle={{
+              backgroundColor: MAIN_COLOR,
+            }}
+          />
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -235,7 +241,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   resendCode: {
-    color: 'blue',
+    color: MAIN_COLOR,
     marginStart: 20,
     marginTop: 20,
   },
