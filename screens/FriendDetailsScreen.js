@@ -17,7 +17,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 // import ImageView from 'react-native-image-view';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import {useDispatch, useSelector} from 'react-redux';
-import {friendApi} from '../api';
+import {friendApi, meApi} from '../api';
 import ViewImageModal from '../components/modal/ViewImageModal';
 import {
   DEFAULT_COVER_IMAGE,
@@ -33,12 +33,14 @@ import {
   fetchFriends,
   updateFriendStatus,
 } from '../redux/friendSlice';
+import {fetchSyncContacts} from '../redux/meSlice';
 import {OVERLAY_AVATAR_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../styles';
 import commonFuc, {handleCreateChat} from '../utils/commonFuc';
 
 export default function FriendDetailsScreen({navigation}) {
   const {searchFriend} = useSelector(state => state.friend);
   const {currentConversationId} = useSelector(state => state.message);
+  const {phoneBooks} = useSelector(state => state.me);
   const dispatch = useDispatch();
   const AVATAR =
     'https://wiki.tino.org/wp-content/uploads/2020/10/react-native-final-file.jpg';
@@ -59,7 +61,7 @@ export default function FriendDetailsScreen({navigation}) {
       : 'Kết bạn';
 
   useEffect(() => {
-    // dispatch(fetchFriends({}));
+    dispatch(fetchSyncContacts());
   }, []);
 
   const handleOnPress = () => {
@@ -190,6 +192,9 @@ export default function FriendDetailsScreen({navigation}) {
       phoneNumber = searchFriend.username;
       if (friendStatus !== friendType.FRIEND) {
         phoneNumber = '**********';
+      } else {
+        const index = phoneBooks.findIndex(ele => ele.username === username);
+        if (index < 0) phoneNumber = '**********';
       }
     }
 
@@ -294,21 +299,26 @@ export default function FriendDetailsScreen({navigation}) {
             <Text style={styles.title}>Ngày sinh</Text>
             <Text style={styles.content}>{handleDoB()}</Text>
           </ListItem>
-          <ListItem topDivider>
-            <Text style={styles.title}>Email</Text>
-            <Text style={styles.content}>{handleEmail()}</Text>
-          </ListItem>
-          <ListItem topDivider>
-            <Text style={styles.title}>Điện thoại</Text>
-            <Text style={styles.content}>{handlePhoneNumber()}</Text>
-          </ListItem>
-          <ListItem containerStyle={{paddingTop: 0}}>
-            <Text style={styles.title}></Text>
-            <Text style={styles.content}>
-              Số điện thoại chỉ hiển thị khi bạn có lưu số người này trong danh
-              bạ
-            </Text>
-          </ListItem>
+          {searchFriend.username.includes('@') ? (
+            <ListItem topDivider>
+              <Text style={styles.title}>Email</Text>
+              <Text style={styles.content}>{handleEmail()}</Text>
+            </ListItem>
+          ) : (
+            <>
+              <ListItem topDivider>
+                <Text style={styles.title}>Điện thoại</Text>
+                <Text style={styles.content}>{handlePhoneNumber()}</Text>
+              </ListItem>
+              <ListItem containerStyle={{paddingTop: 0}}>
+                <Text style={styles.title}></Text>
+                <Text style={styles.content}>
+                  Số điện thoại chỉ hiển thị khi bạn có lưu số người này trong
+                  danh bạ
+                </Text>
+              </ListItem>
+            </>
+          )}
         </View>
 
         {friendStatus === friendType.FRIEND && (

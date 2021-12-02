@@ -8,10 +8,15 @@ import {MAIN_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 
 const MessageNotifyDivider = props => {
-  const {message, isReceiverMessage} = props;
+  const {message, isReceiverMessage, userId} = props;
   const {type, content, user} = message;
 
-  const contentLowercase = commonFuc.getNotifyContent(content, true);
+  const contentLowercase = commonFuc.getNotifyContent(
+    content,
+    true,
+    message,
+    userId,
+  );
   // content === messageType.PIN_MESSAGE
   //   ? 'đã ghim một tin nhắn'
   //   : content === messageType.NOT_PIN_MESSAGE
@@ -57,10 +62,12 @@ const MessageNotifyDivider = props => {
 MessageNotifyDivider.propTypes = {
   message: PropTypes.object,
   isReceiverMessage: PropTypes.bool,
+  userId: PropTypes.string,
 };
 MessageNotifyDivider.defaultProps = {
   message: {},
   isReceiverMessage: true,
+  userId: '',
 };
 
 export default MessageNotifyDivider;

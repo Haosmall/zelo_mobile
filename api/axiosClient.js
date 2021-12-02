@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {AsyncStorage} from 'react-native';
 // import config from "../config";
 import {REACT_APP_API_URL} from '../constants';
+import commonFuc, {logout} from '../utils/commonFuc';
+import {disconnect} from '../utils/socketClient';
 
 const axiosClient = axios.create({
   baseURL: REACT_APP_API_URL,
@@ -48,6 +50,15 @@ axiosClient.interceptors.response.use(
   },
 
   error => {
+    console.error(error.response);
+
+    if (error.response.status === 401) {
+      AsyncStorage.removeItem('token');
+      AsyncStorage.removeItem('refreshToken');
+      AsyncStorage.removeItem('userId');
+      disconnect();
+      commonFuc.notifyMessage('Phiên hết hạn, vui lòng đăng nhập lại');
+    }
     throw error;
   },
 );

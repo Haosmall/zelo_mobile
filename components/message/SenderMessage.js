@@ -32,6 +32,7 @@ const SenderMessage = props => {
   } = props;
 
   const {currentConversation} = useSelector(state => state.message);
+  const {currentUserId} = useSelector(state => state.global);
 
   const {_id, user, isDeleted, type, tagUsers, replyMessage} = message;
 
@@ -40,7 +41,11 @@ const SenderMessage = props => {
     : message.messageContent;
 
   return type === messageType.NOTIFY ? (
-    <MessageNotifyDivider message={message} isReceiverMessage={false} />
+    <MessageNotifyDivider
+      message={message}
+      isReceiverMessage={false}
+      userId={currentUserId}
+    />
   ) : (
     <TouchableWithoutFeedback
       onLongPress={isDeleted ? null : handleOpenOptionModal}

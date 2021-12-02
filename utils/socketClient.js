@@ -12,7 +12,9 @@ export function init() {
 }
 
 export function disconnect() {
-  socket.disconnect();
-  socket.close();
+  if (socket) {
+    socket.disconnect();
+    socket.close();
+  }
   socket = null;
 }

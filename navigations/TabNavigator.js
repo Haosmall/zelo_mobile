@@ -51,7 +51,7 @@ export default function TabNavigator(props) {
             }
             case 'Bạn bè': {
               iconName = 'contacts';
-              count = friendRequests.length;
+              count = friendRequests?.length || 0;
               break;
             }
             case 'Cá nhân': {

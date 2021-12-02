@@ -145,8 +145,10 @@ const commonFuc = {
     return dateUtils.getDate(dateString);
   },
 
-  getNotifyContent: (messageContent, isNotifyDivider) => {
+  getNotifyContent: (messageContent, isNotifyDivider, message, userId) => {
     let content = messageContent;
+
+    const {manipulatedUsers} = message;
 
     switch (messageContent) {
       case messageType.PIN_MESSAGE:
@@ -167,6 +169,44 @@ const commonFuc = {
 
       case messageType.UPDATE_CHANNEL:
         content = 'Đã đổi tên một kênh nhắn tin';
+        break;
+      case messageType.ADD_MANAGERS:
+        content = `Đã thêm ${
+          manipulatedUsers[0]?._id === userId
+            ? 'bạn'
+            : manipulatedUsers[0]?.name
+        } làm phó nhóm`;
+        break;
+      case messageType.DELETE_MANAGERS:
+        content = `Đã xóa phó nhóm của ${
+          manipulatedUsers[0]?._id === userId
+            ? 'bạn'
+            : manipulatedUsers[0]?.name
+        }`;
+        break;
+      case 'Đã thêm vào nhóm':
+        content = `Đã thêm ${
+          manipulatedUsers[0]?._id === userId
+            ? 'bạn'
+            : manipulatedUsers[0]?.name
+        }${
+          manipulatedUsers.length > 1
+            ? ` và ${manipulatedUsers.length - 1} người khác`
+            : ' vào nhóm'
+        }`;
+        break;
+      case 'Đã xóa ra khỏi nhóm':
+        content = `Đã xóa ${
+          manipulatedUsers[0]?._id === userId
+            ? 'bạn'
+            : manipulatedUsers[0]?.name
+        } ra khỏi nhóm`;
+        break;
+      case 'Đã là bạn bè':
+        content = 'Đã trở thành bạn bè của nhau';
+        break;
+      case 'Ảnh đại diện nhóm đã thay đổi':
+        content = 'Đã thay đổi ảnh đại diện nhóm';
         break;
 
       default:
@@ -198,11 +238,13 @@ export const logout = dispatch => {
   AsyncStorage.removeItem('token');
   AsyncStorage.removeItem('refreshToken');
   AsyncStorage.removeItem('userId');
-  dispatch(resetFriendSlice());
-  dispatch(resetGlobalSlice());
-  dispatch(resetMeSlice());
-  dispatch(resetMessageSlice());
-  dispatch(resetPinSlice());
+  if (dispatch) {
+    dispatch(resetFriendSlice());
+    dispatch(resetGlobalSlice());
+    dispatch(resetMeSlice());
+    dispatch(resetMessageSlice());
+    dispatch(resetPinSlice());
+  }
   disconnect();
   // dispatch(setLogin(false));
   // RNRestart.Restart();

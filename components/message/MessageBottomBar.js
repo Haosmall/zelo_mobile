@@ -91,8 +91,6 @@ const MessageBottomBar = props => {
               `@[${tagEle.name}](${tagEle._id})`,
               `@${tagEle.name}`,
             );
-
-          console.log('Content: ', content);
         });
 
         // tags = tagRefCurrent.map(tag => tag._id);
@@ -113,10 +111,6 @@ const MessageBottomBar = props => {
       const replyMessageId =
         type && replyMessage.isReply ? replyMessage.replyMessage._id : null;
 
-      console.table({content, tags, conversationId, replyMessageId});
-
-      console.log('currentChannelId: ', currentChannelId);
-
       const channelId =
         currentChannelId !== conversationId ? currentChannelId : null;
 
@@ -128,33 +122,40 @@ const MessageBottomBar = props => {
         replyMessageId,
         channelId,
       };
-      console.log({newMessage});
-      messageApi
-        .sendMessage(newMessage)
-        .then(res => {
-          console.log('Send Message Success');
-          socket.emit('not-typing', conversationId, userProfile);
-          tagRef.current = [];
-          replyMessage.isReply && setReplyMessage(DEFAULT_REPLY_MESSAGE);
-        })
-        .catch(err => console.error('Send Message Fail', err));
+
+      // messageApi
+      //   .sendMessage(newMessage)
+      //   .then(res => {
+      //     socket.emit('not-typing', conversationId, userProfile);
+      //     tagRef.current = [];
+      //     replyMessage.isReply && setReplyMessage(DEFAULT_REPLY_MESSAGE);
+      //   })
+      //   .catch(err => console.error('Send Message Fail', err));
+
+      try {
+        await messageApi.sendMessage(newMessage);
+        socket.emit('not-typing', conversationId, userProfile);
+        tagRef.current = [];
+        replyMessage.isReply && setReplyMessage(DEFAULT_REPLY_MESSAGE);
+      } catch (error) {
+        console.error('Send Message Fail', err);
+        commonFuc.notifyMessage(ERROR_MESSAGE);
+      }
     } else {
-      console.log('empty');
     }
     setMessageValue('');
   };
 
-  const handleOnChageTextInput = value => {
+  const handleOnChangeTextInput = value => {
     setMessageValue(value);
 
     if (value.length > 0) {
-      console.log(conversationId);
-      socket.emit('typing', conversationId, userProfile);
+      currentChannelId === conversationId &&
+        socket.emit('typing', conversationId, userProfile);
     } else {
       socket.emit('not-typing', conversationId, userProfile);
     }
 
-    console.table(typeof value, value);
     const oldTag = tagRef.current;
 
     if (oldTag.length > 0) {
@@ -162,13 +163,11 @@ const MessageBottomBar = props => {
         value.includes(`@[${ele.name}](${ele._id})`),
       );
       tagRef.current = newTag;
-      console.log('newTag', newTag);
     }
   };
 
   const handleOnTextInputTouch = () => {
-    console.log('conversation-last-view', conversationId);
-    socket.emit('conversation-last-view', conversationId);
+    socket.emit('conversation-last-view', conversationId, currentChannelId);
   };
 
   const selectFile = async () => {
@@ -177,7 +176,6 @@ const MessageBottomBar = props => {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
       });
-      console.log('res stringify : ' + JSON.stringify(res));
       handleUploadFile(res);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
@@ -192,7 +190,6 @@ const MessageBottomBar = props => {
   const handleUploadFile = async singleFile => {
     if (singleFile) {
       const fileToUpload = singleFile[0];
-      console.log(fileToUpload);
 
       const type = fileToUpload.type.includes('video')
         ? messageType.VIDEO
@@ -225,15 +222,10 @@ const MessageBottomBar = props => {
             fileBase64,
           };
 
-          console.log('body:', body);
-
           messageApi
             .sendFileBase64Message(body, params, onUploadProgress)
-            .then(res => {
-              console.log('Send Message Success', res);
-            })
+            .then(res => {})
             .catch(err => {
-              console.log('Send Message Fail', err);
               setIsLoading(false);
             });
         } catch (error) {
@@ -273,7 +265,6 @@ const MessageBottomBar = props => {
                       onPress={() => {
                         onSuggestionPress(item);
                         tagRef.current.push(item);
-                        console.log(tagRef.current);
                       }}>
                       <ListItem
                         containerStyle={{
@@ -355,7 +346,7 @@ const MessageBottomBar = props => {
           <MentionInput
             placeholder="Tin nhắn, @"
             value={messageValue}
-            onChange={value => handleOnChageTextInput(value)}
+            onChange={value => handleOnChangeTextInput(value)}
             onFocus={() => showStickyBoard(false)}
             onBlur={() =>
               socket.emit('not-typing', conversationId, userProfile)
@@ -383,7 +374,7 @@ const MessageBottomBar = props => {
           <TextInput
             placeholder="Tin nhắn, @"
             value={messageValue}
-            onChangeText={value => handleOnChageTextInput(value)}
+            onChangeText={value => handleOnChangeTextInput(value)}
             onFocus={() => showStickyBoard(false)}
             onBlur={() =>
               socket.emit('not-typing', conversationId, userProfile)
@@ -481,6 +472,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 18,
     fontWeight: '500',
+    color: '#000',
   },
   mentionInput: {
     padding: 6,
@@ -491,6 +483,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'cyan',
     maxHeight: 110,
     borderTopWidth: 0,
+    color: '#000',
   },
   headerTitle: {
     color: '#fff',

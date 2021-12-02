@@ -42,25 +42,34 @@ const MessageHeaderModal = ({navigation}) => {
               title="Tạo nhóm"
               containerStyle={styles.buttonTop}
               type="clear"
-              icon={
-                // <IconAntDesign name="addusergroup" size={22} />
-                <Icon name="addusergroup" type="antdesign" size={22} />
-              }
+              icon={<Icon name="addusergroup" type="antdesign" size={22} />}
               titleStyle={styles.title}
-              onPress={() =>
-                navigation.navigate('Tìm kiếm bạn bè', {isAddToGroup: true})
-              }
+              onPress={() => {
+                handleCloseModal();
+                navigation.navigate('Tìm kiếm bạn bè', {isAddToGroup: true});
+              }}
+            />
+            <Button
+              title="Tìm kiếm"
+              containerStyle={styles.button}
+              type="clear"
+              icon={<Icon name="search1" type="antdesign" size={22} />}
+              titleStyle={styles.title}
+              onPress={() => {
+                handleCloseModal();
+                navigation.navigate('Tìm kiếm');
+              }}
             />
             <Button
               title="Thêm bạn"
               containerStyle={styles.buttonBottom}
               type="clear"
-              icon={
-                // <IconAntDesign name="adduser" size={22} />
-                <Icon name="addusergroup" type="antdesign" size={22} />
-              }
+              icon={<Icon name="adduser" type="antdesign" size={22} />}
               titleStyle={styles.title}
-              onPress={() => navigation.navigate('Thêm bạn')}
+              onPress={() => {
+                handleCloseModal();
+                navigation.navigate('Thêm bạn');
+              }}
             />
           </SafeAreaView>
         </TouchableOpacity>

@@ -6,7 +6,11 @@ import {Button} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import messageApi from '../../api/messageApi';
 import pinMessagesApi from '../../api/pinMessagesApi';
-import {DEFAULT_MESSAGE_MODAL_VISIBLE, REACTIONS} from '../../constants';
+import {
+  DEFAULT_MESSAGE_MODAL_VISIBLE,
+  messageType,
+  REACTIONS,
+} from '../../constants';
 import {deleteMessageOnlyMe} from '../../redux/messageSlice';
 import {fetchPinMessages} from '../../redux/pinSlice';
 import commonFuc from '../../utils/commonFuc';
@@ -22,9 +26,8 @@ const MessageModal = props => {
     navigation,
     handleOnReplyMessagePress,
   } = props;
-  const {currentConversation, currentConversationId} = useSelector(
-    state => state.message,
-  );
+  const {currentConversation, currentConversationId, currentChannelId} =
+    useSelector(state => state.message);
   const {pinMessages} = useSelector(state => state.pin);
 
   const messageId = modalVisible.messageId;
@@ -143,26 +146,42 @@ const MessageModal = props => {
             />
             {!modalVisible.isRecall && (
               <>
-                <MessageModalButton
-                  title="Copy"
-                  containerStyle={{
-                    borderBottomStartRadius: BUTTON_RADIUS,
-                  }}
-                  iconName="content-copy"
-                  iconType="material"
-                  iconColor="#899ada"
-                  onPress={handleCopy}
-                />
-
-                {currentConversation?.type && (
+                {modalVisible.type === messageType.TEXT && (
                   <MessageModalButton
-                    title="Ghim"
-                    iconName="pushpino"
-                    iconType="antdesign"
-                    iconColor="#dc923c"
-                    onPress={handlePinMessage}
+                    title="Copy"
+                    containerStyle={{
+                      borderBottomStartRadius: BUTTON_RADIUS,
+                    }}
+                    iconName="content-copy"
+                    iconType="material"
+                    iconColor="#899ada"
+                    onPress={handleCopy}
                   />
                 )}
+                {modalVisible.type === messageType.HTML && (
+                  <MessageModalButton
+                    title="Copy"
+                    containerStyle={{
+                      borderBottomStartRadius: BUTTON_RADIUS,
+                    }}
+                    iconName="content-copy"
+                    iconType="material"
+                    iconColor="#899ada"
+                    onPress={handleCopy}
+                  />
+                )}
+
+                {currentConversation?.type &&
+                  modalVisible.type !== messageType.STICKER &&
+                  currentConversationId === currentChannelId && (
+                    <MessageModalButton
+                      title="Ghim"
+                      iconName="pushpino"
+                      iconType="antdesign"
+                      iconColor="#dc923c"
+                      onPress={handlePinMessage}
+                    />
+                  )}
                 {modalVisible.isMyMessage && (
                   <MessageModalButton
                     title="Thu hồi"

@@ -7,13 +7,13 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {Image} from 'react-native-elements';
+import {Avatar, Image} from 'react-native-elements';
 import {Icon} from 'react-native-elements/dist/icons/Icon';
 import HTMLView from 'react-native-htmlview';
 import RNUrlPreview from 'react-native-url-preview';
 import {useSelector} from 'react-redux';
 import {messageType} from '../../constants';
-import globalStyles, {MAIN_COLOR} from '../../styles';
+import globalStyles, {MAIN_COLOR, OVERLAY_AVATAR_COLOR} from '../../styles';
 import commonFuc from '../../utils/commonFuc';
 import FileMessage from './FileMessage';
 import MessageNotifyDivider from './MessageNotifyDivider';
@@ -30,6 +30,7 @@ const ReceiverMessage = props => {
     reactLength,
     handleViewImage,
     isLastMessage,
+    onLastView,
   } = props;
 
   const {_id, isDeleted, type, tagUsers, replyMessage} = message;
@@ -61,10 +62,15 @@ const ReceiverMessage = props => {
     return usersViewed;
   };
 
+  const handleLastView = () => {
+    const userList = checkLastView();
+    onLastView({isVisible: true, userList});
+  };
+
   return (
     <View>
       {type === messageType.NOTIFY ? (
-        <MessageNotifyDivider message={message} />
+        <MessageNotifyDivider message={message} userId={currentUserId} />
       ) : (
         <TouchableWithoutFeedback
           onLongPress={isDeleted ? null : handleOpenOptionModal}
@@ -156,9 +162,48 @@ const ReceiverMessage = props => {
         </TouchableWithoutFeedback>
       )}
       {checkLastView().length > 0 && (
-        <View style={styles.lastView}>
-          <Text style={{fontSize: 12}}>Đã xem</Text>
-        </View>
+        <TouchableOpacity onPress={handleLastView}>
+          <View style={styles.lastView}>
+            {checkLastView().map((item, index) => {
+              if (index < 5) {
+                return (
+                  <Avatar
+                    key={item._id}
+                    rounded
+                    title={commonFuc.getAcronym(item?.name)}
+                    overlayContainerStyle={{
+                      backgroundColor: OVERLAY_AVATAR_COLOR,
+                    }}
+                    source={
+                      item?.avatar?.length > 0
+                        ? {
+                            uri: item.avatar,
+                          }
+                        : null
+                    }
+                    size={20}
+                  />
+                );
+              }
+              if (index === 5) {
+                const numOfView = checkLastView().length - 5;
+                return (
+                  <Avatar
+                    key={item._id}
+                    rounded
+                    title={`+${numOfView <= 99 ? numOfView : '99'}`}
+                    overlayContainerStyle={{
+                      backgroundColor: '#7562d8',
+                    }}
+                    source={null}
+                    size={20}
+                  />
+                );
+              }
+            })}
+            {/* <Text style={{fontSize: 12}}>Đã xem</Text> */}
+          </View>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -169,6 +214,7 @@ ReceiverMessage.propTypes = {
   handleOpenOptionModal: PropTypes.func,
   handleShowReactDetails: PropTypes.func,
   handleViewImage: PropTypes.func,
+  onLastView: PropTypes.func,
   content: PropTypes.string,
   time: PropTypes.string,
   reactVisibleInfo: PropTypes.string,
@@ -181,6 +227,7 @@ ReceiverMessage.defaultProps = {
   handleOpenOptionModal: null,
   handleShowReactDetails: null,
   handleViewImage: null,
+  onLastView: null,
   content: '',
   time: '',
   reactVisibleInfo: '',
@@ -279,6 +326,7 @@ const styles = StyleSheet.create({
   },
   reactionText: {fontSize: 11},
   lastView: {
+    flexDirection: 'row',
     alignSelf: 'flex-end',
     marginRight: 15,
     // backgroundColor: 'cyan',

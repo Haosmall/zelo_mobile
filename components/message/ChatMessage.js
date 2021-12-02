@@ -17,6 +17,7 @@ function ChatMessage(props) {
     navigation,
     setImageProps,
     isLastMessage,
+    onLastView,
   } = props;
 
   const {_id, createdAt, user, isDeleted, reacts, type} = message;
@@ -35,6 +36,7 @@ function ChatMessage(props) {
       isMyMessage,
       messageId: _id,
       messageContent: content,
+      type,
     };
     setModalVisible(obj);
   };
@@ -69,6 +71,7 @@ function ChatMessage(props) {
       reactLength={reactLength}
       handleViewImage={handleViewImage}
       isLastMessage={isLastMessage}
+      onLastView={onLastView}
     />
   ) : (
     <SenderMessage
@@ -93,6 +96,7 @@ ChatMessage.propTypes = {
   setModalVisible: PropTypes.func,
   showReactDetails: PropTypes.func,
   setImageProps: PropTypes.func,
+  onLastView: PropTypes.func,
 };
 
 ChatMessage.defaultProps = {
@@ -104,6 +108,7 @@ ChatMessage.defaultProps = {
   setModalVisible: null,
   showReactDetails: null,
   setImageProps: null,
+  onLastView: null,
 };
 
 export default ChatMessage;

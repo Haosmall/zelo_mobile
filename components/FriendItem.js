@@ -33,6 +33,7 @@ export default function FriendItem(props) {
     navigation,
     handleGroup,
     avatarColor,
+    isShowButton,
   } = props;
 
   const {currentConversationId} = useSelector(state => state.message);
@@ -242,19 +243,21 @@ export default function FriendItem(props) {
             onPress={handleDeleteFriendRequest}
           />
         )}
-        <Button
-          title={getButtonTitle()}
-          type={
-            type === friendType.YOU_FOLLOW ||
-            type === friendType.REMOVE_FROM_GROUP ||
-            type === friendType.DONT_HAVE_ACCOUNT
-              ? 'outline'
-              : 'solid'
-          }
-          buttonStyle={styles.buttonStyle}
-          titleStyle={styles.buttonTitle}
-          onPress={handleOnPress}
-        />
+        {isShowButton && (
+          <Button
+            title={getButtonTitle()}
+            type={
+              type === friendType.YOU_FOLLOW ||
+              type === friendType.REMOVE_FROM_GROUP ||
+              type === friendType.DONT_HAVE_ACCOUNT
+                ? 'outline'
+                : 'solid'
+            }
+            buttonStyle={styles.buttonStyle}
+            titleStyle={styles.buttonTitle}
+            onPress={handleOnPress}
+          />
+        )}
       </View>
     </ListItem>
   );
@@ -267,6 +270,7 @@ FriendItem.propTypes = {
   avatarColor: PropTypes.string,
   userId: PropTypes.string,
   topDivider: PropTypes.bool,
+  isShowButton: PropTypes.bool,
   handleGroup: PropTypes.func,
 };
 
@@ -276,6 +280,7 @@ FriendItem.defaultProps = {
   avatar: '',
   userId: '',
   topDivider: false,
+  isShowButton: true,
   handleGroup: null,
   avatarColor: OVERLAY_AVATAR_COLOR,
 };

@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 15,
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   text: {color: '#fff', fontSize: 18, marginLeft: 15},

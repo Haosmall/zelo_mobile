@@ -3,6 +3,7 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-elements';
 import {useSelector} from 'react-redux';
+import {SCREEN_WIDTH} from '../../styles';
 
 function MessageHeaderLeft(props) {
   const {goBack, totalMembers, name, currentConversationId} = props;
@@ -18,15 +19,18 @@ function MessageHeaderLeft(props) {
         style={{
           marginLeft: 20,
         }}>
-        <Text style={styles.headerTitle}>{name}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {name}
+        </Text>
         {totalMembers > 2 &&
           (currentChannelId === currentConversationId ? (
             <Text
-              style={
-                styles.headerSubTitle
-              }>{`${totalMembers} thành viên`}</Text>
+              style={styles.headerSubTitle}
+              numberOfLines={1}>{`${totalMembers} thành viên`}</Text>
           ) : (
-            <Text style={styles.headerSubTitle}>{currentChannelName}</Text>
+            <Text style={styles.headerSubTitle} numberOfLines={1}>
+              {currentChannelName}
+            </Text>
           ))}
       </View>
     </View>
@@ -55,6 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     marginLeft: 20,
+    maxWidth: SCREEN_WIDTH - 100,
   },
   headerTitle: {
     color: '#fff',

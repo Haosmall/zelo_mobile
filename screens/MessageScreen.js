@@ -22,6 +22,8 @@ import MessageDivider from '../components/message/MessageDivider';
 import MessageHeaderLeft from '../components/message/MessageHeaderLeft';
 import PinnedMessage from '../components/message/PinnedMessage';
 import ImagePickerModal from '../components/modal/ImagePickerModal';
+import LastViewModal from '../components/modal/LastViewModal';
+import MessageDetailModal from '../components/modal/MessageDetailModal';
 import MessageModal from '../components/modal/MessageModal';
 import PinMessageModal from '../components/modal/PinMessageModal';
 import ReactionModal from '../components/modal/ReactionModal';
@@ -29,6 +31,8 @@ import ViewImageModal from '../components/modal/ViewImageModal';
 import StickyBoard from '../components/StickyBoard';
 import {
   DEFAULT_IMAGE_MODAL,
+  DEFAULT_LAST_VIEW_MODAL,
+  DEFAULT_MESSAGE_DETAIL_MODAL,
   DEFAULT_MESSAGE_MODAL_VISIBLE,
   DEFAULT_MESSAGE_PARAMS,
   DEFAULT_PAGE,
@@ -77,10 +81,14 @@ export default function MessageScreen({navigation, route}) {
   );
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [reactProps, setReactProps] = useState(DEFAULT_REACTION_MODAL_VISIBLE);
+  const [messageDetailProps, setMessageDetailProps] = useState(
+    DEFAULT_MESSAGE_DETAIL_MODAL,
+  );
   const [pinMessageVisible, setPinMessageVisible] = useState(
     DEFAULT_PIN_MESSAGE_MODAL,
   );
   const [imageProps, setImageProps] = useState(DEFAULT_IMAGE_MODAL);
+  const [lastViewProps, setLastViewProps] = useState(DEFAULT_LAST_VIEW_MODAL);
   const [replyMessage, setReplyMessage] = useState(DEFAULT_REPLY_MESSAGE);
   const [stickyBoardVisible, setStickyBoardVisible] = useState(false);
   const [apiParams, setApiParams] = useState(DEFAULT_MESSAGE_PARAMS);
@@ -212,6 +220,7 @@ export default function MessageScreen({navigation, route}) {
             navigation={navigation}
             setImageProps={setImageProps}
             isLastMessage={index === 0}
+            onLastView={setLastViewProps}
           />
         </View>
       </TouchableWithoutFeedback>
@@ -323,12 +332,26 @@ export default function MessageScreen({navigation, route}) {
             <PinMessageModal
               modalVisible={pinMessageVisible}
               setModalVisible={setPinMessageVisible}
+              onViewImage={setImageProps}
+              onViewDetail={setMessageDetailProps}
             />
           )}
           {imageProps.isVisible && (
             <ViewImageModal
               imageProps={imageProps}
               setImageProps={setImageProps}
+            />
+          )}
+          {messageDetailProps.isVisible && (
+            <MessageDetailModal
+              modalVisible={messageDetailProps}
+              setModalVisible={setMessageDetailProps}
+            />
+          )}
+          {lastViewProps.isVisible && (
+            <LastViewModal
+              modalVisible={lastViewProps}
+              setModalVisible={setLastViewProps}
             />
           )}
         </KeyboardAvoidingView>

@@ -36,6 +36,8 @@ export const messageType = {
   CREATE_CHANNEL: 'CREATE_CHANNEL',
   DELETE_CHANNEL: 'DELETE_CHANNEL',
   UPDATE_CHANNEL: 'UPDATE_CHANNEL',
+  ADD_MANAGERS: 'ADD_MANAGERS',
+  DELETE_MANAGERS: 'DELETE_MANAGERS',
 };
 
 export const friendType = {
@@ -61,6 +63,7 @@ export const DEFAULT_MESSAGE_MODAL_VISIBLE = {
   isMyMessage: false,
   messageId: '',
   messageContent: '',
+  type: messageType.TEXT,
 };
 export const DEFAULT_REACTION_MODAL_VISIBLE = {
   isVisible: false,
@@ -103,4 +106,14 @@ export const DEFAULT_MEMBER_MODAL = {
   userRole: memberType.LEADER,
   memberId: '',
   memberName: '',
+};
+
+export const DEFAULT_MESSAGE_DETAIL_MODAL = {
+  isVisible: false,
+  message: {},
+};
+
+export const DEFAULT_LAST_VIEW_MODAL = {
+  isVisible: false,
+  userList: [],
 };

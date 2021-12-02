@@ -38,6 +38,7 @@ import {
   fetchListLastViewer,
   fetchMessages,
   renameConversation,
+  setListLastViewer,
   setNotification,
   updateAvatarConversation,
   updateChannel,
@@ -74,7 +75,6 @@ export default function HomeScreen({navigation}) {
   const handleFetchConversations = async () => {
     await dispatch(fetchConversations());
     await dispatch(fetchStickers());
-    console.log('fect');
     dispatch(fetchFriendRequests());
     dispatch(fetchMyFriendRequests());
   };
@@ -88,7 +88,6 @@ export default function HomeScreen({navigation}) {
 
     socket.emit('join-conversations', conversationIds);
     socket.emit('join', currentUserId);
-    console.log('thay doi');
   }, [conversations]);
 
   useEffect(() => {
@@ -179,7 +178,6 @@ export default function HomeScreen({navigation}) {
 
     socket.on('delete-message', ({conversationId, channelId, id}) => {
       console.log('delete-message');
-      console.log({conversationId, channelId, id});
       dispatch(deleteMessage({conversationId, channelId, id}));
     });
 
@@ -213,11 +211,7 @@ export default function HomeScreen({navigation}) {
     socket.on(
       'new-message-of-channel',
       (conversationId, channelId, message) => {
-        console.log('new-message-of-channel', {
-          conversationId,
-          channelId,
-          message,
-        });
+        console.log('new-message-of-channel');
         dispatch(addChannelMessage({conversationId, channelId, message}));
         // dispatch(
         //   setNotification({conversationId, message, userId: currentUserId}),
@@ -253,19 +247,23 @@ export default function HomeScreen({navigation}) {
     });
 
     // TODO:<====================== lastview socket ======================>
-    socket.on('user-last-view', ({conversationId, userId, lastView}) => {
-      console.log('user-last-view', {conversationId, userId, lastView});
-      currentUserId !== userId &&
-        dispatch(fetchListLastViewer({conversationId}));
-      // userProfile._id !== userId &&
-      //   dispatch(
-      //     setListLastViewer({
-      //       conversationId,
-      //       userId,
-      //       lastView,
-      //     }),
-      //   );
-    });
+    socket.on(
+      'user-last-view',
+      ({conversationId, channelId, userId, lastView}) => {
+        console.log('user-last-view');
+        // currentUserId !== userId &&
+        //   dispatch(fetchListLastViewer({conversationId}));
+        currentUserId !== userId &&
+          dispatch(
+            setListLastViewer({
+              conversationId,
+              channelId,
+              userId,
+              lastView,
+            }),
+          );
+      },
+    );
 
     // TODO:<====================== friend socket ======================>
 
@@ -305,8 +303,6 @@ export default function HomeScreen({navigation}) {
 
     socket.on('revoke-token', ({key}) => {
       if (currentKey !== key) {
-        console.log('currentKey: ', currentKey);
-        console.log('revoke-token key: ', key);
         logout(dispatch);
       }
     });
@@ -330,7 +326,6 @@ export default function HomeScreen({navigation}) {
     // );
     // dispatch(fetchListLastViewer({conversationId}));
     // dispatch(fetchMembers({conversationId}));
-    console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
       channelIdRef,
@@ -345,7 +340,7 @@ export default function HomeScreen({navigation}) {
 
   return (
     <SafeAreaView>
-      {conversations.length > 0 ? (
+      {conversations?.length > 0 ? (
         <FlatList
           data={conversations}
           keyExtractor={conversation => conversation._id}

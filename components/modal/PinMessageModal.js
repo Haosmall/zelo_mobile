@@ -16,12 +16,13 @@ import {
 import {Button, Divider, Icon, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import pinMessagesApi from '../../api/pinMessagesApi';
-import {DEFAULT_PIN_MESSAGE_MODAL} from '../../constants';
+import {DEFAULT_PIN_MESSAGE_MODAL, messageType} from '../../constants';
 import {fetchPinMessages} from '../../redux/pinSlice';
 import {GREY_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../../styles';
+import commonFuc, {checkPermissionDownloadFile} from '../../utils/commonFuc';
 
 const PinMessageModal = props => {
-  const {modalVisible, setModalVisible} = props;
+  const {modalVisible, setModalVisible, onViewImage, onViewDetail} = props;
   const {pinMessages} = useSelector(state => state.pin);
   const {currentConversationId} = useSelector(state => state.message);
   const dispatch = useDispatch();
@@ -57,6 +58,69 @@ const PinMessageModal = props => {
         },
       ],
     );
+  };
+
+  const renderContent = message => {
+    let content = message.content;
+    let iconName = 'message1';
+    let iconType = 'antdesign';
+    switch (message?.type) {
+      case messageType.TEXT:
+        content = message.content;
+        break;
+      case messageType.IMAGE:
+        content = '[Hình ảnh]';
+        iconName = 'image-outline';
+        iconType = 'ionicon';
+        break;
+      case messageType.VIDEO:
+        content = commonFuc.getFileName(message.content);
+        iconName = 'file-video-o';
+        iconType = 'font-awesome';
+        break;
+      case messageType.FILE:
+        content = commonFuc.getFileName(message.content);
+        iconName = 'file1';
+        break;
+      case messageType.HTML:
+        content = '[Văn bản]';
+        iconName = 'filetext1';
+        break;
+
+      default:
+        content = message.content;
+        break;
+    }
+
+    return {content, iconName, iconType};
+  };
+
+  const handleOnPress = (type, message) => {
+    switch (type) {
+      case messageType.IMAGE:
+        onViewImage({
+          isVisible: true,
+          userName: message.user.name,
+          content: [{url: message.content}],
+          isImage: true,
+        });
+        break;
+      case messageType.VIDEO:
+        onViewImage({
+          isVisible: true,
+          userName: message.user.name,
+          content: message.content,
+          isImage: false,
+        });
+        break;
+      case messageType.FILE:
+        checkPermissionDownloadFile(message.content);
+        break;
+
+      default:
+        onViewDetail({isVisible: true, message});
+        break;
+    }
   };
 
   return (
@@ -106,9 +170,12 @@ const PinMessageModal = props => {
                 <ScrollView>
                   {pinMessages.length > 0
                     ? pinMessages.map(item => {
+                        const {content, iconName, iconType} =
+                          renderContent(item);
                         return (
                           <View key={item._id}>
-                            <Pressable>
+                            <TouchableOpacity
+                              onPress={() => handleOnPress(item.type, item)}>
                               <ListItem
                                 topDivider={true}
                                 containerStyle={{
@@ -116,14 +183,14 @@ const PinMessageModal = props => {
                                   // backgroundColor: 'grey',
                                 }}>
                                 <Icon
-                                  name="message1"
-                                  type="antdesign"
+                                  name={iconName}
+                                  type={iconType}
+                                  // name="message1"
+                                  // type="antdesign"
                                   color="#4cacfc"
                                 />
                                 <ListItem.Content>
-                                  <ListItem.Title>
-                                    {item.content}
-                                  </ListItem.Title>
+                                  <ListItem.Title>{content}</ListItem.Title>
                                   <ListItem.Subtitle
                                     numberOfLines={
                                       1
@@ -142,7 +209,7 @@ const PinMessageModal = props => {
                                   onPress={() => showConfirmDialog(item._id)}
                                 />
                               </ListItem>
-                            </Pressable>
+                            </TouchableOpacity>
                           </View>
                         );
                       })
@@ -152,7 +219,7 @@ const PinMessageModal = props => {
             </View>
             <View style={styles.footer}>
               <Button
-                title="Xong"
+                title="Quay lại"
                 containerStyle={styles.buttonClose}
                 buttonStyle={{borderRadius: 50}}
                 onPress={handleCloseModal}
@@ -168,11 +235,15 @@ const PinMessageModal = props => {
 PinMessageModal.propTypes = {
   modalVisible: PropTypes.object,
   setModalVisible: PropTypes.func,
+  onViewImage: PropTypes.func,
+  onViewDetail: PropTypes.func,
 };
 
 PinMessageModal.defaultProps = {
   modalVisible: DEFAULT_PIN_MESSAGE_MODAL,
   setModalVisible: null,
+  onViewImage: null,
+  onViewDetail: null,
 };
 
 const BUTTON_RADIUS = 10;

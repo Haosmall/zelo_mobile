@@ -102,7 +102,7 @@ export default function MeScreen({navigation}) {
     if (isCoverImage) {
       url = userProfile?.coverImage;
     } else {
-      url = userProfile.avatar;
+      url = userProfile?.avatar;
     }
 
     if (!isCoverImage && !url) {
@@ -112,7 +112,7 @@ export default function MeScreen({navigation}) {
 
     setImageProps({
       isVisible: true,
-      userName: userProfile.name,
+      userName: userProfile?.name,
       content: [{url: url || DEFAULT_COVER_IMAGE}],
       isImage: true,
     });
@@ -121,17 +121,17 @@ export default function MeScreen({navigation}) {
   const handleDoB = () => {
     let dob = '';
 
-    if (userProfile.dateOfBirth) {
-      const day = ('00' + userProfile.dateOfBirth.day).slice(-2);
-      const month = ('00' + userProfile.dateOfBirth.month).slice(-2);
-      const year = userProfile.dateOfBirth.year;
+    if (userProfile?.dateOfBirth) {
+      const day = ('00' + userProfile?.dateOfBirth.day).slice(-2);
+      const month = ('00' + userProfile?.dateOfBirth.month).slice(-2);
+      const year = userProfile?.dateOfBirth.year;
       dob = `${day}/${month}/${year}`;
     }
     return dob;
   };
 
   const handleEmail = () => {
-    const username = userProfile.username;
+    const username = userProfile?.username;
     let email = '';
     if (username) {
       if (username.includes('@')) {
@@ -142,7 +142,7 @@ export default function MeScreen({navigation}) {
   };
 
   const handlePhoneNumber = () => {
-    const username = userProfile.username;
+    const username = userProfile?.username;
     let phoneNumber = '';
     if (username) {
       if (!username.includes('@')) {
@@ -210,8 +210,8 @@ export default function MeScreen({navigation}) {
             {/* <View style={{width: '100%', justifyContent: 'center'}}>
             </View> */}
             <Avatar
-              title={commonFuc.getAcronym(userProfile.name)}
-              source={userProfile.avatar ? {uri: userProfile.avatar} : null}
+              title={commonFuc.getAcronym(userProfile?.name)}
+              source={userProfile?.avatar ? {uri: userProfile?.avatar} : null}
               size={120}
               rounded
               overlayContainerStyle={{
@@ -221,12 +221,12 @@ export default function MeScreen({navigation}) {
               containerStyle={styles.avatar}
               onPress={() => onImagePress(false)}
               // onPress={() =>
-              //   userProfile.avatar && handleViewImage(userProfile.avatar)
+              //   userProfile?.avatar && handleViewImage(userProfile?.avatar)
               // }
             />
           </View>
           <View style={styles.action}>
-            <Text style={styles.name}>{userProfile.name}</Text>
+            <Text style={styles.name}>{userProfile?.name}</Text>
           </View>
         </View>
         <View style={styles.detailsContainer}>
@@ -236,7 +236,7 @@ export default function MeScreen({navigation}) {
           <ListItem>
             <Text style={styles.title}>Giới tính</Text>
             <Text style={styles.content}>
-              {userProfile.gender ? 'Nữ' : 'Nam'}
+              {userProfile?.gender ? 'Nữ' : 'Nam'}
             </Text>
           </ListItem>
           <View style={styles.dividerContainer}>

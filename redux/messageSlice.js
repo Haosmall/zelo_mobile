@@ -1,8 +1,10 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import PushNotification from 'react-native-push-notification';
 import {channelApi, conversationApi, messageApi} from '../api';
+import {messageType} from '../constants';
 import commonFuc from '../utils/commonFuc';
 import dateUtils from '../utils/dateUtils';
+import store from './store';
 
 const KEY = 'message';
 
@@ -56,6 +58,15 @@ export const fetchListLastViewer = createAsyncThunk(
   async (params, thunkApi) => {
     const {conversationId} = params;
     const data = await conversationApi.fetchListLastViewer(conversationId);
+    return data;
+  },
+);
+
+export const fetchListLastChannelViewer = createAsyncThunk(
+  `${KEY}/fetchListLastChannelViewer`,
+  async (params, thunkApi) => {
+    const {channelId} = params;
+    const data = await channelApi.fetchLastView(channelId);
     return data;
   },
 );
@@ -247,6 +258,25 @@ const messageSlice = createSlice({
           state.messages = newMessage.reverse();
         }
       }
+      if (channelId === state.currentChannelId) {
+        const channelMessages = state.channelMessages.reverse();
+        // tìm messages
+        const index = channelMessages.findIndex(
+          messageEle => messageEle._id === id,
+        );
+        if (index > -1) {
+          const seachMessage = channelMessages[index];
+          const newChannelMessages = [...channelMessages];
+
+          newChannelMessages[index] = {
+            _id: seachMessage._id,
+            isDeleted: true,
+            user: seachMessage.user,
+            createdAt: seachMessage.createdAt,
+          };
+          state.channelMessages = newChannelMessages.reverse();
+        }
+      }
     },
 
     // TODO:---------------------- deleteMessageOnlyMe ----------------------
@@ -370,32 +400,51 @@ const messageSlice = createSlice({
         return;
       }
 
-      console.log('userId: ', userId);
-      console.log('message.user._id: ', message.user._id);
-
       if (userId === message.user._id) {
         return;
       }
 
       const messageContent = message.content;
-      const messageContentNotify = commonFuc.getNotifyContent(
-        messageContent,
-        false,
-      );
+      let messageContentNotify = messageContent;
 
-      // const messageContentNotify =
-      //   messageContent === messageType.PIN_MESSAGE
-      //     ? 'Đã ghim một tin nhắn'
-      //     : messageContent === messageType.NOT_PIN_MESSAGE
-      //     ? 'Đã bỏ ghim một tin nhắn'
-      //     : messageContent === messageType.CREATE_CHANNEL
-      //     ? 'Đã tạo một kênh nhắn tin'
-      //     : messageContent === messageType.DELETE_CHANNEL
-      //     ? 'Đã xóa một kênh nhắn tin'
-      //     : messageContent === messageType.UPDATE_CHANNEL
-      //     ? 'Đã đổi tên một kênh nhắn tin'
-      //     : messageContent;
-      // PushNotification.cancelAllLocalNotifications();
+      switch (message.type) {
+        case messageType.IMAGE:
+          messageContentNotify = '[Hình ảnh]';
+          break;
+        case messageType.STICKER:
+          messageContentNotify = '[Nhãn dán]';
+          break;
+        case messageType.HTML:
+          messageContentNotify = '[Văn bản]';
+          break;
+        case messageType.VIDEO:
+          const fileNameVideo = commonFuc.getFileName(messageContent);
+          messageContentNotify = `[Video] ${fileNameVideo}`;
+          break;
+        case messageType.FILE:
+          const fileName = commonFuc.getFileName(messageContent);
+          messageContentNotify = `[File] ${fileName}`;
+          break;
+        case messageType.VOTE:
+          messageContentNotify = `Đã tạo cuộc bình chọn mới ${messageContent}`;
+          break;
+        case messageType.TEXT:
+          messageContentNotify = messageContent;
+          break;
+        case messageType.NOTIFY:
+          messageContentNotify = commonFuc.getNotifyContent(
+            messageContent,
+            false,
+            message,
+            userId,
+          );
+          break;
+
+        default:
+          messageContentNotify = messageContent;
+          break;
+      }
+
       PushNotification.localNotification({
         channelId: 'new-message',
         title: conversation.name,
@@ -427,17 +476,34 @@ const messageSlice = createSlice({
 
     // TODO:---------------------- setListLastViewer ----------------------
     setListLastViewer: (state, action) => {
-      const {conversationId, userId, lastView} = action.payload;
+      const {conversationId, channelId, userId, lastView} = action.payload;
 
       if (conversationId !== state.currentConversationId) return;
+      if (
+        state.currentConversation.type === true &&
+        channelId !== state.currentChannelId
+      )
+        return;
 
       const index = state.listLastViewer.findIndex(
-        userEle => userEle.user._id === userId,
+        ele => ele.user._id === userId,
       );
 
       if (index >= 0) {
         state.listLastViewer[index].lastView = lastView;
       } else {
+        let user;
+        if (state.currentConversation.type) {
+          const {_id, name, avatar} = state.members.find(
+            ele => ele._id === userId,
+          );
+          user = {_id, name, avatar};
+        } else {
+          const {userId, name, avatar} = state.currentConversation;
+          user = {_id: userId, name, avatar};
+        }
+        const listLastViewerOld = state.listLastViewer;
+        state.listLastViewer = listLastViewerOld.push({lastView, user});
       }
     },
 
@@ -447,6 +513,7 @@ const messageSlice = createSlice({
 
       if (currentUserId === user._id) return;
       if (conversationId !== state.currentConversationId) return;
+      if (conversationId !== state.currentChannelId) return;
 
       const oldUsersTyping = state.usersTyping;
 
@@ -691,6 +758,21 @@ const messageSlice = createSlice({
     },
     // Xử lý khi bị lỗi
     [fetchListLastViewer.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+
+    // TODO:---------------------- fetchListLastChannelViewer ----------------------
+    // Đang xử lý
+    [fetchListLastChannelViewer.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    // Xử lý khi thành công
+    [fetchListLastChannelViewer.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.listLastViewer = action.payload;
+    },
+    // Xử lý khi bị lỗi
+    [fetchListLastChannelViewer.rejected]: (state, action) => {
       state.isLoading = false;
     },
 

@@ -8,6 +8,8 @@ import {
   clearChannelMessages,
   clearMessages,
   fetchChannelMessages,
+  fetchListLastChannelViewer,
+  fetchListLastViewer,
   fetchMessages,
   setCurrentChannel,
 } from '../../redux/messageSlice';
@@ -53,6 +55,7 @@ const ListChannel = props => {
         }),
       );
       dispatch(fetchPinMessages({conversationId: currentChannelId}));
+      dispatch(fetchListLastViewer({conversationId: currentChannelId}));
     } else {
       dispatch(
         fetchChannelMessages({
@@ -60,6 +63,7 @@ const ListChannel = props => {
           apiParams: DEFAULT_MESSAGE_PARAMS,
         }),
       );
+      dispatch(fetchListLastChannelViewer({channelId: currentChannelId}));
     }
 
     navigation.goBack();

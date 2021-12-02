@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import {Button, Input, ListItem} from 'react-native-elements';
+import {Avatar, Button, Input, ListItem} from 'react-native-elements';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import {userApi} from '../api';
@@ -86,46 +86,75 @@ export default function AddNewFriendScreen({navigation}) {
         />
       </ListItem>
 
-      <ScrollView>
-        {friendSuggests.length > 0 && (
-          <Pressable style={globalStyles.viewEle}>
-            <Text
-              style={{
-                fontWeight: 'bold',
-                marginHorizontal: 15,
-                marginVertical: 6,
-                fontSize: 16,
-              }}>
-              Gợi ý kết bạn
-            </Text>
-            <View
-              style={{
-                // backgroundColor: 'cyan',
-                width: '100%',
-                minHeight: 100,
-                flexDirection: 'row',
-                // aspectRatio: 1,
-                justifyContent: 'center',
-                alignContent: 'space-around',
-              }}>
+      {friendSuggests.length > 0 && (
+        <Pressable style={globalStyles.viewEle}>
+          <Text
+            style={{
+              fontWeight: 'bold',
+              marginHorizontal: 15,
+              marginVertical: 6,
+              fontSize: 16,
+            }}>
+            Gợi ý kết bạn
+          </Text>
+          <View
+            style={{
+              // backgroundColor: 'cyan',
+              width: '100%',
+              minHeight: 100,
+              flexDirection: 'row',
+              // aspectRatio: 1,
+              justifyContent: 'center',
+              alignContent: 'space-around',
+            }}>
+            <ScrollView>
               {friendSuggests.map(friend => (
-                <TouchableOpacity
-                  key={friend._id}
-                  onPress={() => handleGoToPersonalScreen(friend._id)}>
-                  <View
-                    style={{
-                      backgroundColor: 'pink',
-                      width: '30%',
-                      flexDirection: 'row',
-                    }}>
-                    <Text>{friend.name}</Text>
-                  </View>
-                </TouchableOpacity>
+                <Pressable key={friend._id}>
+                  <ListItem bottomDivider>
+                    <Avatar
+                      rounded
+                      title={commonFuc.getAcronym(friend.name)}
+                      overlayContainerStyle={{
+                        backgroundColor: friend?.avatarColor,
+                      }}
+                      source={
+                        friend?.avatar?.length > 0
+                          ? {
+                              uri: friend?.avatar,
+                            }
+                          : null
+                      }
+                      size="medium"
+                    />
+                    <ListItem.Content>
+                      <ListItem.Title numberOfLines={1}>
+                        {friend?.name}
+                      </ListItem.Title>
+                      {/* <ListItem.Subtitle
+                        numberOfLines={
+                          1
+                        }>{`${senderName}${content}`}</ListItem.Subtitle> */}
+                    </ListItem.Content>
+                    {/* <MessageInfo
+                      createdAt={createdAt}
+                      numberUnread={numberUnread}
+                    /> */}
+
+                    <Button
+                      title="Chi tiết"
+                      type="outline"
+                      buttonStyle={styles.buttonStyle}
+                      titleStyle={styles.buttonTitle}
+                      containerStyle={styles.buttonContainer}
+                      onPress={() => handleGoToPersonalScreen(friend._id)}
+                    />
+                  </ListItem>
+                </Pressable>
               ))}
-            </View>
-          </Pressable>
-        )}
-      </ScrollView>
+            </ScrollView>
+          </View>
+        </Pressable>
+      )}
     </SafeAreaView>
   );
 }
@@ -147,5 +176,15 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // backgroundColor: 'cyan',
     // paddingHorizontal: 15,
+  },
+  buttonStyle: {
+    borderRadius: 50,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    minWidth: 60,
+  },
+  buttonTitle: {fontSize: 13},
+  buttonContainer: {
+    borderRadius: 50,
   },
 });

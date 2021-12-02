@@ -21,6 +21,7 @@ export default function FriendSearchScreen({navigation, route}) {
   const {isAddToGroup, currentConversationId} = route.params;
   const dispatch = useDispatch();
   const {listFriends} = useSelector(state => state.friend);
+  const {members} = useSelector(state => state.message);
 
   const [friendList, setFriendList] = useState(listFriends);
   const [listAddToGroup, setListAddToGroup] = useState([]);
@@ -246,7 +247,7 @@ export default function FriendSearchScreen({navigation, route}) {
                         rounded
                         title={commonFuc.getAcronym(item.name)}
                         overlayContainerStyle={{
-                          backgroundColor: OVERLAY_AVATAR_COLOR_GREY,
+                          backgroundColor: item?.avatarColor,
                         }}
                         source={
                           item?.avatar?.length > 0
@@ -318,6 +319,10 @@ export default function FriendSearchScreen({navigation, route}) {
             : isExists
             ? friendType.REMOVE_FROM_GROUP
             : friendType.ADD_TO_GROUP;
+          let isShowButton = true;
+          if (currentConversationId) {
+            isShowButton = !members.some(ele => ele._id === item._id);
+          }
 
           return (
             <TouchableOpacity
@@ -341,6 +346,7 @@ export default function FriendSearchScreen({navigation, route}) {
                             ? handleRemoveFromGroup(item._id)
                             : handleAddToGroup(item)
                   }
+                  isShowButton={isShowButton}
                 />
                 <View
                   style={{

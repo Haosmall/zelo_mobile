@@ -41,9 +41,9 @@ const CustomAvatar = props => {
               }}
               icon={{name: 'person'}}
               source={
-                avatars[value - 1]?.length > 0
+                avatars[value - 1]?.avatar?.length > 0
                   ? {
-                      uri: avatars[value - 1],
+                      uri: avatars[value - 1].avatar,
                     }
                   : null
               }

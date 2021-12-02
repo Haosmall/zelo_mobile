@@ -9,6 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setModalVisible} from '../redux/globalSlice';
 import AddNewFriendScreen from '../screens/AddNewFriendScreen';
 import ConversationOptionsScreen from '../screens/ConversationOptionsScreen';
+import ConversationSearchScreen from '../screens/ConversationSearchScreen';
 import FileScreen from '../screens/FileScreen';
 import ForwardMessageScreen from '../screens/ForwardMessageScreen';
 import FriendDetailsScreen from '../screens/FriendDetailsScreen';
@@ -154,6 +155,7 @@ const MainStackNavigator = ({navigation}) => {
           />
           <Stack.Screen name="Ảnh, video, file đã gửi" component={FileScreen} />
           <Stack.Screen name="Tìm kiếm bạn bè" component={FriendSearchScreen} />
+          <Stack.Screen name="Tìm kiếm" component={ConversationSearchScreen} />
           <Stack.Screen name="Thêm bạn" component={AddNewFriendScreen} />
           <Stack.Screen
             name="Chi tiết bạn bè"

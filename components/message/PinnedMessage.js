@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import {Button, Divider, Icon, ListItem} from 'react-native-elements';
+import {StyleSheet, Text, View} from 'react-native';
+import {Divider, Icon, ListItem} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
-import {GREY_COLOR, MAIN_COLOR, WINDOW_WIDTH} from '../../styles';
+import {messageType} from '../../constants';
+import {GREY_COLOR, WINDOW_WIDTH} from '../../styles';
 
 const PinnedMessage = props => {
   const {openPinMessage} = props;
@@ -18,6 +19,33 @@ const PinnedMessage = props => {
     openPinMessage({isVisible: true, isError: false});
   };
 
+  const renderContent = () => {
+    let content = lastPinMessage.content;
+    switch (lastPinMessage?.type) {
+      case messageType.TEXT:
+        content = lastPinMessage.content;
+        break;
+      case messageType.IMAGE:
+        content = '[Hình ảnh]';
+        break;
+      case messageType.VIDEO:
+        content = '[Video]';
+        break;
+      case messageType.FILE:
+        content = '[File]';
+        break;
+      case messageType.HTML:
+        content = '[Văn bản]';
+        break;
+
+      default:
+        content = lastPinMessage.content;
+        break;
+    }
+
+    return content;
+  };
+
   return (
     length > 0 && (
       <TouchableOpacity onPress={handleOpenPinMessage}>
@@ -26,7 +54,7 @@ const PinnedMessage = props => {
             <Icon name="message1" type="antdesign" color="#4cacfc" />
             <ListItem.Content>
               <ListItem.Title numberOfLines={1}>
-                {lastPinMessage.content}
+                {renderContent()}
               </ListItem.Title>
               <ListItem.Subtitle
                 numberOfLines={

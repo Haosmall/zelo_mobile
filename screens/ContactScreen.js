@@ -116,7 +116,7 @@ export default function ContactScreen({navigation}) {
             );
           })} */}
 
-      {listFriends.length > 0 ? (
+      {listFriends?.length > 0 ? (
         <FlatList
           data={listFriends}
           keyExtractor={item => item._id}

@@ -38,7 +38,12 @@ const Conversation = props => {
     return senderName;
   };
 
-  const handleContent = (lastMessageType, lastMessageContent, isDeleted) => {
+  const handleContent = (
+    lastMessageType,
+    lastMessageContent,
+    isDeleted,
+    lastMessage,
+  ) => {
     let content = '';
     if (isDeleted) {
       content = 'Tin nhắn đã được thu hồi';
@@ -66,7 +71,12 @@ const Conversation = props => {
           break;
         case messageType.NOTIFY:
           console.log(lastMessageContent);
-          content = commonFuc.getNotifyContent(lastMessageContent, false);
+          content = commonFuc.getNotifyContent(
+            lastMessageContent,
+            false,
+            lastMessage,
+            userProfile._id,
+          );
           // content =
           //   lastMessageContent === messageType.PIN_MESSAGE
           //     ? 'Đã ghim một tin nhắn'
@@ -136,6 +146,7 @@ const Conversation = props => {
             lastMessage?.type,
             lastMessage?.content,
             lastMessage?.isDeleted,
+            lastMessage,
           )}`}</ListItem.Subtitle>
         </ListItem.Content>
         {isForward ? (

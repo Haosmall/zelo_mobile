@@ -32,7 +32,7 @@ export default function FriendRequestScreen() {
           const routeName = route.name;
           const type = routeName === 'Đã nhận';
           const content = `${routeName} ${
-            type ? friendRequests.length : myFriendRequests.length
+            type ? friendRequests?.length : myFriendRequests?.length
           }`;
 
           return <Text style={{color}}>{content}</Text>;
