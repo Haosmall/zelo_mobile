@@ -1,5 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {Avatar, Button, Input, ListItem} from 'react-native-elements';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
@@ -107,20 +114,23 @@ export default function AddNewFriendScreen({navigation}) {
               justifyContent: 'center',
               alignContent: 'space-around',
             }}>
-            <ScrollView>
-              {friendSuggests.map(friend => (
-                <Pressable key={friend._id}>
+            <FlatList
+              data={friendSuggests}
+              keyExtractor={friend => friend._id}
+              initialNumToRender={12}
+              renderItem={({item}) => (
+                <Pressable>
                   <ListItem bottomDivider>
                     <Avatar
                       rounded
-                      title={commonFuc.getAcronym(friend.name)}
+                      title={commonFuc.getAcronym(item.name)}
                       overlayContainerStyle={{
-                        backgroundColor: friend?.avatarColor,
+                        backgroundColor: item?.avatarColor,
                       }}
                       source={
-                        friend?.avatar?.length > 0
+                        item?.avatar?.length > 0
                           ? {
-                              uri: friend?.avatar,
+                              uri: item?.avatar,
                             }
                           : null
                       }
@@ -128,17 +138,15 @@ export default function AddNewFriendScreen({navigation}) {
                     />
                     <ListItem.Content>
                       <ListItem.Title numberOfLines={1}>
-                        {friend?.name}
+                        {item?.name}
                       </ListItem.Title>
-                      {/* <ListItem.Subtitle
-                        numberOfLines={
-                          1
-                        }>{`${senderName}${content}`}</ListItem.Subtitle> */}
+                      <ListItem.Subtitle numberOfLines={1}>
+                        {item.numberCommonFriend} bạn chung
+                      </ListItem.Subtitle>
+                      <ListItem.Subtitle numberOfLines={1}>
+                        {item.numberCommonGroup} nhóm chung
+                      </ListItem.Subtitle>
                     </ListItem.Content>
-                    {/* <MessageInfo
-                      createdAt={createdAt}
-                      numberUnread={numberUnread}
-                    /> */}
 
                     <Button
                       title="Chi tiết"
@@ -146,12 +154,12 @@ export default function AddNewFriendScreen({navigation}) {
                       buttonStyle={styles.buttonStyle}
                       titleStyle={styles.buttonTitle}
                       containerStyle={styles.buttonContainer}
-                      onPress={() => handleGoToPersonalScreen(friend._id)}
+                      onPress={() => handleGoToPersonalScreen(item._id)}
                     />
                   </ListItem>
                 </Pressable>
-              ))}
-            </ScrollView>
+              )}
+            />
           </View>
         </Pressable>
       )}
