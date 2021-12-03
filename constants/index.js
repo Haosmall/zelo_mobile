@@ -117,3 +117,8 @@ export const DEFAULT_LAST_VIEW_MODAL = {
   isVisible: false,
   userList: [],
 };
+
+export const DEFAULT_VOTE_DETAIL_MODAL = {
+  isVisible: false,
+  options: [],
+};

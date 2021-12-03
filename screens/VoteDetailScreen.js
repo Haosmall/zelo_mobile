@@ -12,11 +12,13 @@ import {
 import {Button, Divider, Icon, Input} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import {voteApi} from '../api';
+import VoteDetailModal from '../components/modal/VoteDetailModal';
 import VoteProgress from '../components/VoteProgress';
-import {ERROR_MESSAGE} from '../constants';
+import {DEFAULT_VOTE_DETAIL_MODAL, ERROR_MESSAGE} from '../constants';
 import {useGoback, useKeyboard} from '../hooks';
 import {MAIN_COLOR, SCREEN_WIDTH} from '../styles';
 import commonFuc from '../utils/commonFuc';
+import dateUtils from '../utils/dateUtils';
 
 const VoteDetailScreen = ({navigation}) => {
   useGoback(navigation);
@@ -27,6 +29,10 @@ const VoteDetailScreen = ({navigation}) => {
   const [isDisable, setIsDisable] = useState(true);
   const [isfocusTextInput, setIsfocusTextInput] = useState(false);
   const [newOption, setNewOption] = useState('');
+
+  const [voteDetailsProps, setVoteDetailsProps] = useState(
+    DEFAULT_VOTE_DETAIL_MODAL,
+  );
 
   const options = currentVote.options;
   const totalOfVotes = commonFuc.getTotalOfVotes(options);
@@ -83,7 +89,7 @@ const VoteDetailScreen = ({navigation}) => {
       commonFuc.notifyMessage('Bình chọn thành công');
       navigation.goBack();
     } catch (error) {
-      console.log(ERROR_MESSAGE);
+      console.error(error);
       commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
@@ -105,13 +111,12 @@ const VoteDetailScreen = ({navigation}) => {
           const response = await voteApi.addVoteOption(currentVote._id, {
             options: [newOption],
           });
-          console.log('add: ', response);
           setNewOption('');
           setIsfocusTextInput(false);
           Keyboard.dismiss();
         } catch (error) {
           commonFuc.notifyMessage(ERROR_MESSAGE);
-          console.log(ERROR_MESSAGE);
+          console.error(error);
         }
       }
     }
@@ -119,10 +124,8 @@ const VoteDetailScreen = ({navigation}) => {
 
   useEffect(() => {
     if (isKeyBoardOpen) {
-      console.log('kb open');
     } else {
       if (/^\s*$/.test(newOption)) {
-        console.log('kb close');
         setIsfocusTextInput(false);
       }
     }
@@ -135,13 +138,14 @@ const VoteDetailScreen = ({navigation}) => {
           {currentVote.content}
         </Text>
         <Text style={{...styles.smallText, color: 'grey'}}>
-          {`${currentVote.user.name} • ${commonFuc.getNumberOfDays(
+          {`${currentVote.user.name} • ${dateUtils.getDate(
             currentVote.createdAt,
-          )}`}
+          )} lúc ${dateUtils.getTime(currentVote.createdAt)}`}
         </Text>
 
         {totalOfVotes > 0 && (
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setVoteDetailsProps({isVisible: true, options})}>
             <Text style={{...styles.smallText, color: MAIN_COLOR}}>
               {commonFuc.getNumOfPeopleVoted(options)} Người đã bình chọn
             </Text>
@@ -196,7 +200,6 @@ const VoteDetailScreen = ({navigation}) => {
             onChangeText={value => setNewOption(value)}
             autoFocus={isfocusTextInput}
             style={styles.textInput}
-            onSubmitEditing={() => console.log('option submit')}
             multiline
             editable
           />
@@ -220,6 +223,13 @@ const VoteDetailScreen = ({navigation}) => {
           buttonStyle={{borderRadius: 50}}
           containerStyle={{width: '100%', borderRadius: 50}}
           onPress={handleOnPressVote}
+        />
+      )}
+
+      {voteDetailsProps.isVisible && (
+        <VoteDetailModal
+          modalProps={voteDetailsProps}
+          onShowModal={setVoteDetailsProps}
         />
       )}
     </SafeAreaView>

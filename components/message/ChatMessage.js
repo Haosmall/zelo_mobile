@@ -18,6 +18,7 @@ function ChatMessage(props) {
     setImageProps,
     isLastMessage,
     onLastView,
+    onViewVoteDetailModal,
   } = props;
 
   const {_id, createdAt, user, isDeleted, reacts, type} = message;
@@ -59,7 +60,11 @@ function ChatMessage(props) {
   };
 
   return type === messageType.VOTE ? (
-    <VoteMessage message={message} navigation={navigation} />
+    <VoteMessage
+      message={message}
+      navigation={navigation}
+      onViewVoteDetailModal={onViewVoteDetailModal}
+    />
   ) : isMyMessage ? (
     <ReceiverMessage
       message={message}
@@ -97,6 +102,7 @@ ChatMessage.propTypes = {
   showReactDetails: PropTypes.func,
   setImageProps: PropTypes.func,
   onLastView: PropTypes.func,
+  onViewVoteDetailModal: PropTypes.func,
 };
 
 ChatMessage.defaultProps = {
@@ -109,6 +115,7 @@ ChatMessage.defaultProps = {
   showReactDetails: null,
   setImageProps: null,
   onLastView: null,
+  onViewVoteDetailModal: null,
 };
 
 export default ChatMessage;

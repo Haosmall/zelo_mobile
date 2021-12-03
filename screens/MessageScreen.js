@@ -28,6 +28,7 @@ import MessageModal from '../components/modal/MessageModal';
 import PinMessageModal from '../components/modal/PinMessageModal';
 import ReactionModal from '../components/modal/ReactionModal';
 import ViewImageModal from '../components/modal/ViewImageModal';
+import VoteDetailModal from '../components/modal/VoteDetailModal';
 import StickyBoard from '../components/StickyBoard';
 import {
   DEFAULT_IMAGE_MODAL,
@@ -40,6 +41,7 @@ import {
   DEFAULT_PIN_MESSAGE_MODAL,
   DEFAULT_REACTION_MODAL_VISIBLE,
   DEFAULT_REPLY_MESSAGE,
+  DEFAULT_VOTE_DETAIL_MODAL,
 } from '../constants';
 import {
   clearMessagePages,
@@ -92,6 +94,9 @@ export default function MessageScreen({navigation, route}) {
   const [replyMessage, setReplyMessage] = useState(DEFAULT_REPLY_MESSAGE);
   const [stickyBoardVisible, setStickyBoardVisible] = useState(false);
   const [apiParams, setApiParams] = useState(DEFAULT_MESSAGE_PARAMS);
+  const [voteDetailsProps, setVoteDetailsProps] = useState(
+    DEFAULT_VOTE_DETAIL_MODAL,
+  );
 
   // Ref
   const scrollViewRef = useRef(null);
@@ -106,7 +111,6 @@ export default function MessageScreen({navigation, route}) {
   };
 
   const handleGoToOptionScreen = () => {
-    console.log('API: ', currentConversation._id);
     dispatch(fetchChannels({conversationId: currentConversation._id}));
     navigation.navigate('Tùy chọn', {
       conversationId,
@@ -157,8 +161,6 @@ export default function MessageScreen({navigation, route}) {
   );
 
   useEffect(() => {
-    console.log('Message: ', currentUserId);
-    //
     dispatch(updateCurrentConversation({conversationId}));
     dispatch(
       setCurrentChannel({
@@ -221,6 +223,7 @@ export default function MessageScreen({navigation, route}) {
             setImageProps={setImageProps}
             isLastMessage={index === 0}
             onLastView={setLastViewProps}
+            onViewVoteDetailModal={setVoteDetailsProps}
           />
         </View>
       </TouchableWithoutFeedback>
@@ -228,7 +231,6 @@ export default function MessageScreen({navigation, route}) {
   };
 
   const goToNextPage = async () => {
-    console.log('Scroll Top');
     const currentPage = apiParams.page;
 
     const totalPages = isGeneralChannel
@@ -249,8 +251,6 @@ export default function MessageScreen({navigation, route}) {
           );
 
       setApiParams(newParam);
-      console.log('currentPage: ', currentPage);
-      console.log('messagePages.totalPages:', messagePages.totalPages);
     }
   };
 
@@ -352,6 +352,13 @@ export default function MessageScreen({navigation, route}) {
             <LastViewModal
               modalVisible={lastViewProps}
               setModalVisible={setLastViewProps}
+            />
+          )}
+
+          {voteDetailsProps.isVisible && (
+            <VoteDetailModal
+              modalProps={voteDetailsProps}
+              onShowModal={setVoteDetailsProps}
             />
           )}
         </KeyboardAvoidingView>

@@ -9,7 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setCurrentVote} from '../../redux/messageSlice';
 
 const VoteMessage = props => {
-  const {message, navigation} = props;
+  const {message, navigation, onViewVoteDetailModal} = props;
 
   const dispatch = useDispatch();
 
@@ -30,7 +30,8 @@ const VoteMessage = props => {
         <View style={styles.textContainer}>
           <Text style={styles.text}>{message.content}</Text>
           {totalOfVotes > 0 && (
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onViewVoteDetailModal({isVisible: true, options})}>
               <Text style={{...styles.smallText, color: MAIN_COLOR}}>
                 {commonFuc.getNumOfPeopleVoted(options)} Người đã bình chọn
               </Text>
@@ -78,11 +79,13 @@ const VoteMessage = props => {
 VoteMessage.propTypes = {
   message: PropTypes.object,
   navigation: PropTypes.object,
+  onViewVoteDetailModal: PropTypes.func,
 };
 
 VoteMessage.defaultProps = {
   message: {},
   navigation: {},
+  onViewVoteDetailModal: null,
 };
 export default VoteMessage;
 
