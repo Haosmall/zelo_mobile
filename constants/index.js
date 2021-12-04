@@ -1,7 +1,5 @@
 export const REACT_APP_API_URL = 'https://zelochat.xyz/api';
 export const REACT_APP_SOCKET_URL = 'https://zelochat.xyz';
-// export const REACT_APP_API_URL = 'http://192.168.1.8:3001';
-// export const REACT_APP_SOCKET_URL = 'http://192.168.1.8:3001';
 
 export const DEFAULT_MESSAGE_PARAMS = {
   page: 0,
