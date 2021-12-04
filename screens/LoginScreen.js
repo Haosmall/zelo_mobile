@@ -10,36 +10,49 @@ import {
   StatusBar,
   Platform,
 } from 'react-native';
-import {Button} from 'react-native-elements';
+import {Button, Icon} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginApi, meApi} from '../api';
 import InputField from '../components/InputField';
-import {useKeyboard} from '../hooks';
-import {setLoading, setLogin} from '../redux/globalSlice';
-import globalStyles from '../styles';
+import {useKeyboardHeight} from '../hooks';
+import {setCurrentUserId, setLoading, setLogin} from '../redux/globalSlice';
+import globalStyles, {MAIN_COLOR} from '../styles';
 import {loginValid} from '../utils/validator';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const LoginScreen = ({navigation}) => {
   const {isLoading} = useSelector(state => state.global);
   const [errorMessage, setErrorMessage] = useState('');
   const dispatch = useDispatch();
-  const keyboardHeight = useKeyboard();
+  const keyboardHeight = useKeyboardHeight();
 
   const handleLogin = async acount => {
     errorMessage !== '' && setErrorMessage('');
     dispatch(setLoading(true));
 
-    const response = await loginApi.login(acount);
+    try {
+      const response = await loginApi.login(acount);
 
-    if (response.data) {
-      setErrorMessage('Tài khoản hay mật khẩu không chính xác');
-    } else {
       await AsyncStorage.setItem('token', response.token);
+      await AsyncStorage.setItem('refreshToken', response.refreshToken);
       const userProfile = await meApi.fetchProfile();
       await AsyncStorage.setItem('userId', userProfile._id);
+      dispatch(setCurrentUserId(userProfile._id));
       dispatch(setLogin(true));
+    } catch (error) {
+      setErrorMessage('Tài khoản hay mật khẩu không chính xác');
     }
+
+    // if (response.data) {
+    //   setErrorMessage('Tài khoản hay mật khẩu không chính xác');
+    // } else {
+    //   await AsyncStorage.setItem('token', response.token);
+    //   await AsyncStorage.setItem('refreshToken', response.refreshToken);
+    //   const userProfile = await meApi.fetchProfile();
+    //   await AsyncStorage.setItem('userId', userProfile._id);
+    //   dispatch(setLogin(true));
+    // }
 
     dispatch(setLoading(false));
   };
@@ -75,47 +88,72 @@ const LoginScreen = ({navigation}) => {
             return (
               <>
                 <InputField
+                  containerStyle={styles.input}
                   placeholder="Email/số điện thoại"
                   autoFocus
                   onChangeText={handleChange('username')}
                   value={values.username}
                   error={errors.username}
+                  leftIcon={
+                    <Icon
+                      name="user"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
 
                 <InputField
-                  style={styles.input}
+                  containerStyle={styles.input}
                   placeholder="Mật khẩu"
                   secureTextEntry={true}
                   onChangeText={handleChange('password')}
                   value={values.password}
                   error={errors.password}
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
-                <Text style={{color: 'red', marginLeft: 10}}>
-                  {errorMessage}
-                </Text>
+                {errorMessage.length > 0 && (
+                  <Text style={{color: 'red'}}>{errorMessage}</Text>
+                )}
+
+                <View style={styles.forgotPasswordContainer}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Quên mật khẩu')}>
+                    <Text style={styles.forgotPasswordText}>
+                      Quên mật khẩu?
+                    </Text>
+                  </TouchableOpacity>
+                </View>
 
                 <Button
                   title="Đăng nhập"
-                  style={styles.button}
+                  containerStyle={styles.button}
                   onPress={handleSubmit}
+                  buttonStyle={{
+                    backgroundColor: MAIN_COLOR,
+                  }}
                 />
               </>
             );
           }}
         </Formik>
 
-        <Button
-          title="Đăng ký"
-          type="outline"
-          style={styles.button}
-          onPress={() => navigation.navigate('Đăng ký')}
-        />
-        <Button
-          title="Quên mật khẩu?"
-          type="clear"
-          style={styles.forgotPassword}
-          onPress={() => navigation.navigate('Quên mật khẩu')}
-        />
+        <View style={styles.registerContainer}>
+          <Text style={{fontSize: 15}}>Không có tài khoản? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Đăng ký')}>
+            <Text style={[styles.forgotPasswordText, {color: MAIN_COLOR}]}>
+              Đăng ký
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -125,10 +163,11 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // backgroundColor: "#0068FF",
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 100,
   },
   zelo: {
     textAlign: 'center',
@@ -137,6 +176,7 @@ const styles = StyleSheet.create({
     fontSize: 80,
     // marginTop: 80,
     // marginBottom: 30,
+    // backgroundColor: 'cyan',
   },
 
   inputContainer: {
@@ -144,17 +184,27 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    // color: "white",
+    // backgroundColor: 'red',
+    paddingHorizontal: 0,
   },
 
   button: {
     marginTop: 20,
-    marginHorizontal: 10,
   },
 
-  forgotPassword: {
-    marginTop: 20,
-    marginHorizontal: 10,
-    borderWidth: 0,
+  forgotPasswordContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+
+    // backgroundColor: 'red',
+  },
+  forgotPasswordText: {
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
   },
 });

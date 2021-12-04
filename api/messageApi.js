@@ -7,6 +7,10 @@ const messageApi = {
     const url = `${BASE_URL}/${conversationId}`;
     return axiosClient.get(url, {params});
   },
+  fetchFiles: (conversationId, params) => {
+    const url = `${BASE_URL}/${conversationId}/files`;
+    return axiosClient.get(url, {params});
+  },
 
   sendMessage: message => {
     const url = `${BASE_URL}/text`;
@@ -24,23 +28,33 @@ const messageApi = {
     const url = `${BASE_URL}/${messageId}/reacts/${type}`;
     return axiosClient.post(url);
   },
-  sendFileMessage: (file, params) => {
-    const {type, conversationId} = params;
+
+  sendFileBase64Message: (file, params, uploadProgress) => {
+    const {type, conversationId, channelId} = params;
 
     const config = {
       params: {
         type,
         conversationId,
+        channelId,
       },
+
       onUploadProgress: progressEvent => {
-        let percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total,
-        );
-        console.log(percentCompleted);
+        if (typeof uploadProgress === 'function') {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
+          uploadProgress(percentCompleted);
+        }
       },
     };
 
-    return axiosClient.post(`${BASE_URL}/files`, file, config);
+    return axiosClient.post(`${BASE_URL}/files/base64`, file, config);
+  },
+
+  forwardMessage: (messageId, conversationId) => {
+    const url = `${BASE_URL}/${messageId}/share/${conversationId}`;
+    return axiosClient.post(url);
   },
 };
 

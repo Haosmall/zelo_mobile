@@ -2,30 +2,35 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ContactScreen from '../screens/ContactScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MeScreen from '../screens/MeScreen';
 import commonFuc from '../utils/commonFuc';
 
-export default function TabNavigator() {
+export default function TabNavigator(props) {
+  const dispatch = useDispatch();
+
   const Tab = createMaterialTopTabNavigator();
   const {conversations} = useSelector(state => state.message);
+  const {friendRequests} = useSelector(state => state.friend);
 
   return (
     <Tab.Navigator
       // screenListeners={(navigation, route) => {
-      // 	console.log(navigation.route.name);
       // 	const title = navigation.route.name;
       // 	dispatch(setHeaderTitle(title));
       // }}
+
       tabBarPosition="bottom"
+      keyboardDismissMode={true}
       screenOptions={({route, navigation}) => ({
         tabBarLabelStyle: {fontSize: 12},
         tabBarItemStyle: {height: 50},
         tabBarActiveTintColor: '#0275d8',
         tabBarInactiveTintColor: 'grey',
         swipeEnabled: true,
+
         // tabBarLabel: navigation.isFocused() ? route.name : "",
         tabBarLabel: ({focused, color}) => {
           return <Text style={{color}}>{route.name}</Text>;
@@ -45,7 +50,7 @@ export default function TabNavigator() {
             }
             case 'Bạn bè': {
               iconName = 'contacts';
-              count = 9;
+              count = friendRequests?.length || 0;
               break;
             }
             case 'Cá nhân': {
@@ -62,11 +67,13 @@ export default function TabNavigator() {
             <View style={{flex: 1}}>
               <IconAntDesign name={iconName} size={22} color={color} />
               {count > 0 && (
-                <View style={styles.iconBadge}>
-                  <Text style={styles.badgeElement}>
-                    {count > 99 ? 'N' : count}
-                  </Text>
-                </View>
+                <>
+                  <View style={styles.iconBadge}>
+                    <Text style={styles.badgeElement}>
+                      {count > 99 ? 'N' : count}
+                    </Text>
+                  </View>
+                </>
               )}
             </View>
           );

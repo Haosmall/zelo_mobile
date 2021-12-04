@@ -1,6 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useRef, useState} from 'react';
 import {
-  AsyncStorage,
   Keyboard,
   Animated,
   Easing,
@@ -8,11 +8,12 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
+  BackHandler,
 } from 'react-native';
 
 const DEFAULT_HEIGHT = 280;
 
-export const useKeyboard = () => {
+export const useKeyboardHeight = () => {
   const [keyboardHeight, setKeyboardHeight] = useState(DEFAULT_HEIGHT);
 
   async function onKeyboardDidShow(e) {
@@ -29,11 +30,19 @@ export const useKeyboard = () => {
   }
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
-    Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+    const keyboardDidShow = Keyboard.addListener(
+      'keyboardDidShow',
+      onKeyboardDidShow,
+    );
+    const keyboardDidHide = Keyboard.addListener(
+      'keyboardDidHide',
+      onKeyboardDidHide,
+    );
     return () => {
-      Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow);
-      Keyboard.removeListener('keyboardDidHide', onKeyboardDidHide);
+      // Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow);
+      // Keyboard.removeListener('keyboardDidHide', onKeyboardDidHide);
+      keyboardDidShow.remove();
+      keyboardDidHide.remove();
     };
   }, []);
 
@@ -70,3 +79,44 @@ export const useAnimatedBottom = (show, height = DEFAULT_HEIGHT) => {
 
   return bottom;
 };
+
+export const useGoback = navigation => {
+  const handleGoBack = () => {
+    navigation.goBack();
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleGoBack);
+
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handleGoBack);
+    };
+  }, []);
+};
+
+export function useKeyboard() {
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  return isKeyboardVisible;
+}

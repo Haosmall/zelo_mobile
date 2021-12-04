@@ -176,6 +176,11 @@ android {
 
         }
     }
+// react-native-webrtc
+    compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
 }
 
 dependencies {
@@ -184,6 +189,13 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+//  animated gif in React Native
+    implementation 'com.facebook.fresco:fresco:1.10.0'
+    implementation 'com.facebook.fresco:animated-gif:1.10.0'
+
+    compile project(':react-native-video')
+    implementation "androidx.appcompat:appcompat:1.0.0"
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
