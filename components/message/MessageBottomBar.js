@@ -108,8 +108,9 @@ const MessageBottomBar = props => {
         // }
       }
 
-      const replyMessageId =
-        type && replyMessage.isReply ? replyMessage.replyMessage._id : null;
+      const replyMessageId = replyMessage.isReply
+        ? replyMessage.replyMessage._id
+        : null;
 
       const channelId =
         currentChannelId !== conversationId ? currentChannelId : null;
@@ -206,7 +207,8 @@ const MessageBottomBar = props => {
         channelId,
       };
 
-      if (fileToUpload.fileSize > 20971520) {
+      if (fileToUpload.size > 20000000) {
+        // if (fileToUpload.size > 20971520) {
         commonFuc.notifyMessage('Tối đa 20Mb');
       } else {
         try {
@@ -222,13 +224,18 @@ const MessageBottomBar = props => {
             fileBase64,
           };
 
-          messageApi
-            .sendFileBase64Message(body, params, onUploadProgress)
-            .then(res => {})
-            .catch(err => {
-              setIsLoading(false);
-            });
+          try {
+            await messageApi.sendFileBase64Message(
+              body,
+              params,
+              onUploadProgress,
+            );
+          } catch (error) {
+            console.error(error);
+          }
         } catch (error) {
+          console.error(error);
+          setIsLoading(false);
           commonFuc.notifyMessage('Có lõi xảy ra');
         }
       }

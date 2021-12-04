@@ -69,7 +69,6 @@ const ConfirmOTPScreen = ({navigation, route}) => {
           otp: otpValue,
         });
         dispatch(setLoading(false));
-        console.log(response.data);
         if (response.data?.message) {
           setErrorMessage(response.data.message);
         } else {

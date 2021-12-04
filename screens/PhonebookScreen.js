@@ -16,10 +16,11 @@ import {meApi} from '../api';
 import ContactAction from '../components/ContactAction';
 import EmptyData from '../components/EmptyData';
 import FriendItem from '../components/FriendItem';
-import {friendType} from '../constants';
+import {ERROR_MESSAGE, friendType} from '../constants';
 import {fetchFriendById} from '../redux/friendSlice';
 import {fetchSyncContacts, setLoading} from '../redux/meSlice';
 import globalStyles from '../styles';
+import commonFuc from '../utils/commonFuc';
 
 const PhonebookScreen = ({navigation}) => {
   const {isLoading, phoneBooks} = useSelector(state => state.me);
@@ -30,14 +31,13 @@ const PhonebookScreen = ({navigation}) => {
     const contacts = await handleGetContacts();
     const phones = handleContactPhoneNumber(contacts);
 
-    console.log('cmh ', phones);
     if (phones.length > 0) {
       try {
         const response = await meApi.syncContacts(phones);
-        console.log('Post Sync: ', response);
         dispatch(fetchSyncContacts());
       } catch (error) {
-        console.log('Post Sync error: ', error);
+        console.error(error);
+        commonFuc.notifyMessage(ERROR_MESSAGE);
       }
     }
     dispatch(setLoading(false));
@@ -57,10 +57,10 @@ const PhonebookScreen = ({navigation}) => {
 
       if (permission === 'granted') {
         contacts = await Contacts.getAll();
-        // console.log(contacts);
       }
     } catch (error) {
-      console.log('Contacts: ', error);
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
 
     return contacts;

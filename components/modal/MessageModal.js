@@ -67,9 +67,9 @@ const MessageModal = props => {
         const response = await pinMessagesApi.addPinMessage(messageId);
 
         dispatch(fetchPinMessages({conversationId: currentConversationId}));
-        console.log(response);
       } catch (error) {
         commonFuc.notifyMessage('Ghim tin nhắn thất bại');
+        console.error(error);
       }
     }
     handleCloseModal();

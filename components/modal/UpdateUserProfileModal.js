@@ -55,7 +55,6 @@ const UpdateUserProfileModal = props => {
     const month = dateOfBirth.getMonth() + 1;
     const year = dateOfBirth.getFullYear();
 
-    console.log({date, month, year});
     return (
       ('00' + date).slice(-2) + '/' + ('00' + month).slice(-2) + '/' + year
     );

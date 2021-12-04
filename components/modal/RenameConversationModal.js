@@ -32,8 +32,6 @@ const RenameConversationModal = props => {
       currentConversationId,
       name,
     );
-    console.log(name);
-    console.log(response);
     handleCloseModal();
   };
 
@@ -44,10 +42,7 @@ const RenameConversationModal = props => {
         transparent={true}
         visible={modalVisible.isVisible}
         onRequestClose={handleCloseModal}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPressOut={handleCloseModal}
-          style={styles.container}>
+        <TouchableOpacity activeOpacity={1} style={styles.container}>
           <SafeAreaView style={styles.modalView}>
             <View style={styles.header}>
               <Text style={styles.title}>

@@ -70,10 +70,10 @@ const Conversation = props => {
           content = `Đã tạo cuộc bình chọn mới ${lastMessageContent}`;
           break;
         case messageType.NOTIFY:
-          console.log(lastMessageContent);
           content = commonFuc.getNotifyContent(
             lastMessageContent,
             false,
+
             lastMessage,
             userProfile._id,
           );

@@ -32,7 +32,6 @@ export default function ConversationSearchScreen({navigation, route}) {
     avatar,
   ) => {
     channelIdRef.current = conversationId;
-    console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
       channelIdRef,

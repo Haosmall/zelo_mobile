@@ -14,7 +14,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useSelector} from 'react-redux';
 import {messageApi} from '../../api';
-import {messageType} from '../../constants';
+import {ERROR_MESSAGE, messageType} from '../../constants';
 import globalStyles, {WINDOW_WIDTH} from '../../styles';
 import RNFetchBlob from 'react-native-fetch-blob';
 import commonFuc from '../../utils/commonFuc';
@@ -45,18 +45,12 @@ const ImagePickerModal = props => {
     };
 
     await launchImageLibrary(options, async res => {
-      console.log('res = ', res);
-
       if (res.didCancel) {
-        console.log('User cancelled image picker');
       } else if (res.error) {
-        console.log('ImagePicker Error: ', res.error);
       } else if (res.customButton) {
-        console.log('User tapped custom button: ', res.customButton);
         alert(res.customButton);
       } else {
         let source = res.assets[0];
-        console.log('source = ', source.uri);
         await handleSendImage(source, isVideo);
       }
     });
@@ -75,13 +69,13 @@ const ImagePickerModal = props => {
         },
       );
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Camera permission denied');
+        commonFuc.notifyMessage('Chưa cấp quyền truy cập máy ảnh');
         return;
       } else {
-        console.log('Camera permission given');
       }
     } catch (err) {
-      console.warn(err);
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
 
     const options = {
@@ -90,14 +84,9 @@ const ImagePickerModal = props => {
       includeBase64: true,
     };
     launchCamera(options, async res => {
-      console.log('res = ', res);
-
       if (res.didCancel) {
-        console.log('User cancelled camera');
       } else if (res.error) {
-        console.error('ImagePicker Error: ', res.error);
       } else if (res.customButton) {
-        console.log('User tapped custom button: ', res.customButton);
         alert(res.customButton);
       } else {
         let source = res.assets[0];
@@ -107,8 +96,6 @@ const ImagePickerModal = props => {
   };
 
   const handleSendImage = async (file, isVideo) => {
-    console.log('filePath: ', file);
-
     const channelId =
       currentChannelId !== currentConversationId ? currentChannelId : null;
 
@@ -131,18 +118,16 @@ const ImagePickerModal = props => {
             fileBase64,
           };
 
-          messageApi
-            .sendFileBase64Message(body, params, onUploadProgress)
-            .then(res => {
-              console.log('Send Message Success', res);
-              handleCloseModal();
-            })
-            .catch(err => {
-              console.log('Send Message Fail');
-              setIsLoading(false);
-            });
+          await messageApi.sendFileBase64Message(
+            body,
+            params,
+            onUploadProgress,
+          );
+          handleCloseModal();
         } catch (error) {
           setIsLoading(false);
+          console.error(error);
+          commonFuc.notifyMessage(ERROR_MESSAGE);
         }
       }
     } else {
@@ -153,19 +138,17 @@ const ImagePickerModal = props => {
 
       const body = {fileName, fileExtension, fileBase64};
 
-      console.log('body: ', body);
       handleCloseModal();
       setIsLoading(true);
-      messageApi
-        .sendFileBase64Message(body, params, onUploadProgress)
-        .then(res => {
-          console.log('Send Message Success', res);
-          handleCloseModal();
-        })
-        .catch(err => {
-          console.log('Send Message Fail');
-          setIsLoading(false);
-        });
+
+      try {
+        await messageApi.sendFileBase64Message(body, params, onUploadProgress);
+        handleCloseModal();
+      } catch (error) {
+        setIsLoading(false);
+        console.error(error);
+        commonFuc.notifyMessage(ERROR_MESSAGE);
+      }
     }
   };
 

@@ -27,7 +27,6 @@ const LogoutAllModal = props => {
 
   const handleOnSubmit = async values => {
     const {password} = values;
-    console.log('password: ', password);
 
     try {
       const key = makeId();
@@ -63,6 +62,14 @@ const LogoutAllModal = props => {
                   secureTextEntry={true}
                   value={values.password}
                   error={errors.password}
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
               </View>
               <View style={styles.footer}>

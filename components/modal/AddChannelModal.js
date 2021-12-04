@@ -30,7 +30,6 @@ const AddChannelModal = props => {
   };
 
   const handleConfirm = async () => {
-    console.log('Channel name: ', name);
     if (error.length === 0) {
       try {
         if (modalProps.channelId.length > 0) {
@@ -49,10 +48,7 @@ const AddChannelModal = props => {
   };
 
   const onChangeText = value => {
-    console.log('Channel name: ', value);
     const index = channels.findIndex(channelEle => channelEle.name === value);
-
-    console.log('index', index);
 
     if (index >= 0) {
       setError('Không được trùng tên');
@@ -69,10 +65,7 @@ const AddChannelModal = props => {
         transparent={true}
         visible={modalProps.isVisible}
         onRequestClose={handleCloseModal}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPressOut={handleCloseModal}
-          style={styles.container}>
+        <TouchableOpacity activeOpacity={1} style={styles.container}>
           <SafeAreaView style={styles.modalView}>
             <View style={styles.header}>
               <Text style={styles.title}>

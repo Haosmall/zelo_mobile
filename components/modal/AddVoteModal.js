@@ -13,7 +13,7 @@ import {
 import {Button, Divider, Icon, Input} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import {voteApi} from '../../api';
-import {DEFAULT_ADD_VOTE_MODAL} from '../../constants';
+import {DEFAULT_ADD_VOTE_MODAL, ERROR_MESSAGE} from '../../constants';
 import commonFuc from '../../utils/commonFuc';
 
 const AddVoteModal = props => {
@@ -95,15 +95,13 @@ const AddVoteModal = props => {
         };
         const response = await voteApi.addVote(vote);
 
-        console.log(vote);
-        console.log(response);
-
         setContent('');
         setTextValue('');
         setNumInputs(2);
         inputsRef.current = ['', ''];
       } catch (error) {
-        console.log('Loi');
+        console.error(error);
+        commonFuc.notifyMessage(ERROR_MESSAGE);
       }
 
       handleCloseModal();

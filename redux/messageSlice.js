@@ -335,8 +335,6 @@ const messageSlice = createSlice({
       );
       const seachConversation = state.conversations[index];
 
-      console.log({conversationId, conversationName, message});
-
       seachConversation.numberUnread = seachConversation.numberUnread + 1;
       seachConversation.lastMessage = {
         ...message,
@@ -389,7 +387,6 @@ const messageSlice = createSlice({
     setNotification: (state, action) => {
       const {conversationId, message, userId} = action.payload;
       const conversation = state.conversations.find(ele => {
-        // console.log('ele: ', ele);
         return ele._id === conversationId;
       });
 
@@ -695,10 +692,8 @@ const messageSlice = createSlice({
       state.currentChannelId = conversationId;
       state.messagePages = messages;
       if (isSendMessage) {
-        console.log('fext mess send');
         state.messages = messages.data.reverse();
       } else {
-        console.log('fext mess heare');
         const temp = [...messages.data, ...state.messages.reverse()];
         state.messages = commonFuc.getUniqueListBy(temp, '_id').reverse();
       }
@@ -731,10 +726,8 @@ const messageSlice = createSlice({
       state.currentChannelId = channelId;
       state.channelPages = messages;
       if (isSendMessage) {
-        console.log('fext mess send');
         state.channelMessages = messages.data.reverse();
       } else {
-        console.log('fext mess heare');
         const temp = [...messages.data, ...state.channelMessages.reverse()];
         state.channelMessages = commonFuc
           .getUniqueListBy(temp, '_id')

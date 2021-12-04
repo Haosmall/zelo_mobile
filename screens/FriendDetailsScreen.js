@@ -18,6 +18,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import {useDispatch, useSelector} from 'react-redux';
 import {friendApi, meApi} from '../api';
+import OptionButton from '../components/conversation/OptionButton';
 import ViewImageModal from '../components/modal/ViewImageModal';
 import {
   DEFAULT_COVER_IMAGE,
@@ -67,7 +68,6 @@ export default function FriendDetailsScreen({navigation}) {
   const handleOnPress = () => {
     switch (friendStatus) {
       case friendType.FRIEND:
-        console.log('Nhan tin');
         handleCreateChat(
           searchFriend._id,
           navigation,
@@ -77,18 +77,14 @@ export default function FriendDetailsScreen({navigation}) {
         break;
       case friendType.FOLLOWER:
         handleAcceptFriend();
-        console.log('Dong y');
         break;
       case friendType.YOU_FOLLOW:
         handleDeleteMyFriendRequest();
-        console.log('Huy yeu cau');
         break;
       case friendType.NOT_FRIEND:
-        console.log('Ket ban');
         handleAddFriendRequest();
         break;
       default:
-        console.log('df Nhan tin');
         break;
     }
   };
@@ -97,22 +93,22 @@ export default function FriendDetailsScreen({navigation}) {
     try {
       const userId = searchFriend._id;
       const response = await friendApi.addFriendRequest(userId);
-      console.log('gui ket ban thanh cong');
       dispatch(updateFriendStatus(friendType.YOU_FOLLOW));
       dispatch(addNewFriendRequest());
     } catch (error) {
-      console.log('Loi');
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
   const handleDeleteMyFriendRequest = async () => {
     try {
       const userId = searchFriend._id;
       const response = await friendApi.deleteMyFriendRequest(userId);
-      console.log('huy yeu cau thanh cong');
       dispatch(updateFriendStatus(friendType.NOT_FRIEND));
       dispatch(cancelMyFriendRequest(userId));
     } catch (error) {
-      console.log('Loi', error);
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 
@@ -120,23 +116,23 @@ export default function FriendDetailsScreen({navigation}) {
     try {
       const userId = searchFriend._id;
       const response = await friendApi.deleteFriendRequest(userId);
-      console.log('Tu choi thanh cong');
       dispatch(updateFriendStatus(friendType.NOT_FRIEND));
       dispatch(deleteFriendRequest(userId));
     } catch (error) {
-      console.log('Loi');
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
   const handleAcceptFriend = async () => {
     try {
       const userId = searchFriend._id;
       const response = await friendApi.acceptFriend(userId);
-      console.log('Dong y thanh cong');
       dispatch(updateFriendStatus(friendType.FRIEND));
       dispatch(deleteFriendRequest(userId));
       dispatch(fetchFriends());
     } catch (error) {
-      console.log('Loi');
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 
@@ -189,12 +185,14 @@ export default function FriendDetailsScreen({navigation}) {
     let phoneNumber = '';
 
     if (!username.includes('@')) {
-      phoneNumber = searchFriend.username;
       if (friendStatus !== friendType.FRIEND) {
         phoneNumber = '**********';
+      }
+      const index = phoneBooks.findIndex(ele => ele.username === username);
+      if (index < 0) {
+        phoneNumber = '**********';
       } else {
-        const index = phoneBooks.findIndex(ele => ele.username === username);
-        if (index < 0) phoneNumber = '**********';
+        phoneNumber = searchFriend.username;
       }
     }
 
@@ -214,7 +212,6 @@ export default function FriendDetailsScreen({navigation}) {
           onPress: async () => {
             try {
               const response = await friendApi.deleteFriend(searchFriend._id);
-              console.log(response);
               dispatch(deleteFriend(searchFriend._id));
             } catch (error) {
               commonFuc.notifyMessage(ERROR_MESSAGE);
@@ -322,6 +319,17 @@ export default function FriendDetailsScreen({navigation}) {
         </View>
 
         {friendStatus === friendType.FRIEND && (
+          <OptionButton
+            onPress={handleUnFriend}
+            iconType="antdesign"
+            iconName="deleteuser"
+            title="Xóa kết bạn"
+            iconColor="red"
+            titleStyle={{color: 'red'}}
+          />
+        )}
+
+        {/* {friendStatus === friendType.FRIEND && (
           <Button
             containerStyle={styles.buttonContainer}
             title="Xóa kết bạn"
@@ -330,7 +338,7 @@ export default function FriendDetailsScreen({navigation}) {
             type="outline"
             onPress={handleUnFriend}
           />
-        )}
+        )} */}
 
         <ViewImageModal imageProps={imageProps} setImageProps={setImageProps} />
       </ScrollView>

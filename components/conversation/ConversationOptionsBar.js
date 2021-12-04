@@ -39,7 +39,6 @@ const ConversationOptionsBar = props => {
         conversationId,
         isNotify ? 1 : 0,
       );
-      console.log('update isNotify: ', response);
       dispatch(updateNotification({conversationId, isNotify}));
 
       commonFuc.notifyMessage(`Đã ${notify ? 'tắt' : 'bật'} thông báo`);

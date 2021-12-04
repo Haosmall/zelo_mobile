@@ -38,8 +38,6 @@ export default function ForwardMessageScreen({navigation, route}) {
       newListForward = listForward.filter(ele => ele._id !== conversation._id);
     }
 
-    console.log('newListForward: ', isChecked, newListForward);
-
     setListForward(newListForward);
   };
 

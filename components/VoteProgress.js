@@ -15,7 +15,6 @@ const VoteProgress = props => {
     totalOfVotes,
     option.userIds.length,
   );
-  // console.log('percent: ', percent);
 
   const isChecked = option.userIds.includes(userProfile._id);
   const [checked, setChecked] = useState(isChecked);

@@ -19,7 +19,6 @@ const ForgotPasswordScreen = ({navigation}) => {
     const {username} = account;
     try {
       const user = await loginApi.fetchUser(username);
-      console.log(user);
       if (user.isActived) {
         navigation.navigate('Xác nhận', {account, isForgotPassword: true});
       } else {
@@ -40,10 +39,8 @@ const ForgotPasswordScreen = ({navigation}) => {
     try {
       const response = await loginApi.changePassword({username});
       navigation.navigate('Xác nhận', {account, isForgotPassword: true});
-      console.log(response.data);
 
       // const user = await loginApi.fetchUser(username);
-      // console.log(user);
       // if (user.isActived) {
       //   navigation.navigate('Xác nhận', {account, isForgotPassword: true});
       // } else {
@@ -60,7 +57,6 @@ const ForgotPasswordScreen = ({navigation}) => {
     //   Alert.alert('Cảnh báo', 'Tài khoản không tồn tại');
     // } else {
     //   const user = await loginApi.fetchUser(username);
-    //   console.log(user);
     //   if (user.isActived) {
     //     navigation.navigate('Xác nhận', {account, isForgotPassword: true});
     //   } else {

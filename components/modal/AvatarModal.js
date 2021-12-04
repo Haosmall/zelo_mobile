@@ -28,7 +28,6 @@ const AvatarModal = props => {
 
   const handleOnSubmit = async values => {
     const {password} = values;
-    console.log('password: ', password);
 
     try {
       const key = makeId();

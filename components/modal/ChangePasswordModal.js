@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Button} from 'react-native-elements';
+import {Button, Icon} from 'react-native-elements';
 import {meApi} from '../../api';
 import commonFuc, {currentKey, makeId} from '../../utils/commonFuc';
 import {changePasswordValid} from '../../utils/validator';
@@ -64,6 +64,14 @@ const ChangePasswordModal = props => {
                   secureTextEntry={true}
                   value={values.oldPassword}
                   error={errors.oldPassword}
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
                 <InputField
                   placeholder="Nhập mật khẩu mới"
@@ -71,6 +79,14 @@ const ChangePasswordModal = props => {
                   secureTextEntry={true}
                   value={values.newPassword}
                   error={errors.newPassword}
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
 
                 <InputField
@@ -80,6 +96,14 @@ const ChangePasswordModal = props => {
                   onChangeText={handleChange('passwordConfirmation')}
                   value={values.passwordConfirmation}
                   error={errors.passwordConfirmation}
+                  leftIcon={
+                    <Icon
+                      name="lock"
+                      type="antdesign"
+                      size={24}
+                      color="black"
+                    />
+                  }
                 />
               </View>
               <View style={styles.footer}>

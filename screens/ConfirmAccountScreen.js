@@ -72,7 +72,6 @@ const ConfirmAccountScreen = ({navigation, route}) => {
   };
 
   const handleConfirm = async () => {
-    console.log('otp is ', otpValue);
     if (otpValue.length === 6) {
       dispatch(setLoading(true));
 
@@ -80,7 +79,7 @@ const ConfirmAccountScreen = ({navigation, route}) => {
         const response = await handleConfirmAccount(account.username, otpValue);
         await handleLogin();
       } catch (error) {
-        console.log('ConfirmAccountScreen', error);
+        console.error('ConfirmAccountScreen', error);
         dispatch(setLoading(false));
         setErrorMessage('OTP không đúng hoặc hết hạn');
       }

@@ -50,7 +50,6 @@ export default function MeScreen({navigation}) {
 
   useEffect(() => {
     handleFetchProfile();
-    console.log({userProfile});
   }, []);
 
   const images = [
@@ -86,10 +85,7 @@ export default function MeScreen({navigation}) {
         {
           text: 'Có',
           onPress: async password => {
-            console.log('before all ', currentKey);
             makeId();
-            console.log('after all ', currentKey);
-            console.log('OK Pressed, password: ' + password);
           },
         },
       ],
@@ -171,18 +167,15 @@ export default function MeScreen({navigation}) {
 
   const handleUploadFile = async (body, isCoverImage) => {
     setIsImageVisible(false);
-    console.log('Body upload: ', body);
     try {
       if (isCoverImage) {
         const response = await meApi.updateCoverImageBase64(
           body,
           onUploadProgress,
         );
-        console.log('coverImage: ', response.coverImage);
         dispatch(updateImage({isCoverImage, uri: response.coverImage}));
       } else {
         const response = await meApi.updateAvatarBase64(body, onUploadProgress);
-        console.log('avatar: ', response.avatar);
         dispatch(updateImage({isCoverImage, uri: response.avatar}));
       }
     } catch (error) {

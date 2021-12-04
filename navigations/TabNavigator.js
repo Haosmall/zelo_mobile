@@ -18,7 +18,6 @@ export default function TabNavigator(props) {
   return (
     <Tab.Navigator
       // screenListeners={(navigation, route) => {
-      // 	console.log(navigation.route.name);
       // 	const title = navigation.route.name;
       // 	dispatch(setHeaderTitle(title));
       // }}

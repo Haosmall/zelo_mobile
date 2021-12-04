@@ -63,10 +63,10 @@ export default function FriendSearchScreen({navigation, route}) {
       // const response = await userApi.fetchUsers(userName);
       const response = await friendApi.fetchFriends({name: userName});
       setFriendList(response);
-      console.log(response);
       response.length === 0 && commonFuc.notifyMessage('Không tìm thấy');
     } catch (error) {
       commonFuc.notifyMessage('Không tìm thấy');
+      console.error(error);
     }
   };
   // const handleSearchFriendSubmit = async userName => {
@@ -74,7 +74,6 @@ export default function FriendSearchScreen({navigation, route}) {
   //     // const response = await userApi.fetchUsers(userName);
   //     const response = await friendApi.fetchFriends({name: userName});
   //     setFriendList(response);
-  //     console.log(response);
   //     response.length === 0 && commonFuc.notifyMessage('Không tìm thấy');
   //   } catch (error) {
   //     commonFuc.notifyMessage('Không tìm thấy');
@@ -83,12 +82,10 @@ export default function FriendSearchScreen({navigation, route}) {
 
   const handleAddToGroup = item => {
     const listAddToGroupNew = [...listAddToGroup, item];
-    console.log(listAddToGroupNew);
     setListAddToGroup(listAddToGroupNew);
   };
   const handleRemoveFromGroup = itemId => {
     const listAddToGroupNew = listAddToGroup.filter(ele => ele._id !== itemId);
-    console.log(listAddToGroupNew);
 
     setListAddToGroup(listAddToGroupNew);
   };
@@ -116,7 +113,6 @@ export default function FriendSearchScreen({navigation, route}) {
       return;
     }
     if (!/^(?!\s+$).+/.test(name)) {
-      // console.log(/^(?!\s+$).+/.test(name), name);
       setErrorText('Tên nhóm không hợp lệ');
       return;
     }
@@ -131,7 +127,6 @@ export default function FriendSearchScreen({navigation, route}) {
       const response = await conversationApi.createGroup(name, userIds);
       await dispatch(fetchConversations());
       const conversationId = response._id;
-      console.log('Tạo group thành công: ', conversationId);
       handleEnterChat(conversationId);
     } catch (error) {
       commonFuc.notifyMessage(ERROR_MESSAGE);
@@ -150,7 +145,6 @@ export default function FriendSearchScreen({navigation, route}) {
     // );
     // dispatch(fetchListLastViewer({conversationId}));
     // dispatch(fetchMembers({conversationId}));
-    console.log('group: : ', conversationId);
     navigation.replace('Nhắn tin', {
       conversationId,
     });

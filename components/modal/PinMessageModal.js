@@ -16,7 +16,11 @@ import {
 import {Button, Divider, Icon, ListItem} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
 import pinMessagesApi from '../../api/pinMessagesApi';
-import {DEFAULT_PIN_MESSAGE_MODAL, messageType} from '../../constants';
+import {
+  DEFAULT_PIN_MESSAGE_MODAL,
+  ERROR_MESSAGE,
+  messageType,
+} from '../../constants';
 import {fetchPinMessages} from '../../redux/pinSlice';
 import {GREY_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH} from '../../styles';
 import commonFuc, {checkPermissionDownloadFile} from '../../utils/commonFuc';
@@ -47,12 +51,12 @@ const PinMessageModal = props => {
           onPress: async () => {
             try {
               const response = await pinMessagesApi.deletePinMessage(messageId);
-              console.log(response);
               dispatch(
                 fetchPinMessages({conversationId: currentConversationId}),
               );
             } catch (error) {
-              console.log(error);
+              console.error(error);
+              commonFuc.notifyMessage(ERROR_MESSAGE);
             }
           },
         },

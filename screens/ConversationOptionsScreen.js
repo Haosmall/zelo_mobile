@@ -110,7 +110,6 @@ export default function ConversationOptionsScreen({navigation, route}) {
   };
 
   const handleDeleteConversation = async () => {
-    console.log('giai tan');
     try {
       const response = await conversationApi.deleteGroup(currentConversationId);
       navigation.popToTop();
@@ -121,7 +120,6 @@ export default function ConversationOptionsScreen({navigation, route}) {
   };
 
   const handleLeaveConversation = async () => {
-    console.log('Roi nhom');
     try {
       const response = await conversationApi.leaveGroup(currentConversationId);
       socket.emit('leave-conversation', currentConversationId);
@@ -173,7 +171,6 @@ export default function ConversationOptionsScreen({navigation, route}) {
 
   const handleUploadFile = async body => {
     setIsImageVisible(false);
-    console.log('Body upload: ', body);
     try {
       await conversationApi.updateAvatarBase64(
         currentConversationId,

@@ -260,9 +260,6 @@ export const handleCreateChat = async (
     const response = await conversationApi.addConversation(userId);
     await dispatch(fetchConversations());
     // if (response?.isExists) {
-    console.log('Nhan Tin: ', response._id);
-
-    console.log('currentConversationId: ', currentConversationId);
 
     handleEnterChat(response._id, navigation, dispatch, currentConversationId);
     // }
@@ -291,8 +288,6 @@ const handleEnterChat = (
     // dispatch(fetchMembers({conversationId}));
     dispatch(setCurrentChannel({conversationId}));
     dispatch(resetPinSlice());
-
-    console.log('conver: ', conversationId);
   }
   navigation.replace('Nhắn tin', {
     conversationId,
@@ -317,7 +312,6 @@ export const checkPermissionDownloadFile = async fileUrl => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         // Start downloading
         downloadFile(fileUrl);
-        console.log('Storage Permission Granted.');
       } else {
         commonFuc.notifyMessage('Quyền lưu trữ không được cấp');
       }
@@ -359,12 +353,11 @@ const downloadFile = fileUrl => {
     .fetch('GET', fileUrl)
     .then(res => {
       // Alert after successful downloading
-      console.log('res -> ', JSON.stringify(res));
       commonFuc.notifyMessage('Tải thành công');
     })
     .catch(err => {
       commonFuc.notifyMessage(ERROR_MESSAGE);
-      console.log('Đã có lỗi xảy ra: ', err);
+      console.error('Đã có lỗi xảy ra: ', err);
     });
 };
 
@@ -395,18 +388,12 @@ export const showImagePicker = async (uploadFile, isCoverImage) => {
   };
 
   await launchImageLibrary(options, async res => {
-    console.log('res = ', res);
-
     if (res.didCancel) {
-      console.log('User cancelled image picker');
     } else if (res.error) {
-      console.log('ImagePicker Error: ', res.error);
     } else if (res.customButton) {
-      console.log('User tapped custom button: ', res.customButton);
       alert(res.customButton);
     } else {
       let source = res.assets[0];
-      console.log('source = ', source.uri);
       await handleSendImage(source, uploadFile, isCoverImage);
     }
   });
@@ -425,10 +412,9 @@ export const openCamera = async (uploadFile, isCoverImage) => {
       },
     );
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('Camera permission denied');
+      commonFuc.notifyMessage('Chưa cấp quyền truy cập máy ảnh');
       return;
     } else {
-      console.log('Camera permission given');
     }
   } catch (err) {
     console.warn(err);
@@ -439,14 +425,12 @@ export const openCamera = async (uploadFile, isCoverImage) => {
     includeBase64: true,
   };
   launchCamera(options, async res => {
-    console.log('res = ', res);
-
     if (res.didCancel) {
-      console.log('User cancelled camera');
+      commonFuc.notifyMessage('Hủy');
     } else if (res.error) {
-      console.error('ImagePicker Error: ', res.error);
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     } else if (res.customButton) {
-      console.log('User tapped custom button: ', res.customButton);
       alert(res.customButton);
     } else {
       let source = res.assets[0];

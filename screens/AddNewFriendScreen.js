@@ -58,13 +58,11 @@ export default function AddNewFriendScreen({navigation}) {
         // } else {
         //   console.log('looix');
         // }
-        console.log(valid);
-        console.log(response);
         setIsError(false);
         setErrorMessage('');
       } catch (error) {
         commonFuc.notifyMessage('Không tìm thấy');
-        console.log('Không tìm thấy', error);
+        console.error('Không tìm thấy', error);
       }
     }
   };

@@ -37,7 +37,6 @@ const VoteDetailModal = props => {
   };
 
   const handleOnPress = index => {
-    console.log(modalProps.options[index]);
     setCurrentSelected(index);
   };
 
@@ -115,7 +114,6 @@ const VoteDetailModal = props => {
                     initialNumToRender={10}
                     renderItem={({item, index}) => {
                       const member = members.find(ele => ele._id === item);
-                      console.log({member});
                       return (
                         <Pressable>
                           <ListItem

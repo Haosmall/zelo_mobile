@@ -165,7 +165,7 @@ export default function HomeScreen({navigation}) {
 
     // TODO:<====================== message socket ======================>
     socket.on('new-message', (conversationId, message) => {
-      console.log('new-message', conversationId);
+      console.log('new-message');
       if (flag) {
         dispatch(addMessage({conversationId, message}));
       } else {

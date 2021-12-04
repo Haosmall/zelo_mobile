@@ -83,32 +83,24 @@ export default function FriendItem(props) {
   const handleOnPress = () => {
     switch (type) {
       case friendType.FRIEND:
-        console.log('Nhan tin');
         handleCreateChat(userId, navigation, dispatch, currentConversationId);
         break;
       case friendType.FOLLOWER:
         handleAcceptFriend();
-        console.log('Dong y');
         break;
       case friendType.YOU_FOLLOW:
         handleDeleteMyFriendRequest();
-        console.log('Huy yeu cau');
         break;
       case friendType.NOT_FRIEND:
-        console.log('Ket ban');
         handleAddFriendRequest();
         break;
       case friendType.ADD_TO_GROUP:
-        console.log('Them Vao nhom');
         handleGroup();
         break;
       case friendType.REMOVE_FROM_GROUP:
-        console.log('Xoa khoi nhom');
         handleGroup();
         break;
       case friendType.DONT_HAVE_ACCOUNT:
-        console.log('Moi tao tk');
-
         const messageBody =
           'Moi ban cai dat Zelo de nhan tin va goi dien thoai mien phi: https://zelochat.xyz';
 
@@ -121,7 +113,6 @@ export default function FriendItem(props) {
       case 'DETAILS':
         break;
       default:
-        console.log('df Nhan tin');
         break;
     }
   };
@@ -129,43 +120,43 @@ export default function FriendItem(props) {
   const handleAddFriendRequest = async () => {
     try {
       const response = await friendApi.addFriendRequest(userId);
-      console.log('gui ket ban thanh cong');
       dispatch(updateFriendStatus(friendType.YOU_FOLLOW));
       dispatch(addNewFriendRequest());
     } catch (error) {
-      console.log('Loi');
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
   const handleDeleteMyFriendRequest = async () => {
     try {
       const response = await friendApi.deleteMyFriendRequest(userId);
-      console.log('huy yeu cau thanh cong');
       dispatch(updateFriendStatus(friendType.NOT_FRIEND));
       dispatch(cancelMyFriendRequest(userId));
     } catch (error) {
-      console.log('Loi', error);
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 
   const handleDeleteFriendRequest = async () => {
     try {
       const response = await friendApi.deleteFriendRequest(userId);
-      console.log('Tu choi thanh cong');
       dispatch(updateFriendStatus(friendType.NOT_FRIEND));
       dispatch(deleteFriendRequest(userId));
     } catch (error) {
-      console.log('Loi');
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
   const handleAcceptFriend = async () => {
     try {
       const response = await friendApi.acceptFriend(userId);
-      console.log('Dong y thanh cong');
       dispatch(updateFriendStatus(friendType.FRIEND));
       dispatch(deleteFriendRequest(userId));
       dispatch(fetchFriends());
     } catch (error) {
-      console.log('Loi');
+      console.error(error);
+      commonFuc.notifyMessage(ERROR_MESSAGE);
     }
   };
 
@@ -193,15 +184,12 @@ export default function FriendItem(props) {
     // );
     // dispatch(fetchListLastViewer({conversationId}));
     // dispatch(fetchMembers({conversationId}));
-    console.log('conver: ', conversationId);
     navigation.navigate('Nhắn tin', {
       conversationId,
     });
   };
 
-  const handleInvite = userId => {
-    console.log('Moi tao tk');
-  };
+  const handleInvite = userId => {};
 
   return (
     <ListItem
