@@ -1,4 +1,5 @@
 # Zelo App Chat - React Native
+- Video demo: [https://www.youtube.com/watch?v=PslQST0Zkmw](https://www.youtube.com/watch?v=PslQST0Zkmw).
 
 ## Cài đặt
 
